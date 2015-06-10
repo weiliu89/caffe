@@ -18,6 +18,12 @@
 
 #include "caffe/util/device_alternate.hpp"
 
+#ifdef libcaffe_EXPORTS && def(_MSC_VER)
+#define DLL_EXPORT __declspec(dllexport)
+#else
+#define DLL_EXPORT
+#endif
+
 // gflags 2.1 issue: namespace google was changed to gflags without warning.
 // Luckily we will be able to use GFLAGS_GFLAGS_H_ to detect if it is version
 // 2.1. If yes, we will add a temporary solution to redirect the namespace.

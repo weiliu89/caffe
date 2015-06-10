@@ -47,7 +47,9 @@
 // Acknowledgment: Google Test borrowed the idea of automatic test
 // registration from Barthelemy Dagenais' (barthelemy@prologique.com)
 // easyUnit framework.
-
+#ifdef _MSC_VER
+#define _VARIADIC_MAX 10
+#endif
 #ifndef GTEST_INCLUDE_GTEST_GTEST_H_
 #define GTEST_INCLUDE_GTEST_GTEST_H_
 
@@ -660,6 +662,7 @@
 // In theory, defining stuff in the ::std namespace is undefined
 // behavior.  We can do this as we are playing the role of a standard
 // library vendor.
+
 namespace std {
 namespace tr1 {
 

@@ -17,9 +17,15 @@ if(HAVE_CUDA)
   list(APPEND srcs ${cuda_objs} ${cuda})
 endif()
 
-add_library(caffe ${srcs})
-target_link_libraries(caffe proto ${Caffe_LINKER_LIBS})
-caffe_default_properties(caffe)
+IF(WIN32)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+add_definitions(-D_VARIADIC_MAX=10)
+add_definitions(-DGTEST_HAS_TR1_TUPLE=0)
+ENDIF()
+
+add_library(libcaffe ${srcs})
+target_link_libraries(libcaffe proto ${Caffe_LINKER_LIBS})
+caffe_default_properties(libcaffe)
 
 # ---[ Tests
  add_subdirectory(test)
@@ -27,7 +33,7 @@ caffe_default_properties(caffe)
 # ---[ Install
 install(DIRECTORY ${Caffe_INCLUDE_DIR}/caffe DESTINATION include)
 install(FILES ${proto_hdrs} DESTINATION include/caffe/proto)
-install(TARGETS caffe proto EXPORT CaffeTargets DESTINATION lib)
+install(TARGETS libcaffe proto EXPORT CaffeTargets DESTINATION lib)
 
 file(WRITE ${PROJECT_BINARY_DIR}/__init__.py)
 list(APPEND proto_python ${PROJECT_BINARY_DIR}/__init__.py)

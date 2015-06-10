@@ -2,7 +2,7 @@
 # Defines global Caffe_LINK flag, This flag is required to prevent linker from excluding
 # some objects which are not addressed directly but are registered via static constructors
 if(BUILD_SHARED_LIBS)
-  set(Caffe_LINK caffe)
+  set(Caffe_LINK libcaffe)
 else()
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(Caffe_LINK -Wl,-force_load caffe)

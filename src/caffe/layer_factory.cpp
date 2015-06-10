@@ -11,6 +11,57 @@
 
 namespace caffe {
 
+	template<typename T> std::map<std::string, boost::shared_ptr<Layer<T>>(*)(const LayerParameter&)>& LayerRegistry<T>::Registry() {
+		//static CreatorRegistry* g_registry_ = new CreatorRegistry();
+		static LayerRegistry<T> s_instance;
+		return s_instance.registry;
+	}
+
+	template<typename T> void LayerRegistry<T>::AddCreator(const string& type, Creator creator) {
+		CreatorRegistry& registry = Registry();
+		CHECK_EQ(registry.count(type), 0)
+			<< "Layer type " << type << " already registered.";
+		registry[type] = creator;
+	}
+
+	template<typename T> shared_ptr<Layer<T> > LayerRegistry<T>::CreateLayer(const LayerParameter& param) {
+		LOG(INFO) << "Creating layer " << param.name();
+		const string& type = param.type();
+		CreatorRegistry& registry = Registry();
+		CHECK_EQ(registry.count(type), 1) << "Unknown layer type: " << type
+			<< " (known types: " << LayerTypeList() << ")";
+		return registry[type](param);
+	}
+
+	template<typename T> string LayerRegistry<T>::LayerTypeList() 
+	{
+		CreatorRegistry& registry = Registry();
+		string layer_types;
+		for (typename CreatorRegistry::iterator iter = registry.begin();
+			iter != registry.end(); ++iter) {
+			if (iter != registry.begin()) {
+				layer_types += ", ";
+			}
+			layer_types += iter->first;
+		}
+		return layer_types;
+	}
+
+	template class LayerRegistry < float > ;
+	template class LayerRegistry < double>;
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Get convolution layer according to engine.
 template <typename Dtype>
 shared_ptr<Layer<Dtype> > GetConvolutionLayer(
@@ -177,3 +228,4 @@ REGISTER_LAYER_CREATOR(Python, GetPythonLayer);
 // Layers that use their constructor as their default creator should be
 // registered in their corresponding cpp files. Do not register them here.
 }  // namespace caffe
+

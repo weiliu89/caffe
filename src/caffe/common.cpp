@@ -4,7 +4,9 @@
 
 #include "caffe/common.hpp"
 #include "caffe/util/rng.hpp"
-
+#ifdef _MSC_VER
+#include <process.h>
+#endif
 namespace caffe {
 
 shared_ptr<Caffe> Caffe::singleton_;
@@ -36,7 +38,9 @@ void GlobalInit(int* pargc, char*** pargv) {
   // Google logging.
   ::google::InitGoogleLogging(*(pargv)[0]);
   // Provide a backtrace on segfault.
+#ifndef _MSC_VER
   ::google::InstallFailureSignalHandler();
+#endif
 }
 
 #ifdef CPU_ONLY  // CPU-only Caffe.

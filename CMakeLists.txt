@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.7)
 
 # ---[ Caffe project
 project(Caffe C CXX)
-
+set(CMAKE_DEBUG_POSTFIX "d")
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 

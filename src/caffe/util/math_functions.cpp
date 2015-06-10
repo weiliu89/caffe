@@ -6,6 +6,8 @@
 #include "caffe/common.hpp"
 #include "caffe/util/math_functions.hpp"
 #include "caffe/util/rng.hpp"
+#define __builtin_popcount __popcnt 
+#define __builtin_popcountl __popcnt
 
 namespace caffe {
 
