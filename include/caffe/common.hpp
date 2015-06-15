@@ -101,15 +101,16 @@ void GlobalInit(int* pargc, char*** pargv);
 
 // A singleton class to hold common caffe stuff, such as the handler that
 // caffe is going to use for cublas, curand, etc.
-class Caffe {
+class DLL_EXPORT Caffe {
  public:
   ~Caffe();
-  inline static Caffe& Get() {
+  /*inline static Caffe& Get() {
     if (!singleton_.get()) {
       singleton_.reset(new Caffe());
     }
     return *singleton_;
-  }
+  }*/
+  static Caffe& Get();
   enum Brew { CPU, GPU };
 
   // This random number generator facade hides boost and CUDA rng
@@ -164,7 +165,7 @@ class Caffe {
   shared_ptr<RNG> random_generator_;
 
   Brew mode_;
-  static shared_ptr<Caffe> singleton_;
+  //static shared_ptr<Caffe> singleton_;
 
  private:
   // The private constructor to avoid duplicate instantiation.

@@ -9,7 +9,7 @@
 #endif
 namespace caffe {
 
-shared_ptr<Caffe> Caffe::singleton_;
+//shared_ptr<Caffe> Caffe::singleton_;
 
 // random seeding
 int64_t cluster_seedgen(void) {
@@ -111,7 +111,11 @@ Caffe::~Caffe() {
     CURAND_CHECK(curandDestroyGenerator(curand_generator_));
   }
 }
-
+Caffe& Caffe::Get()
+{
+	static Caffe singleton_ = Caffe();
+	return singleton_;
+}
 void Caffe::set_random_seed(const unsigned int seed) {
   // Curand seed
   static bool g_curand_availability_logged = false;
