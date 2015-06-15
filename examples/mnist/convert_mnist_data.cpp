@@ -14,11 +14,15 @@
 #include <lmdb.h>
 #include <stdint.h>
 #include <sys/stat.h>
-#include <direct.h>
+
+
 #include <fstream>  // NOLINT(readability/streams)
 #include <string>
 
 #include "caffe/proto/caffe.pb.h"
+#ifdef _MSC_VER
+#include <direct.h>
+#endif
 
 using namespace caffe;  // NOLINT(build/namespaces)
 using std::string;
@@ -83,7 +87,11 @@ void convert_dataset(const char* image_filename, const char* label_filename,
     batch = new leveldb::WriteBatch();
   } else if (db_backend == "lmdb") {  // lmdb
     LOG(INFO) << "Opening lmdb " << db_path;
+#ifdef _MSC_VER
     CHECK_EQ(_mkdir(db_path), 0)
+#else
+    CHECK_EQ(mkdir(db_path,0744), 0)
+#endif
         << "mkdir " << db_path << "failed";
     CHECK_EQ(mdb_env_create(&mdb_env), MDB_SUCCESS) << "mdb_env_create failed";
     CHECK_EQ(mdb_env_set_mapsize(mdb_env, 1099511627776), MDB_SUCCESS)  // 1TB
@@ -117,7 +125,11 @@ void convert_dataset(const char* image_filename, const char* label_filename,
     label_file.read(&label, 1);
     datum.set_data(pixels, rows*cols);
     datum.set_label(label);
+#ifdef _MSC_VER
     sprintf_s(key_cstr, kMaxKeyLength, "%08d", item_id);
+#else
+    snprintf(key_cstr, kMaxKeyLength, "%08d", item_id);
+#endif
     datum.SerializeToString(&value);
     string keystr(key_cstr);
 

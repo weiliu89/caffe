@@ -18,7 +18,7 @@
 
 #include "caffe/util/device_alternate.hpp"
 
-#ifdef libcaffe_EXPORTS && def(_MSC_VER)
+#if defined libcaffe_EXPORTS && defined _MSC_VER
 #define DLL_EXPORT __declspec(dllexport)
 #else
 #define DLL_EXPORT

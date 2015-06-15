@@ -11,7 +11,7 @@
 
 namespace caffe {
 
-	template<typename T> std::map<std::string, boost::shared_ptr<Layer<T>>(*)(const LayerParameter&)>& LayerRegistry<T>::Registry() {
+    template<typename T> std::map< std::string, boost::shared_ptr<Layer<T> >(*)(const LayerParameter&)>& LayerRegistry<T>::Registry() {
 		//static CreatorRegistry* g_registry_ = new CreatorRegistry();
 		static LayerRegistry<T> s_instance;
 		return s_instance.registry;
@@ -48,19 +48,7 @@ namespace caffe {
 	}
 
 	template class LayerRegistry < float > ;
-	template class LayerRegistry < double>;
-
-
-
-
-
-
-
-
-
-
-
-
+    template class LayerRegistry < double> ;
 
 // Get convolution layer according to engine.
 template <typename Dtype>
@@ -82,6 +70,7 @@ shared_ptr<Layer<Dtype> > GetConvolutionLayer(
   } else {
     LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
   }
+  return shared_ptr<Layer<Dtype> >();
 }
 
 REGISTER_LAYER_CREATOR(Convolution, GetConvolutionLayer);
@@ -112,6 +101,7 @@ shared_ptr<Layer<Dtype> > GetPoolingLayer(const LayerParameter& param) {
   } else {
     LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
   }
+  return shared_ptr<Layer<Dtype> >();
 }
 
 REGISTER_LAYER_CREATOR(Pooling, GetPoolingLayer);
@@ -135,6 +125,7 @@ shared_ptr<Layer<Dtype> > GetReLULayer(const LayerParameter& param) {
   } else {
     LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
   }
+  return shared_ptr<Layer<Dtype> >();
 }
 
 REGISTER_LAYER_CREATOR(ReLU, GetReLULayer);
@@ -158,6 +149,7 @@ shared_ptr<Layer<Dtype> > GetSigmoidLayer(const LayerParameter& param) {
   } else {
     LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
   }
+  return shared_ptr<Layer<Dtype> >();
 }
 
 REGISTER_LAYER_CREATOR(Sigmoid, GetSigmoidLayer);
@@ -181,6 +173,7 @@ shared_ptr<Layer<Dtype> > GetSoftmaxLayer(const LayerParameter& param) {
   } else {
     LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
   }
+  return shared_ptr<Layer<Dtype> >();
 }
 
 REGISTER_LAYER_CREATOR(Softmax, GetSoftmaxLayer);
@@ -204,6 +197,7 @@ shared_ptr<Layer<Dtype> > GetTanHLayer(const LayerParameter& param) {
   } else {
     LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
   }
+  return shared_ptr<Layer<Dtype> >();
 }
 
 REGISTER_LAYER_CREATOR(TanH, GetTanHLayer);
@@ -220,6 +214,7 @@ shared_ptr<Layer<Dtype> > GetPythonLayer(const LayerParameter& param) {
     PyErr_Print();
     throw;
   }
+  return shared_ptr<Layer<Dtype> >();
 }
 
 REGISTER_LAYER_CREATOR(Python, GetPythonLayer);
