@@ -6,6 +6,8 @@ set(CMAKE_DEBUG_POSTFIX "d")
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
+include(ExternalProject)
+
 include(cmake/Utils.cmake)
 include(cmake/Targets.cmake)
 include(cmake/Misc.cmake)
