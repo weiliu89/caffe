@@ -5,15 +5,12 @@
 #include <string>
 
 #include "google/protobuf/message.h"
-#include "hdf5.h"
-#include "hdf5_hl.h"
+
 
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
 #include "mkstemp.h"
-
-#define HDF5_NUM_DIMS 4
 
 namespace caffe {
 
@@ -133,6 +130,7 @@ inline bool DLL_EXPORT ReadImageToDatum(const string& filename, const int label,
 bool DLL_EXPORT DecodeDatumNative(Datum* datum);
 bool DLL_EXPORT DecodeDatum(Datum* datum, bool is_color);
 
+#ifdef USE_OPENCV
 cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename,
     const int height, const int width, const bool is_color);
 
@@ -148,7 +146,8 @@ cv::Mat DLL_EXPORT DecodeDatumToCVMatNative(const Datum& datum);
 cv::Mat DLL_EXPORT DecodeDatumToCVMat(const Datum& datum, bool is_color);
 
 void DLL_EXPORT CVMatToDatum(const cv::Mat& cv_img, Datum* datum);
-
+#endif  // USE_OPENCV
+/*
 template <typename Dtype>
 void DLL_EXPORT hdf5_load_nd_dataset_helper(
     hid_t file_id, const char* dataset_name_, int min_dim, int max_dim,
@@ -162,7 +161,7 @@ void DLL_EXPORT hdf5_load_nd_dataset(
 template <typename Dtype>
 void DLL_EXPORT hdf5_save_nd_dataset(
     const hid_t file_id, const string& dataset_name, const Blob<Dtype>& blob);
-
+	*/
 }  // namespace caffe
 
 #endif   // CAFFE_UTIL_IO_H_

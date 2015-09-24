@@ -1,4 +1,10 @@
+// Make sure we include Python.h before any system header
+// to avoid _POSIX_C_SOURCE redefinition
+#ifdef WITH_PYTHON_LAYER
+#include <boost/python.hpp>
+#endif
 #include <string>
+#include <vector>
 
 #include "caffe/layer.hpp"
 #include "caffe/layer_factory.hpp"
@@ -28,21 +34,17 @@ namespace caffe {
 		LOG(INFO) << "Creating layer " << param.name();
 		const string& type = param.type();
 		CreatorRegistry& registry = Registry();
-		CHECK_EQ(registry.count(type), 1) << "Unknown layer type: " << type
-			<< " (known types: " << LayerTypeList() << ")";
+		CHECK_EQ(registry.count(type), 1) << "Unknown layer type: " << type;
+			//<< " (known types: " << LayerTypeList() << ")";
 		return registry[type](param);
 	}
 
-	template<typename T> string LayerRegistry<T>::LayerTypeList() 
-	{
+	template<typename T> vector<string> LayerRegistry<T>::LayerTypeList() {
 		CreatorRegistry& registry = Registry();
-		string layer_types;
+		vector<string> layer_types;
 		for (typename CreatorRegistry::iterator iter = registry.begin();
 			iter != registry.end(); ++iter) {
-			if (iter != registry.begin()) {
-				layer_types += ", ";
-			}
-			layer_types += iter->first;
+			layer_types.push_back(iter->first);
 		}
 		return layer_types;
 	}
