@@ -41,8 +41,10 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "caffe/common.hpp"
+#include "caffe/layer.hpp"
 #include "caffe/proto/caffe.pb.h"
 
 namespace caffe {
@@ -66,8 +68,26 @@ class DLL_EXPORT LayerRegistry {
   static void AddCreator(const string& type, Creator creator);
 
   // Get a layer using a LayerParameter.
-  static shared_ptr<Layer<Dtype> > CreateLayer(const LayerParameter& param);
-  static string LayerTypeList();
+  static shared_ptr<Layer<Dtype> > CreateLayer(const LayerParameter& param) {
+    if (Caffe::root_solver()) {
+      LOG(INFO) << "Creating layer " << param.name();
+    }
+    const string& type = param.type();
+    CreatorRegistry& registry = Registry();
+    CHECK_EQ(registry.count(type), 1) << "Unknown layer type: " << type
+        << " (known types: " << LayerTypeListString() << ")";
+    return registry[type](param);
+  }
+
+  static vector<string> LayerTypeList() {
+    CreatorRegistry& registry = Registry();
+    vector<string> layer_types;
+    for (typename CreatorRegistry::iterator iter = registry.begin();
+         iter != registry.end(); ++iter) {
+      layer_types.push_back(iter->first);
+    }
+    return layer_types;
+  }
 
  private:
   // Layer registry should never be instantiated - everything is done with its
@@ -75,6 +95,18 @@ class DLL_EXPORT LayerRegistry {
   LayerRegistry() {}
   CreatorRegistry registry;
 
+  static string LayerTypeListString() {
+    vector<string> layer_types = LayerTypeList();
+    string layer_types_str;
+    for (vector<string>::iterator iter = layer_types.begin();
+         iter != layer_types.end(); ++iter) {
+      if (iter != layer_types.begin()) {
+        layer_types_str += ", ";
+      }
+      layer_types_str += *iter;
+    }
+    return layer_types_str;
+  }
 };
 
 
