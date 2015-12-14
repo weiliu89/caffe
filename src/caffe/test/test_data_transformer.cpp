@@ -9,7 +9,7 @@
 #include "caffe/common.hpp"
 #include "caffe/data_transformer.hpp"
 #include "caffe/filler.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/io.hpp"
 
 #include "caffe/test/test_caffe_main.hpp"

@@ -6,7 +6,7 @@
 #include "gtest/gtest.h"
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/sgd_solvers.hpp"
 #include "caffe/solver.hpp"
 

@@ -122,11 +122,11 @@ Caffe::~Caffe() {
     CURAND_CHECK(curandDestroyGenerator(curand_generator_));
   }
 }
-Caffe& Caffe::Get()
+/*Caffe& Caffe::Get()
 {
 	static Caffe singleton_ = Caffe();
 	return singleton_;
-}
+}*/
 void Caffe::set_random_seed(const unsigned int seed) {
   // Curand seed
   static bool g_curand_availability_logged = false;

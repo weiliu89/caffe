@@ -84,11 +84,11 @@ function(caffe_generate_export_configs)
   configure_file("cmake/Templates/CaffeConfig.cmake.in" "${PROJECT_BINARY_DIR}/CaffeConfig.cmake" @ONLY)
 
   # Add targets to the build-tree export set
-IF(WIN32)
-  export(TARGETS libcaffe proto FILE "${PROJECT_BINARY_DIR}/CaffeTargets.cmake")
-ELSE(WIN32)
-export(TARGETS caffe proto FILE "${PROJECT_BINARY_DIR}/CaffeTargets.cmake")
-ENDIF(WIN32)
+  IF(WIN32)
+    export(TARGETS libcaffe proto FILE "${PROJECT_BINARY_DIR}/CaffeTargets.cmake")
+  ELSE(WIN32)
+    export(TARGETS caffe proto FILE "${PROJECT_BINARY_DIR}/CaffeTargets.cmake")
+  ENDIF(WIN32)
   export(PACKAGE Caffe)
 
   # ---[ Configure install-tree CaffeConfig.cmake file ]---

@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/neuron_layer.hpp"
 #include "caffe/layers/relu_layer.hpp"

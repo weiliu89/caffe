@@ -3,17 +3,17 @@ set(Caffe_LINKER_LIBS "")
 
 # ---[ Boost
 if(MSVC)
-set(Boost_USE_STATIC_LIBS @Boost_USE_STATIC_LIBS@)
-set(Boost_USE_STATIC @Boost_USE_STATIC@)
-set(Boost_USE_MULTITHREAD @Boost_USE_MULTITHREAD@)
-set(BOOST_INCLUDEDIR "@Boost_INCLUDE_DIR@")
-set(Boost_NO_BOOST_CMAKE ON)
-# since lmdb requires boost on windows, we need to link against additional boost libraries
-find_package(Boost 1.46 REQUIRED COMPONENTS system thread date_time chrono filesystem)
-list(APPEND Caffe_LINKER_LIBS "shlwapi.lib")
+	set(Boost_USE_STATIC_LIBS @Boost_USE_STATIC_LIBS@)
+	set(Boost_USE_STATIC @Boost_USE_STATIC@)
+	set(Boost_USE_MULTITHREAD @Boost_USE_MULTITHREAD@)
+	set(BOOST_INCLUDEDIR "@Boost_INCLUDE_DIR@")
+	set(Boost_NO_BOOST_CMAKE ON)
+	# since lmdb requires boost on windows, we need to link against additional boost libraries
+	find_package(Boost 1.46 REQUIRED COMPONENTS system thread date_time chrono filesystem)
+	list(APPEND Caffe_LINKER_LIBS "shlwapi.lib")
 
 else(MSVC)
-find_package(Boost 1.46 REQUIRED COMPONENTS system thread filesystem)
+	find_package(Boost 1.46 REQUIRED COMPONENTS system thread filesystem)
 endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})

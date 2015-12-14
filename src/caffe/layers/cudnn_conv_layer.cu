@@ -18,7 +18,8 @@ void CuDNNConvolutionLayer<Dtype>::Forward_gpu(
     // Forward through cuDNN in parallel over groups.
     for (int g = 0; g < this->group_; g++) {
       // Filters.
-      CUDNN_CHECK(cudnnConvolutionForward(handle_[g],
+      CUDNN_CHECK(cudnnConvolutionForward(
+			handle_[g],
             cudnn::dataType<Dtype>::one,
             bottom_descs_[i], bottom_data + bottom_offset_ * g,
             filter_desc_, weight + this->weight_offset_ * g,
@@ -30,11 +31,17 @@ void CuDNNConvolutionLayer<Dtype>::Forward_gpu(
       // Bias.
       if (this->bias_term_) {
         const Dtype* bias_data = this->blobs_[1]->gpu_data();
-        CUDNN_CHECK(cudnnAddTensor(handle_[g], CUDNN_ADD_SAME_C,
-              cudnn::dataType<Dtype>::one,
-              bias_desc_, bias_data + bias_offset_ * g,
-              cudnn::dataType<Dtype>::one,
-              top_descs_[i], top_data + top_offset_ * g));
+		
+        CUDNN_CHECK(
+			cudnnAddTensor(
+				handle_[g], 
+				CUDNN_ADD_SAME_C,
+				cudnn::dataType<Dtype>::one,
+				bias_desc_, 
+				bias_data + bias_offset_ * g,
+				cudnn::dataType<Dtype>::one,
+				top_descs_[i], 
+				top_data + top_offset_ * g));
       }
     }
 

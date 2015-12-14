@@ -9,9 +9,16 @@
 #include "google/protobuf/message.h"
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
-#include "mkstemp.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/format.hpp"
+#ifdef _MSC_VER
+#include "mkstemp.h"
+#include <io.h>
+#include <string.h>
+#include <stdio.h>
+#include <hdf5.h>
+#endif
+
 
 #ifndef CAFFE_TMP_DIR_RETRIES
 #define CAFFE_TMP_DIR_RETRIES 100
@@ -22,19 +29,23 @@ namespace caffe {
 using ::google::protobuf::Message;
 using ::boost::filesystem::path;
 
-inline void MakeTempDir(string* temp_dirname) {
-  temp_dirname->clear();
-  const path& model =
-    boost::filesystem::temp_directory_path()/"caffe_test.%%%%-%%%%";
-  for ( int i = 0; i < CAFFE_TMP_DIR_RETRIES; i++ ) {
-    const path& dir = boost::filesystem::unique_path(model).string();
-    bool done = boost::filesystem::create_directory(dir);
-    if ( done ) {
-      *temp_dirname = dir.string();
-      return;
-    }
-  }
-  LOG(FATAL) << "Failed to create a temporary directory.";
+inline void DLL_EXPORT MakeTempDir(string* temp_dirname) {
+	temp_dirname->clear();
+	*temp_dirname = "/tmp/caffe_test.XXXXXX";
+	char* temp_dirname_cstr = new char[temp_dirname->size() + 1];
+	// NOLINT_NEXT_LINE(runtime/printf)
+	strcpy(temp_dirname_cstr, temp_dirname->c_str());
+#ifndef _MSC_VER 
+	char* mkdtemp_result = mkdtemp(temp_dirname_cstr);
+#else 
+	errno_t mkdtemp_result = _mktemp_s(temp_dirname_cstr, sizeof(temp_dirname_cstr));
+#endif
+	//  char* mkdtemp_result = mkdtemp(temp_dirname_cstr);
+
+	CHECK(mkdtemp_result != NULL)
+		<< "Failed to create a temporary directory at: " << *temp_dirname;
+	*temp_dirname = temp_dirname_cstr;
+	delete[] temp_dirname_cstr;
 }
 
 inline void MakeTempFilename(string* temp_filename) {
@@ -50,24 +61,7 @@ inline void MakeTempFilename(string* temp_filename) {
     (temp_files_subpath/caffe::format_int(next_temp_file++, 9)).string();
 }
 
-inline void DLL_EXPORT MakeTempDir(string* temp_dirname) {
-  temp_dirname->clear();
-  *temp_dirname = "/tmp/caffe_test.XXXXXX";
-  char* temp_dirname_cstr = new char[temp_dirname->size() + 1];
-  // NOLINT_NEXT_LINE(runtime/printf)
-  strcpy(temp_dirname_cstr, temp_dirname->c_str());
-#ifndef _MSC_VER 
-  char* mkdtemp_result = mkdtemp(temp_dirname_cstr); 
-#else 
-  errno_t mkdtemp_result = _mktemp_s(temp_dirname_cstr, sizeof(temp_dirname_cstr)); 
-#endif
-//  char* mkdtemp_result = mkdtemp(temp_dirname_cstr);
 
-  CHECK(mkdtemp_result != NULL)
-      << "Failed to create a temporary directory at: " << *temp_dirname;
-  *temp_dirname = temp_dirname_cstr;
-  delete[] temp_dirname_cstr;
-}
 
 bool DLL_EXPORT ReadProtoFromTextFile(const char* filename, Message* proto);
 
@@ -150,7 +144,7 @@ bool DLL_EXPORT DecodeDatumNative(Datum* datum);
 bool DLL_EXPORT DecodeDatum(Datum* datum, bool is_color);
 
 #ifdef USE_OPENCV
-cv::Mat ReadImageToCVMat(const string& filename,
+cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename,
     const int height, const int width, const bool is_color);
 
 cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename,
@@ -167,7 +161,7 @@ cv::Mat DLL_EXPORT DecodeDatumToCVMat(const Datum& datum, bool is_color);
 void DLL_EXPORT CVMatToDatum(const cv::Mat& cv_img, Datum* datum);
 #endif  // USE_OPENCV
 
-template <typename Dtype>
+/*template <typename Dtype>
 void DLL_EXPORT hdf5_load_nd_dataset_helper(
     hid_t file_id, const char* dataset_name_, int min_dim, int max_dim,
     Blob<Dtype>* blob);
@@ -179,7 +173,7 @@ void DLL_EXPORT hdf5_load_nd_dataset(
 
 template <typename Dtype>
 void DLL_EXPORT hdf5_save_nd_dataset(
-    const hid_t file_id, const string& dataset_name, const Blob<Dtype>& blob);
+    const hid_t file_id, const string& dataset_name, const Blob<Dtype>& blob);*/
 
 }  // namespace caffe
 

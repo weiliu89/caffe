@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/im2col.hpp"
 
 namespace caffe {
