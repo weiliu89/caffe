@@ -20,6 +20,13 @@ include(cmake/Misc.cmake)
 include(cmake/Summary.cmake)
 include(cmake/ConfigGen.cmake)
 
+IF(MSVC)
+  ADD_DEFINITIONS( -D_VARIADIC_MAX=10 )
+  ADD_DEFINITIONS( -DGTEST_HAS_TR1_TUPLE=0 )
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+ENDIF(MSVC)
+
+
 # ---[ Options
 caffe_option(CPU_ONLY  "Build Caffe without CUDA support" OFF) # TODO: rename to USE_CUDA
 caffe_option(USE_CUDNN "Build Caffe with cuDNN library support" ON IF NOT CPU_ONLY)
@@ -41,6 +48,11 @@ include(cmake/Dependencies.cmake)
 if(UNIX OR APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall")
 endif()
+IF(${BUILD_SHARED_LIBS})
+    SET(LINK_TYPE SHARED)
+ELSE(${BUILD_SHARED_LIBS})
+    SET(LINK_TYPE STATIC)
+ENDIF(${BUILD_SHARED_LIBS})
 
 if(USE_libstdcpp)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")

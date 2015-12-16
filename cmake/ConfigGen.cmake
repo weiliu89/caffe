@@ -85,7 +85,7 @@ function(caffe_generate_export_configs)
 
   # Add targets to the build-tree export set
   IF(WIN32)
-    export(TARGETS libcaffe proto FILE "${PROJECT_BINARY_DIR}/CaffeTargets.cmake")
+    export(TARGETS libcaffe_${LINK_TYPE} proto FILE "${PROJECT_BINARY_DIR}/CaffeTargets.cmake")
   ELSE(WIN32)
     export(TARGETS caffe proto FILE "${PROJECT_BINARY_DIR}/CaffeTargets.cmake")
   ENDIF(WIN32)
