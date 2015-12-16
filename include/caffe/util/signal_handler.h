@@ -3,10 +3,10 @@
 
 #include "caffe/proto/caffe_pb.h"
 #include "caffe/solver.hpp"
-
+#include "caffe/common.hpp"
 namespace caffe {
 
-class SignalHandler {
+class DLL_EXPORT SignalHandler {
  public:
   // Contructor. Specify what action to take when a signal is received.
   SignalHandler(SolverAction::Enum SIGINT_action,

@@ -7,7 +7,11 @@ foreach(source ${srcs})
 
   # caffe target already exits
   if(name MATCHES "caffe")
-    set(name ${name}.bin)
+    IF(MSVC)
+      set(name ${name}_bin)
+    ELSE(MSVC)
+      set(name ${name}.bin)
+	ENDIF(MSVC)
   endif()
 
   # target

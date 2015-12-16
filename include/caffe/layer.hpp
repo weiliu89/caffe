@@ -30,7 +30,7 @@ namespace caffe {
  * their output Blob%s.
  */
 template <typename Dtype>
-class Layer {
+class DLL_EXPORT Layer {
  public:
   /**
    * You should not implement your own constructor. Any set up code should go

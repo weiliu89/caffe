@@ -2,12 +2,12 @@
 #define CAFFE_UTIL_BENCHMARK_H_
 
 #include <boost/date_time/posix_time/posix_time.hpp>
-
+#include "caffe/common.hpp"
 #include "caffe/util/device_alternate.hpp"
 
 namespace caffe {
 
-class Timer {
+ class DLL_EXPORT Timer {
  public:
   Timer();
   virtual ~Timer();
@@ -37,7 +37,7 @@ class Timer {
   float elapsed_microseconds_;
 };
 
-class CPUTimer : public Timer {
+class DLL_EXPORT CPUTimer : public Timer {
  public:
   explicit CPUTimer();
   virtual ~CPUTimer() {}

@@ -6,7 +6,7 @@
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
 #include "caffe/proto/caffe_pb.h"
-
+#include "caffe/common.hpp"
 #include "caffe/layers/base_data_layer.hpp"
 
 namespace caffe {
@@ -17,7 +17,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward and proto params.
  */
 template <typename Dtype>
-class MemoryDataLayer : public BaseDataLayer<Dtype> {
+class DLL_EXPORT MemoryDataLayer : public BaseDataLayer<Dtype> {
  public:
   explicit MemoryDataLayer(const LayerParameter& param)
       : BaseDataLayer<Dtype>(param), has_new_data_(false) {}
