@@ -52,7 +52,7 @@ endif()
 IF(WIN32)
   get_filename_component(__caffe_lib_dir_ "${Caffe_CMAKE_DIR}/../../lib" ABSOLUTE)
   
-  set(Caffe_LIBRARIES ${__caffe_lib_dir_}/libcaffe.lib)
+  set(Caffe_LIBRARIES ${__caffe_lib_dir_}/@CAFFE_LIB@.lib)
 ELSE(WIN32)
   set(Caffe_LIBRARIES caffe)
 ENDIF(WIN32)

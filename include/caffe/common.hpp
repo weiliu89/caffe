@@ -17,9 +17,12 @@
 #include <vector>
 
 #include "caffe/util/device_alternate.hpp"
-
-#if defined libcaffe_EXPORTS && defined _MSC_VER
+#ifdef _MSC_VER
+#if defined libcaffe_EXPORTS
 #define DLL_EXPORT __declspec(dllexport)
+#else
+#define DLL_EXPORT
+#endif
 #else
 #define DLL_EXPORT
 #endif
