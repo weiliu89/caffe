@@ -2,18 +2,25 @@
 set(Caffe_LINKER_LIBS "")
 
 # ---[ Boost
-if(MSVC)
-set(Boost_USE_STATIC_LIBS @Boost_USE_STATIC_LIBS@)
-set(Boost_USE_STATIC @Boost_USE_STATIC@)
-set(Boost_USE_MULTITHREAD @Boost_USE_MULTITHREAD@)
-set(BOOST_INCLUDEDIR "@Boost_INCLUDE_DIR@")
-set(Boost_NO_BOOST_CMAKE ON)
-# since lmdb requires boost on windows, we need to link against additional boost libraries
-find_package(Boost 1.46 REQUIRED COMPONENTS system thread date_time chrono filesystem)
-list(APPEND Caffe_LINKER_LIBS "shlwapi.lib")
 
+if(MSVC)
+	IF(BUILD_SHARED_LIBS)
+		ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK)
+		set(Boost_USE_STATIC_LIBS FALSE)
+		set(Boost_USE_STATIC FALSE)
+	ELSE(BUILD_SHARED_LIBS)
+		set(Boost_USE_STATIC_LIBS TRUE)
+		set(Boost_USE_STATIC TRUE)
+	ENDIF(BUILD_SHARED_LIBS)
+	set(Boost_USE_MULTITHREAD TRUE)
+	
+	
+	# since lmdb requires boost on windows, we need to link against additional boost libraries
+	find_package(Boost 1.46 REQUIRED COMPONENTS system thread date_time chrono filesystem)
+	list(APPEND Caffe_LINKER_LIBS "shlwapi.lib")
+	
 else(MSVC)
-find_package(Boost 1.46 REQUIRED COMPONENTS system thread )
+	find_package(Boost 1.46 REQUIRED COMPONENTS system thread filesystem)
 endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
@@ -47,6 +54,9 @@ if(USE_LMDB)
   include_directories(SYSTEM ${LMDB_INCLUDE_DIR})
   list(APPEND Caffe_LINKER_LIBS ${LMDB_LIBRARIES})
   add_definitions(-DUSE_LMDB)
+  if(ALLOW_LMDB_NOLOCK)
+    add_definitions(-DALLOW_LMDB_NOLOCK)
+  endif()
 endif()
 
 # ---[ LevelDB
@@ -68,9 +78,9 @@ endif()
 include(cmake/Cuda.cmake)
 if(NOT HAVE_CUDA)
   if(CPU_ONLY)
-    message("-- CUDA is disabled. Building without it...")
+    message(STATUS "-- CUDA is disabled. Building without it...")
   else()
-    message("-- CUDA is not detected by cmake. Building without it...")
+    message(WARNING "-- CUDA is not detected by cmake. Building without it...")
   endif()
 
   # TODO: remove this not cross platform define in future. Use caffe_config.h instead.
@@ -124,14 +134,14 @@ if(BUILD_python)
     # Find the matching boost python implementation
     set(version ${PYTHONLIBS_VERSION_STRING})
     
-    STRING( REPLACE "." "" boost_py_version ${version} )
+    STRING( REGEX REPLACE "[^0-9]" "" boost_py_version ${version} )
     find_package(Boost 1.46 COMPONENTS "python-py${boost_py_version}")
     set(Boost_PYTHON_FOUND ${Boost_PYTHON-PY${boost_py_version}_FOUND})
     
     while(NOT "${version}" STREQUAL "" AND NOT Boost_PYTHON_FOUND)
       STRING( REGEX REPLACE "([0-9.]+).[0-9]+" "\\1" version ${version} )
       
-      STRING( REPLACE "." "" boost_py_version ${version} )
+      STRING( REGEX REPLACE "[^0-9]" "" boost_py_version ${version} )
       find_package(Boost 1.46 COMPONENTS "python-py${boost_py_version}")
       set(Boost_PYTHON_FOUND ${Boost_PYTHON-PY${boost_py_version}_FOUND})
       
