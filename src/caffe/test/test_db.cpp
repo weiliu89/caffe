@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/db.hpp"
 #include "caffe/util/io.hpp"
 

@@ -5,7 +5,7 @@
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
 
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/test/test_caffe_main.hpp"
 

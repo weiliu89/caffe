@@ -18,7 +18,8 @@ void CuDNNConvolutionLayer<Dtype>::Forward_gpu(
     // Forward through cuDNN in parallel over groups.
     for (int g = 0; g < this->group_; g++) {
       // Filters.
-      CUDNN_CHECK(cudnnConvolutionForward(handle_[g],
+      CUDNN_CHECK(cudnnConvolutionForward(
+			handle_[g],
             cudnn::dataType<Dtype>::one,
             bottom_descs_[i], bottom_data + bottom_offset_ * g,
             filter_desc_, weight + this->weight_offset_ * g,

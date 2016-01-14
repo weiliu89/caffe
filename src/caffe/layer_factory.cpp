@@ -15,7 +15,7 @@
 #include "caffe/layers/sigmoid_layer.hpp"
 #include "caffe/layers/softmax_layer.hpp"
 #include "caffe/layers/tanh_layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #ifdef USE_CUDNN
 #include "caffe/layers/cudnn_conv_layer.hpp"
@@ -47,12 +47,15 @@ namespace caffe {
 		registry[type] = creator;
 	}
 
-	template<typename T> shared_ptr<Layer<T> > LayerRegistry<T>::CreateLayer(const LayerParameter& param) {
-		LOG(INFO) << "Creating layer " << param.name();
+	template<typename T> shared_ptr<Layer<T> > LayerRegistry<T>::CreateLayer(const LayerParameter& param)
+	{
+		if (Caffe::root_solver()) {
+			LOG(INFO) << "Creating layer " << param.name();
+		}
 		const string& type = param.type();
 		CreatorRegistry& registry = Registry();
-		CHECK_EQ(registry.count(type), 1) << "Unknown layer type: " << type;
-			//<< " (known types: " << LayerTypeList() << ")";
+		CHECK_EQ(registry.count(type), 1) << "Unknown layer type: " << type
+			<< " (known types: " << LayerTypeListString() << ")";
 		return registry[type](param);
 	}
 
@@ -64,6 +67,19 @@ namespace caffe {
 			layer_types.push_back(iter->first);
 		}
 		return layer_types;
+	}
+
+	template<typename T> string LayerRegistry<T>::LayerTypeListString() {
+		vector<string> layer_types = LayerTypeList();
+		string layer_types_str;
+		for (vector<string>::iterator iter = layer_types.begin();
+		iter != layer_types.end(); ++iter) {
+			if (iter != layer_types.begin()) {
+				layer_types_str += ", ";
+			}
+			layer_types_str += *iter;
+		}
+		return layer_types_str;
 	}
 
 	template class LayerRegistry < float > ;

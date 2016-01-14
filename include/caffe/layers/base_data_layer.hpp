@@ -7,7 +7,7 @@
 #include "caffe/data_transformer.hpp"
 #include "caffe/internal_thread.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/blocking_queue.hpp"
 
 namespace caffe {

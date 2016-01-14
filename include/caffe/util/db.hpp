@@ -4,13 +4,13 @@
 #include <string>
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe { namespace db {
 
 enum Mode { READ, WRITE, NEW };
 
-class Cursor {
+class DLL_EXPORT Cursor {
  public:
   Cursor() { }
   virtual ~Cursor() { }
@@ -23,7 +23,7 @@ class Cursor {
   DISABLE_COPY_AND_ASSIGN(Cursor);
 };
 
-class Transaction {
+class DLL_EXPORT Transaction {
  public:
   Transaction() { }
   virtual ~Transaction() { }
@@ -33,7 +33,7 @@ class Transaction {
   DISABLE_COPY_AND_ASSIGN(Transaction);
 };
 
-class DB {
+class DLL_EXPORT DB {
  public:
   DB() { }
   virtual ~DB() { }
@@ -45,8 +45,8 @@ class DB {
   DISABLE_COPY_AND_ASSIGN(DB);
 };
 
-DB* GetDB(DataParameter::DB backend);
-DB* GetDB(const string& backend);
+DLL_EXPORT DB* GetDB(DataParameter::DB backend);
+DLL_EXPORT DB* GetDB(const string& backend);
 
 }  // namespace db
 }  // namespace caffe

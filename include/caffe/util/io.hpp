@@ -12,6 +12,7 @@
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/format.hpp"
 
+
 #ifndef CAFFE_TMP_DIR_RETRIES
 #define CAFFE_TMP_DIR_RETRIES 100
 #endif
@@ -48,6 +49,8 @@ inline void MakeTempFilename(string* temp_filename) {
   *temp_filename =
     (temp_files_subpath/caffe::format_int(next_temp_file++, 9)).string();
 }
+
+
 
 bool DLL_EXPORT ReadProtoFromTextFile(const char* filename, Message* proto);
 
@@ -147,7 +150,7 @@ cv::Mat DLL_EXPORT DecodeDatumToCVMat(const Datum& datum, bool is_color);
 void DLL_EXPORT CVMatToDatum(const cv::Mat& cv_img, Datum* datum);
 #endif  // USE_OPENCV
 /*
-template <typename Dtype>
+/*template <typename Dtype>
 void DLL_EXPORT hdf5_load_nd_dataset_helper(
     hid_t file_id, const char* dataset_name_, int min_dim, int max_dim,
     Blob<Dtype>* blob);

@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/syncedmem.hpp"
 
 const int kMaxBlobAxes = 32;

@@ -45,7 +45,7 @@
 
 #include "caffe/common.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -69,17 +69,8 @@ class DLL_EXPORT LayerRegistry {
 
   // Get a layer using a LayerParameter.
   static shared_ptr<Layer<Dtype> > CreateLayer(const LayerParameter& param);
-  static vector<string> LayerTypeList();
 
-  /*static vector<string> LayerTypeList() {
-    CreatorRegistry& registry = Registry();
-    vector<string> layer_types;
-    for (typename CreatorRegistry::iterator iter = registry.begin();
-         iter != registry.end(); ++iter) {
-      layer_types.push_back(iter->first);
-    }
-    return layer_types;
-  }*/
+  static vector<string> LayerTypeList();
 
  private:
   // Layer registry should never be instantiated - everything is done with its
@@ -87,6 +78,7 @@ class DLL_EXPORT LayerRegistry {
   LayerRegistry() {}
   CreatorRegistry registry;
 
+  static string LayerTypeListString();
 };
 
 

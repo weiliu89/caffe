@@ -11,6 +11,18 @@ project(Caffe C CXX)
 set(CMAKE_DEBUG_POSTFIX "d")
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+IF(${BUILD_SHARED_LIBS})
+	SET(LINK_TYPE SHARED)
+    set(Boost_USE_STATIC_LIBS        OFF)
+    set(Boost_USE_MULTITHREADED      ON)
+    set(Boost_USE_STATIC_RUNTIME     OFF)
+	ADD_DEFINITIONS( -DBOOST_ALL_DYN_LINK )
+ELSE(${BUILD_SHARED_LIBS})
+    set(Boost_USE_STATIC_LIBS        ON)
+    set(Boost_USE_MULTITHREADED      ON)
+    set(Boost_USE_STATIC_RUNTIME     ON)
+    SET(LINK_TYPE STATIC)
+ENDIF(${BUILD_SHARED_LIBS})
 
 include(ExternalProject)
 
@@ -19,6 +31,13 @@ include(cmake/Targets.cmake)
 include(cmake/Misc.cmake)
 include(cmake/Summary.cmake)
 include(cmake/ConfigGen.cmake)
+
+IF(MSVC)
+  ADD_DEFINITIONS( -D_VARIADIC_MAX=10 )
+  ADD_DEFINITIONS( -DGTEST_HAS_TR1_TUPLE=0 )
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+ENDIF(MSVC)
+
 
 # ---[ Options
 caffe_option(CPU_ONLY  "Build Caffe without CUDA support" OFF) # TODO: rename to USE_CUDA
@@ -41,6 +60,7 @@ include(cmake/Dependencies.cmake)
 if(UNIX OR APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall")
 endif()
+
 
 if(USE_libstdcpp)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")

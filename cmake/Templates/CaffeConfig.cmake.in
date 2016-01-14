@@ -49,7 +49,13 @@ if(NOT TARGET caffe AND NOT caffe_BINARY_DIR)
 endif()
 
 # List of IMPORTED libs created by CaffeTargets.cmake
-set(Caffe_LIBRARIES caffe)
+IF(WIN32)
+  get_filename_component(__caffe_lib_dir_ "${Caffe_CMAKE_DIR}/../../lib" ABSOLUTE)
+  
+  set(Caffe_LIBRARIES ${__caffe_lib_dir_}/@CAFFE_LIB@.lib)
+ELSE(WIN32)
+  set(Caffe_LIBRARIES caffe)
+ENDIF(WIN32)
 
 # Definitions
 set(Caffe_DEFINITIONS "@Caffe_DEFINITIONS@")
