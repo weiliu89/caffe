@@ -67,9 +67,9 @@ void caffe_set(const int N, const Dtype alpha, Dtype* Y) {
   }
 }
 
-template void caffe_set<int>(const int N, const int alpha, int* Y);
-template void caffe_set<float>(const int N, const float alpha, float* Y);
-template void caffe_set<double>(const int N, const double alpha, double* Y);
+template DLL_EXPORT void caffe_set<int>(const int N, const int alpha, int* Y);
+template DLL_EXPORT void caffe_set<float>(const int N, const float alpha, float* Y);
+template DLL_EXPORT void caffe_set<double>(const int N, const double alpha, double* Y);
 
 template <>
 void caffe_add_scalar(const int N, const float alpha, float* Y) {
@@ -101,11 +101,11 @@ void caffe_copy(const int N, const Dtype* X, Dtype* Y) {
   }
 }
 
-template void caffe_copy<int>(const int N, const int* X, int* Y);
-template void caffe_copy<unsigned int>(const int N, const unsigned int* X,
+template DLL_EXPORT void caffe_copy<int>(const int N, const int* X, int* Y);
+template DLL_EXPORT void caffe_copy<unsigned int>(const int N, const unsigned int* X,
     unsigned int* Y);
-template void caffe_copy<float>(const int N, const float* X, float* Y);
-template void caffe_copy<double>(const int N, const double* X, double* Y);
+template DLL_EXPORT void caffe_copy<float>(const int N, const float* X, float* Y);
+template DLL_EXPORT void caffe_copy<double>(const int N, const double* X, double* Y);
 
 template <>
 void caffe_scal<float>(const int N, const float alpha, float *X) {
@@ -239,10 +239,10 @@ Dtype caffe_nextafter(const Dtype b) {
       b, std::numeric_limits<Dtype>::max());
 }
 
-template
+template DLL_EXPORT 
 float caffe_nextafter(const float b);
 
-template
+template DLL_EXPORT 
 double caffe_nextafter(const double b);
 
 template <typename Dtype>
@@ -258,11 +258,11 @@ void caffe_rng_uniform(const int n, const Dtype a, const Dtype b, Dtype* r) {
   }
 }
 
-template
+template DLL_EXPORT 
 void caffe_rng_uniform<float>(const int n, const float a, const float b,
                               float* r);
 
-template
+template DLL_EXPORT 
 void caffe_rng_uniform<double>(const int n, const double a, const double b,
                                double* r);
 
@@ -280,11 +280,11 @@ void caffe_rng_gaussian(const int n, const Dtype a,
   }
 }
 
-template
+template DLL_EXPORT 
 void caffe_rng_gaussian<float>(const int n, const float mu,
                                const float sigma, float* r);
 
-template
+template DLL_EXPORT 
 void caffe_rng_gaussian<double>(const int n, const double mu,
                                 const double sigma, double* r);
 
@@ -302,10 +302,10 @@ void caffe_rng_bernoulli(const int n, const Dtype p, int* r) {
   }
 }
 
-template
+template DLL_EXPORT 
 void caffe_rng_bernoulli<double>(const int n, const double p, int* r);
 
-template
+template DLL_EXPORT 
 void caffe_rng_bernoulli<float>(const int n, const float p, int* r);
 
 template <typename Dtype>
@@ -322,10 +322,10 @@ void caffe_rng_bernoulli(const int n, const Dtype p, unsigned int* r) {
   }
 }
 
-template
+template DLL_EXPORT 
 void caffe_rng_bernoulli<double>(const int n, const double p, unsigned int* r);
 
-template
+template DLL_EXPORT 
 void caffe_rng_bernoulli<float>(const int n, const float p, unsigned int* r);
 
 template <>
@@ -345,10 +345,10 @@ Dtype caffe_cpu_dot(const int n, const Dtype* x, const Dtype* y) {
   return caffe_cpu_strided_dot(n, x, 1, y, 1);
 }
 
-template
+template DLL_EXPORT 
 float caffe_cpu_dot<float>(const int n, const float* x, const float* y);
 
-template
+template DLL_EXPORT 
 double caffe_cpu_dot<double>(const int n, const double* x, const double* y);
 
 template <>
