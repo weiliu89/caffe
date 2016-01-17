@@ -3,18 +3,21 @@ file(GLOB proto_files proto/*.proto)
 caffe_protobuf_generate_cpp_py(${proto_gen_folder} proto_srcs proto_hdrs proto_python ${proto_files})
 
 # include python files either to force generation
-ADD_DEFINITIONS(-Dlibcaffe_EXPORTS)
+
 
 
 add_library(proto STATIC ${proto_hdrs} ${proto_srcs} ${proto_python})
+IF(WIN32)
+target_link_libraries(proto ${Caffe_LINKER_LIBS})
+ENDIF(WIN32)
 set(Caffe_LINKER_LIBS proto ${Caffe_LINKER_LIBS}) # note, crucial to prepend!
-
+ADD_DEFINITIONS(-Dlibcaffe_EXPORTS)
 
 caffe_default_properties(proto)
 
 IF(WIN32)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/common.hpp")
-	SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/common.hpp")
+	SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS")
 ELSE(WIN32)
     SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp")
 ENDIF(WIN32)

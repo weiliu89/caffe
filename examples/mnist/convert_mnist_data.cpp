@@ -23,7 +23,7 @@
 #include <fstream>  // NOLINT(readability/streams)
 #include <string>
 
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/format.hpp"
 #ifdef _MSC_VER
 #include <direct.h>
@@ -131,7 +131,7 @@ void convert_dataset(const char* image_filename, const char* label_filename,
     datum.set_data(pixels, rows*cols);
     datum.set_label(label);
     string key_str = caffe::format_int(item_id, 8);
-#endif
+//#endif
     datum.SerializeToString(&value);
 
     // Put in db

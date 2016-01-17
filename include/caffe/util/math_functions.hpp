@@ -67,7 +67,7 @@ DLL_EXPORT void caffe_div(const int N, const Dtype* a, const Dtype* b, Dtype* y)
 template <typename Dtype>
 DLL_EXPORT void caffe_powx(const int n, const Dtype* a, const Dtype b, Dtype* y);
 
-unsigned int caffe_rng_rand();
+DLL_EXPORT unsigned int caffe_rng_rand();
 
 template <typename Dtype>
 DLL_EXPORT Dtype caffe_nextafter(const Dtype b);
