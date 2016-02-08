@@ -427,12 +427,12 @@ template DLL_EXPORT void caffe_gpu_log<float>(const int n, const float* a, float
 template DLL_EXPORT void caffe_gpu_powx<float>(const int n, const float* a, const float b, float* y);
 template DLL_EXPORT void caffe_gpu_rng_uniform<float>(const int n, const float a, const float b, float* r);
 template DLL_EXPORT void caffe_gpu_rng_gaussian<float>(const int n, const float mu, const float sigma, float* r);
-template DLL_EXPORT void caffe_gpu_rng_bernoulli<float>(const int n, const float p, int* r);
+//template DLL_EXPORT void caffe_gpu_rng_bernoulli<float>(const int n, const float p, int* r);
 template DLL_EXPORT void caffe_gpu_dot<float>(const int n, const float* x, const float* y, float* out);
 template DLL_EXPORT void caffe_gpu_asum<float>(const int n, const float* x, float* y);
 template DLL_EXPORT void caffe_gpu_sign<float>(const int n, const float* x, float* y);
 template DLL_EXPORT void caffe_gpu_sgnbit<float>(const int n, const float* x, float* y);
-template DLL_EXPORT void caffe_gpu_fabs<float>(const int n, const float* x, float* y);
+//template DLL_EXPORT void caffe_gpu_fabs<float>(const int n, const float* x, float* y);
 template DLL_EXPORT void caffe_gpu_scale<float>(const int n, const float alpha, const float *x, float* y);
 
 
@@ -449,12 +449,12 @@ template DLL_EXPORT void caffe_gpu_log<double>(const int n, const double* a, dou
 template DLL_EXPORT void caffe_gpu_powx<double>(const int n, const double* a, const double b, double* y);
 template DLL_EXPORT void caffe_gpu_rng_uniform<double>(const int n, const double a, const double b, double* r);
 template DLL_EXPORT void caffe_gpu_rng_gaussian<double>(const int n, const double mu, const double sigma, double* r);
-template DLL_EXPORT void caffe_gpu_rng_bernoulli<double>(const int n, const double p, int* r);
+//template DLL_EXPORT void caffe_gpu_rng_bernoulli<double>(const int n, const double p, int* r);
 template DLL_EXPORT void caffe_gpu_dot<double>(const int n, const double* x, const double* y, double* out);
 template DLL_EXPORT void caffe_gpu_asum<double>(const int n, const double* x, double* y);
 template DLL_EXPORT void caffe_gpu_sign<double>(const int n, const double* x, double* y);
 template DLL_EXPORT void caffe_gpu_sgnbit<double>(const int n, const double* x, double* y);
-template DLL_EXPORT void caffe_gpu_fabs<double>(const int n, const double* x, double* y);
+//template DLL_EXPORT void caffe_gpu_fabs<double>(const int n, const double* x, double* y);
 template DLL_EXPORT void caffe_gpu_scale<double>(const int n, const double alpha, const double *x, double* y);
 
 
