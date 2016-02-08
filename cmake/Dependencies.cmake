@@ -4,21 +4,9 @@ set(Caffe_LINKER_LIBS "")
 # ---[ Boost
 
 if(MSVC)
-	IF(BUILD_SHARED_LIBS)
-		ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK)
-		set(Boost_USE_STATIC_LIBS FALSE)
-		set(Boost_USE_STATIC FALSE)
-	ELSE(BUILD_SHARED_LIBS)
-		set(Boost_USE_STATIC_LIBS TRUE)
-		set(Boost_USE_STATIC TRUE)
-	ENDIF(BUILD_SHARED_LIBS)
-	set(Boost_USE_MULTITHREAD TRUE)
-	
-	
 	# since lmdb requires boost on windows, we need to link against additional boost libraries
 	find_package(Boost 1.46 REQUIRED COMPONENTS system thread date_time chrono filesystem)
 	list(APPEND Caffe_LINKER_LIBS "shlwapi.lib")
-	
 else(MSVC)
 	find_package(Boost 1.46 REQUIRED COMPONENTS system thread filesystem)
 endif()
