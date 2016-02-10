@@ -12,18 +12,23 @@ set(CMAKE_DEBUG_POSTFIX "d")
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 set(Boost_dynamic_link ON CACHE BOOL "Link boost dynamically")
-IF(${BUILD_SHARED_LIBS} AND ${Boost_dynamic_link})
-	SET(LINK_TYPE SHARED)
+IF(${Boost_dynamic_link})
+	
     set(Boost_USE_STATIC_LIBS        OFF)
     set(Boost_USE_MULTITHREADED      ON)
     set(Boost_USE_STATIC_RUNTIME     OFF)
 	ADD_DEFINITIONS( -DBOOST_ALL_DYN_LINK )
-ELSE(${BUILD_SHARED_LIBS} AND ${Boost_dynamic_link})
+ELSE(${Boost_dynamic_link})
     set(Boost_USE_STATIC_LIBS        ON)
     set(Boost_USE_MULTITHREADED      ON)
     set(Boost_USE_STATIC_RUNTIME     ON)
-    SET(LINK_TYPE STATIC)
-ENDIF(${BUILD_SHARED_LIBS} AND ${Boost_dynamic_link})
+    
+ENDIF(${Boost_dynamic_link})
+if(${BUILD_SHARED_LIBS})
+	SET(LINK_TYPE SHARED)
+else(${BUILD_SHARED_LIBS})
+	SET(LINK_TYPE STATIC)
+endif(${BUILD_SHARED_LIBS})
 
 include(ExternalProject)
 

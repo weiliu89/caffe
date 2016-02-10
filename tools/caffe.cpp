@@ -383,12 +383,7 @@ int time() {
 RegisterBrewFunction(time);
 
 int main(int argc, char** argv) {
-
-
-
-
-
-
+    
   FLAGS_alsologtostderr = 1;
   // Usage message.
   gflags::SetUsageMessage("command line brew\n"
@@ -468,14 +463,13 @@ int main(int argc, char** argv)
 	boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
 	if (brew_function == "train")
 	{
-		
 		if (vm.count("solver"))
 		{
 			caffe::SolverParameter solver_param;
 			caffe::ReadSolverParamsFromTextFileOrDie(vm["solver"].as<std::string>(), &solver_param);
 			// If the gpus flag is not provided, allow the mode and device to be set
 			// in the solver prototxt.
-			if (vm.count("gpu") == 0 && solver_param.solver_mode() == caffe::SolverParameter_SolverMode_GPU) 
+			if (solver_param.solver_mode() == caffe::SolverParameter_SolverMode_GPU) 
 			{
 				std::string gpu;
 				if (solver_param.has_device_id()) {
@@ -541,6 +535,76 @@ int main(int argc, char** argv)
 			}
 		}
 	}
+    if(brew_function == "test")
+    {
+        if(vm.count("model") && vm.count("weights") && vm.count("iterations"))
+        {
+            vector<int> gpus;
+            get_gpus(&gpus, vm["gpu"].as<std::string>());
+            if (gpus.size() != 0) 
+            {
+                LOG(INFO) << "Use GPU with device ID " << gpus[0];
+                Caffe::SetDevice(gpus[0]);
+                Caffe::set_mode(Caffe::GPU);
+            } else 
+            {
+                LOG(INFO) << "Use CPU.";
+                Caffe::set_mode(Caffe::CPU);
+            }
+
+            Net<float> caffe_net(vm["model"].as<string>(), caffe::TEST);
+            caffe_net.CopyTrainedLayersFrom(vm["weights"].as<string>());
+            int iterations = vm["iterations"].as<int>();
+            LOG(INFO) << "Running for " << iterations << " iterations.";
+            
+            vector<Blob<float>* > bottom_vec;
+            vector<int> test_score_output_id;
+            vector<float> test_score;
+            float loss = 0;
+            for (int i = 0; i < iterations; ++i) 
+            {
+                float iter_loss;
+                const vector<Blob<float>*>& result =
+                    caffe_net.Forward(bottom_vec, &iter_loss);
+                loss += iter_loss;
+                int idx = 0;
+                for (int j = 0; j < result.size(); ++j) 
+                {
+                    const float* result_vec = result[j]->cpu_data();
+                    for (int k = 0; k < result[j]->count(); ++k, ++idx) 
+                    {
+                        const float score = result_vec[k];
+                        if (i == 0) {
+                            test_score.push_back(score);
+                            test_score_output_id.push_back(j);
+                        } else {
+                            test_score[idx] += score;
+                        }
+                        const std::string& output_name = caffe_net.blob_names()[caffe_net.output_blob_indices()[j]];
+                        LOG(INFO) << "Batch " << i << ", " << output_name << " = " << score;
+                    }
+                }
+            }
+            loss /= iterations;
+            LOG(INFO) << "Loss: " << loss;
+            for (int i = 0; i < test_score.size(); ++i) 
+            {
+                const std::string& output_name = caffe_net.blob_names()[
+                    caffe_net.output_blob_indices()[test_score_output_id[i]]];
+                const float loss_weight = caffe_net.blob_loss_weights()[
+                    caffe_net.output_blob_indices()[test_score_output_id[i]]];
+                std::ostringstream loss_msg_stream;
+                const float mean_score = test_score[i] / iterations;
+                if (loss_weight) 
+                {
+                    loss_msg_stream << " (* " << loss_weight
+                        << " = " << loss_weight * mean_score << " loss)";
+                }
+                LOG(INFO) << output_name << " = " << mean_score << loss_msg_stream.str();
+            }
+        }
+        return 0;
+    }
 	return -1;
 }
 
