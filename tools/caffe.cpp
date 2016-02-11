@@ -447,9 +447,9 @@ int main(int argc, char** argv)
 		("model", boost::program_options::value<std::string>(), "The model definition protocol buffer text file..")
 		("snapshot", boost::program_options::value<std::string>(), "Optional; the snapshot solver state to resume training.")
 		("weights", boost::program_options::value<std::string>(),
-			"Optional; the pretrained weights to initialize finetuning, "
-			"separated by ','. Cannot be set simultaneously with snapshot.")
-		("gpu", boost::program_options::value<std::string>()->default_value(""),
+		"Optional; the pretrained weights to initialize finetuning, "
+		"separated by ','. Cannot be set simultaneously with snapshot.")
+		("gpu", boost::program_options::value<std::string>()->default_value("all"),
 			"Optional; run in GPU mode on given device IDs separated by ','."
 			"Use '-gpu all' to run on all available GPUs. The effective training "
 			"batch size is multiplied by the number of devices.")
@@ -503,7 +503,7 @@ int main(int argc, char** argv)
 				}
 				caffe::SignalHandler signal_handler(
 					GetRequestedAction(vm["sigint_effect"].as<std::string>()),
-					GetRequestedAction(vm["sigup_effect"].as<std::string>()));
+					GetRequestedAction(vm["sighup_effect"].as<std::string>()));
 
 				boost::shared_ptr<caffe::Solver<float> >
 					solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
