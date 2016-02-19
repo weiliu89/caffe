@@ -325,9 +325,15 @@ void Solver<Dtype>::Solve(const char* resume_file) {
 template <typename Dtype>
 void Solver<Dtype>::TestAll() {
   for (int test_net_id = 0;
-       test_net_id < test_nets_.size() && !requested_early_exit_;
-       ++test_net_id) {
-    Test(test_net_id);
+    test_net_id < test_nets_.size() && !requested_early_exit_;
+    ++test_net_id) {
+    if (param_.eval_type() == "classification") {
+      Test(test_net_id);
+    } else if (param_.eval_type() == "segmentation") {
+      TestSegmentation(test_net_id);
+    } else {
+    LOG(FATAL) << "Unknown evaluation type: " << param_.eval_type();
+    }
   }
 }
 
@@ -403,6 +409,94 @@ void Solver<Dtype>::Test(const int test_net_id) {
     }
     LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
               << mean_score << loss_msg_stream.str();
+  }
+}
+
+template <typename Dtype>
+void Solver<Dtype>::TestSegmentation(const int test_net_id) {
+  LOG(INFO) << "Iteration " << iter_
+            << ", Testing net (#" << test_net_id << ")";
+  CHECK_NOTNULL(test_nets_[test_net_id].get())->
+      ShareTrainedLayersWith(net_.get());
+  vector<shared_ptr<Blob<Dtype> > > label_stats;
+  vector<Blob<Dtype>*> bottom_vec;
+  const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
+  Dtype loss = 0;
+  for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
+    Dtype iter_loss;
+    const vector<Blob<Dtype>*>& result =
+        test_net->Forward(bottom_vec, &iter_loss);
+    if (param_.test_compute_loss()) {
+      loss += iter_loss;
+    }
+    if (result.size() == 0) {
+      continue;
+    }
+    if (i == 0) {
+      for (int j = 0; j < result.size(); ++j) {
+        shared_ptr<Blob<Dtype> > label_stat(new Blob<Dtype>());
+        label_stats.push_back(label_stat);
+        label_stat->Reshape(1, result[j]->channels(),
+                            result[j]->height(), result[j]->width());
+        // copy the result
+        caffe_copy(result[j]->count(), result[j]->cpu_data(),
+                   label_stat->mutable_cpu_data());
+      }
+    } else {
+      // add the result
+      for (int j = 0; j < result.size(); ++j) {
+        caffe_axpy(result[j]->count(), Dtype(1), result[j]->cpu_data(),
+                   label_stats[j]->mutable_cpu_data());
+      }
+    }
+  }
+  if (param_.test_compute_loss()) {
+    loss /= param_.test_iter(test_net_id);
+    LOG(INFO) << "Test loss: " << loss;
+  }
+  for (int i = 0; i < label_stats.size(); ++i) {
+    const int output_blob_index = test_net->output_blob_indices()[i];
+    const string& output_name = test_net->blob_names()[output_blob_index];
+    const Dtype* label_stat_data = label_stats[i]->cpu_data();
+    const int channels = label_stats[i]->channels();
+    // get sum infomation
+    Dtype sum_gtpred = 0;
+    Dtype sum_gt = 0;
+    for (int c = 0; c < channels; ++c) {
+      sum_gtpred += label_stat_data[c*3];
+      sum_gt += label_stat_data[c*3+1];
+    }
+    if (sum_gt > 0) {
+      // compute accuracy for segmentation
+      Dtype per_pixel_acc = sum_gtpred / sum_gt;
+      Dtype per_label_acc = 0;
+      Dtype iou, iou_acc = 0, weighted_iou_acc = 0;
+      int num_valid_labels = 0;
+      for (int c = 0; c < channels; ++c) {
+        if (label_stat_data[1] != 0) {
+          per_label_acc += label_stat_data[0] / label_stat_data[1];
+          ++num_valid_labels;
+        }
+        if (label_stat_data[1] + label_stat_data[2] != 0) {
+          iou = label_stat_data[0] / (label_stat_data[1] + label_stat_data[2]
+                                      - label_stat_data[0]);
+          iou_acc += iou;
+          weighted_iou_acc += iou * label_stat_data[1] / sum_gt;
+        }
+        label_stat_data += label_stats[i]->offset(0, 1);
+      }
+      LOG(INFO) << "    Test net output #" << i << " " << output_name
+          << ": per_pixel_acc = " << per_pixel_acc;
+      LOG(INFO) << "    Test net output #" << i << " " << output_name
+          << ": per_label_acc = " << per_label_acc / num_valid_labels;
+      LOG(INFO) << "    Test net output #" << i << " " << output_name
+          << ": iou_acc = " << iou_acc / num_valid_labels;
+      LOG(INFO) << "    Test net output #" << i << " " << output_name
+          << ": weighted_iou_acc = " << weighted_iou_acc;
+    } else {
+      LOG(INFO) << "    Test net output #" << i << " " << output_name
+          << ": no valid labels!";
+    }
   }
 }
 
