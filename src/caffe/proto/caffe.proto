@@ -306,7 +306,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 147 (last added: unpooling_param)
+// LayerParameter next available layer-specific ID: 148 (last added: parse_evaluate_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -381,6 +381,7 @@ message LayerParameter {
   optional MemoryDataParameter memory_data_param = 119;
   optional MVNParameter mvn_param = 120;
   optional NormalizeParameter norm_param = 145;
+  optional ParseEvaluateParameter parse_evaluate_param = 147;
   optional PoolingParameter pooling_param = 121;
   optional PowerParameter power_param = 122;
   optional PReLUParameter prelu_param = 131;
@@ -879,6 +880,14 @@ message NormalizeParameter {
   optional bool channel_shared = 3 [default = true];
   // Epsilon for not dividing by zero while normalizing variance
   optional float eps = 4 [default = 1e-10];
+}
+
+// Message that stores parameters used by ParseEvaluateLayer
+message ParseEvaluateParameter {
+  // Number of total labels. Must provide.
+  optional int32 num_labels = 1;
+  // Ignore evaluating following labels.
+  repeated int32 ignore_label = 2;
 }
 
 message PoolingParameter {
