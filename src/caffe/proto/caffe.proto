@@ -306,7 +306,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 147 (last added: norm_param)
+// LayerParameter next available layer-specific ID: 147 (last added: unpooling_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -396,6 +396,7 @@ message LayerParameter {
   optional TanHParameter tanh_param = 127;
   optional ThresholdParameter threshold_param = 128;
   optional TileParameter tile_param = 138;
+  optional UnPoolingParameter unpooling_param = 146;
   optional WindowDataParameter window_data_param = 129;
 }
 
@@ -1132,6 +1133,27 @@ message TileParameter {
 // Message that stores parameters used by ThresholdLayer
 message ThresholdParameter {
   optional float threshold = 1 [default = 0]; // Strictly positive values
+}
+
+// Message that stores parameters used by UnPoolingLayer
+message UnPoolingParameter {
+  enum UnPoolMethod {
+    FIXED = 0;  // Put in the middle of a kernel
+    DIV = 1;    // Divide equally through a kernel
+    REP = 2;    // Repeat through a kernel
+  }
+  optional UnPoolMethod unpool = 1 [default = FIXED]; // The unpooling method
+  // Pad, kernel size, and stride are all given as a single value for equal
+  // dimensions in height and width or as Y, X pairs.
+  optional uint32 out_pad = 4 [default = 0]; // The padding size (equal in Y, X)
+  optional uint32 out_pad_h = 9 [default = 0]; // The padding height
+  optional uint32 out_pad_w = 10 [default = 0]; // The padding width
+  optional uint32 out_kernel_size = 2; // The kernel size (square)
+  optional uint32 out_kernel_h = 5; // The kernel height
+  optional uint32 out_kernel_w = 6; // The kernel width
+  optional uint32 out_stride = 3 [default = 1]; // The stride (equal in Y, X)
+  optional uint32 out_stride_h = 7; // The stride height
+  optional uint32 out_stride_w = 8; // The stride width
 }
 
 message WindowDataParameter {
