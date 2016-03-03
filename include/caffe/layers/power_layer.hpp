@@ -17,7 +17,7 @@ namespace caffe {
  *        and power @f$ \gamma @f$.
  */
 template <typename Dtype>
-class PowerLayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT PowerLayer : public NeuronLayer<Dtype> {
  public:
   /**
    * @param param provides PowerParameter power_param,

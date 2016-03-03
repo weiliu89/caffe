@@ -20,7 +20,7 @@ namespace caffe {
  * The ReLULayer is often a better choice for this reason.
  */
 template <typename Dtype>
-class SigmoidLayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT SigmoidLayer : public NeuronLayer<Dtype> {
  public:
   explicit SigmoidLayer(const LayerParameter& param)
       : NeuronLayer<Dtype>(param) {}

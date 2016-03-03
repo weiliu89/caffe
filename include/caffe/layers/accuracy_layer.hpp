@@ -16,7 +16,7 @@ namespace caffe {
  *        classification task.
  */
 template <typename Dtype>
-class AccuracyLayer : public Layer<Dtype> {
+class DLL_EXPORT AccuracyLayer : public Layer<Dtype> {
  public:
   /**
    * @param param provides AccuracyParameter accuracy_param,

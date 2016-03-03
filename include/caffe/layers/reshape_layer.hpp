@@ -16,7 +16,7 @@ namespace caffe {
  * (see FlattenLayer, Blob::ShareData and Blob::ShareDiff).
  */
 template <typename Dtype>
-class ReshapeLayer : public Layer<Dtype> {
+class DLL_EXPORT ReshapeLayer : public Layer<Dtype> {
  public:
   explicit ReshapeLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

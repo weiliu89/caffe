@@ -77,7 +77,7 @@ class DLL_EXPORT SolverRegistry {
 
 
 template <typename Dtype>
-class SolverRegisterer {
+class DLL_EXPORT SolverRegisterer {
  public:
   SolverRegisterer(const string& type,
       Solver<Dtype>* (*creator)(const SolverParameter&)) {

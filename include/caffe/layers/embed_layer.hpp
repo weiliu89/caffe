@@ -17,7 +17,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward, Backward, and proto params.
  */
 template <typename Dtype>
-class EmbedLayer : public Layer<Dtype> {
+class DLL_EXPORT EmbedLayer : public Layer<Dtype> {
  public:
   explicit EmbedLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

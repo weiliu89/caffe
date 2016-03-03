@@ -83,7 +83,7 @@ class DLL_EXPORT LayerRegistry {
 
 
 template <typename Dtype>
-class LayerRegisterer {
+class DLL_EXPORT LayerRegisterer {
  public:
   LayerRegisterer(const string& type,
                   shared_ptr<Layer<Dtype> > (*creator)(const LayerParameter&)) {

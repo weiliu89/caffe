@@ -16,7 +16,7 @@ namespace caffe {
  *        element.
  */
 template <typename Dtype>
-class NeuronLayer : public Layer<Dtype> {
+class DLL_EXPORT NeuronLayer : public Layer<Dtype> {
  public:
   explicit NeuronLayer(const LayerParameter& param)
      : Layer<Dtype>(param) {}

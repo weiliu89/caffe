@@ -20,7 +20,7 @@ const float kLOG_THRESHOLD = 1e-20;
  * -- the predictions.
  */
 template <typename Dtype>
-class LossLayer : public Layer<Dtype> {
+class DLL_EXPORT LossLayer : public Layer<Dtype> {
  public:
   explicit LossLayer(const LayerParameter& param)
      : Layer<Dtype>(param) {}

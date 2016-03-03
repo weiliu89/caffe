@@ -21,7 +21,7 @@ namespace caffe {
  * NOTE: does not implement Backwards operation.
  */
 template <typename Dtype>
-class ArgMaxLayer : public Layer<Dtype> {
+class DLL_EXPORT ArgMaxLayer : public Layer<Dtype> {
  public:
   /**
    * @param param provides ArgMaxParameter argmax_param,

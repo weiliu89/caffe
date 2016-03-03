@@ -11,7 +11,7 @@
 
 namespace caffe { namespace db {
 
-class LevelDBCursor : public Cursor {
+class DLL_EXPORT LevelDBCursor : public Cursor {
  public:
   explicit LevelDBCursor(leveldb::Iterator* iter)
     : iter_(iter) { SeekToFirst(); }
@@ -26,7 +26,7 @@ class LevelDBCursor : public Cursor {
   leveldb::Iterator* iter_;
 };
 
-class LevelDBTransaction : public Transaction {
+class DLL_EXPORT LevelDBTransaction : public Transaction {
  public:
   explicit LevelDBTransaction(leveldb::DB* db) : db_(db) { CHECK_NOTNULL(db_); }
   virtual void Put(const string& key, const string& value) {
@@ -45,7 +45,7 @@ class LevelDBTransaction : public Transaction {
   DISABLE_COPY_AND_ASSIGN(LevelDBTransaction);
 };
 
-class LevelDB : public DB {
+class DLL_EXPORT LevelDB : public DB {
  public:
   LevelDB() : db_(NULL) { }
   virtual ~LevelDB() { Close(); }

@@ -41,7 +41,7 @@ namespace caffe {
  *      @f$
  */
 template <typename Dtype>
-class MultinomialLogisticLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT MultinomialLogisticLossLayer : public LossLayer<Dtype> {
  public:
   explicit MultinomialLogisticLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param) {}

@@ -55,7 +55,7 @@ namespace caffe {
  * HingeLossLayer).
  */
 template <typename Dtype>
-class HingeLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT HingeLossLayer : public LossLayer<Dtype> {
  public:
   explicit HingeLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param) {}

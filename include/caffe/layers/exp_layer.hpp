@@ -17,7 +17,7 @@ namespace caffe {
  *        and base @f$ \gamma @f$.
  */
 template <typename Dtype>
-class ExpLayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT ExpLayer : public NeuronLayer<Dtype> {
  public:
   /**
    * @param param provides ExpParameter exp_param,

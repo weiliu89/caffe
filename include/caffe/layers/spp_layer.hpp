@@ -16,7 +16,7 @@ namespace caffe {
  *        images are of the same size.
  */
 template <typename Dtype>
-class SPPLayer : public Layer<Dtype> {
+class DLL_EXPORT SPPLayer : public Layer<Dtype> {
  public:
   explicit SPPLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

@@ -41,7 +41,7 @@ namespace caffe {
  *      @f$, for softmax output class probabilites @f$ \hat{p} @f$
  */
 template <typename Dtype>
-class SoftmaxWithLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT SoftmaxWithLossLayer : public LossLayer<Dtype> {
  public:
    /**
     * @param param provides LossParameter loss_param, with options:

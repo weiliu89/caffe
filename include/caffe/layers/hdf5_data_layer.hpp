@@ -20,7 +20,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward and proto params.
  */
 template <typename Dtype>
-class HDF5DataLayer : public Layer<Dtype> {
+class DLL_EXPORT HDF5DataLayer : public Layer<Dtype> {
  public:
   explicit HDF5DataLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

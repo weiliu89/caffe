@@ -16,7 +16,7 @@ namespace caffe {
  *        above threshold; 0 otherwise.
  */
 template <typename Dtype>
-class ThresholdLayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT ThresholdLayer : public NeuronLayer<Dtype> {
  public:
   /**
    * @param param provides ThresholdParameter threshold_param,

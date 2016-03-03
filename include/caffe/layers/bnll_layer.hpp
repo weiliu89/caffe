@@ -29,7 +29,7 @@ namespace caffe {
  *      @f$
  */
 template <typename Dtype>
-class BNLLLayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT BNLLLayer : public NeuronLayer<Dtype> {
  public:
   explicit BNLLLayer(const LayerParameter& param)
       : NeuronLayer<Dtype>(param) {}

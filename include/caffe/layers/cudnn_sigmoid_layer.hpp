@@ -17,7 +17,7 @@ namespace caffe {
  * @brief CuDNN acceleration of SigmoidLayer.
  */
 template <typename Dtype>
-class CuDNNSigmoidLayer : public SigmoidLayer<Dtype> {
+class DLL_EXPORT CuDNNSigmoidLayer : public SigmoidLayer<Dtype> {
  public:
   explicit CuDNNSigmoidLayer(const LayerParameter& param)
       : SigmoidLayer<Dtype>(param), handles_setup_(false) {}

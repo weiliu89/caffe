@@ -14,7 +14,7 @@ namespace caffe {
  *        or channel dimension, outputting the result.
  */
 template <typename Dtype>
-class ConcatLayer : public Layer<Dtype> {
+class DLL_EXPORT ConcatLayer : public Layer<Dtype> {
  public:
   explicit ConcatLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

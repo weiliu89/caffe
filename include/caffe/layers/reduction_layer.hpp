@@ -17,7 +17,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward, Backward, and proto params.
  */
 template <typename Dtype>
-class ReductionLayer : public Layer<Dtype> {
+class DLL_EXPORT ReductionLayer : public Layer<Dtype> {
  public:
   explicit ReductionLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

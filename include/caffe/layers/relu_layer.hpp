@@ -16,7 +16,7 @@ namespace caffe {
  *        The simple max is fast to compute, and the function does not saturate.
  */
 template <typename Dtype>
-class ReLULayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT ReLULayer : public NeuronLayer<Dtype> {
  public:
   /**
    * @param param provides ReLUParameter relu_param,

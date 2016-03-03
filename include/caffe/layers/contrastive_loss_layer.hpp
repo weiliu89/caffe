@@ -36,7 +36,7 @@ namespace caffe {
  * This can be used to train siamese networks.
  */
 template <typename Dtype>
-class ContrastiveLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT ContrastiveLossLayer : public LossLayer<Dtype> {
  public:
   explicit ContrastiveLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param), diff_() {}

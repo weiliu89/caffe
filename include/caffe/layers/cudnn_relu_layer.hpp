@@ -17,7 +17,7 @@ namespace caffe {
  * @brief CuDNN acceleration of ReLULayer.
  */
 template <typename Dtype>
-class CuDNNReLULayer : public ReLULayer<Dtype> {
+class DLL_EXPORT CuDNNReLULayer : public ReLULayer<Dtype> {
  public:
   explicit CuDNNReLULayer(const LayerParameter& param)
       : ReLULayer<Dtype>(param), handles_setup_(false) {}

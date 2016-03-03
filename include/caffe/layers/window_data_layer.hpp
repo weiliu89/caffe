@@ -21,7 +21,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward and proto params.
  */
 template <typename Dtype>
-class WindowDataLayer : public BasePrefetchingDataLayer<Dtype> {
+class DLL_EXPORT WindowDataLayer : public BasePrefetchingDataLayer<Dtype> {
  public:
   explicit WindowDataLayer(const LayerParameter& param)
       : BasePrefetchingDataLayer<Dtype>(param) {}

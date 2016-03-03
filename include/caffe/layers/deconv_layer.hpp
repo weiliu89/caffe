@@ -26,7 +26,7 @@ namespace caffe {
  *   stride results in upsampling rather than downsampling).
  */
 template <typename Dtype>
-class DeconvolutionLayer : public BaseConvolutionLayer<Dtype> {
+class DLL_EXPORT DeconvolutionLayer : public BaseConvolutionLayer<Dtype> {
  public:
   explicit DeconvolutionLayer(const LayerParameter& param)
       : BaseConvolutionLayer<Dtype>(param) {}

@@ -23,7 +23,7 @@ namespace caffe {
  *      the computed outputs @f$ y = |x| @f$
  */
 template <typename Dtype>
-class DropoutLayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT DropoutLayer : public NeuronLayer<Dtype> {
  public:
   /**
    * @param param provides DropoutParameter dropout_param,

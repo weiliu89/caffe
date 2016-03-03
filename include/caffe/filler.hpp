@@ -16,7 +16,7 @@ namespace caffe {
 
 /// @brief Fills a Blob with constant or randomly-generated data.
 template <typename Dtype>
-class Filler {
+class DLL_EXPORT Filler {
  public:
   explicit Filler(const FillerParameter& param) : filler_param_(param) {}
   virtual ~Filler() {}
@@ -28,7 +28,7 @@ class Filler {
 
 /// @brief Fills a Blob with constant values @f$ x = 0 @f$.
 template <typename Dtype>
-class ConstantFiller : public Filler<Dtype> {
+class DLL_EXPORT ConstantFiller : public Filler<Dtype> {
  public:
   explicit ConstantFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
@@ -47,7 +47,7 @@ class ConstantFiller : public Filler<Dtype> {
 
 /// @brief Fills a Blob with uniformly distributed values @f$ x\sim U(a, b) @f$.
 template <typename Dtype>
-class UniformFiller : public Filler<Dtype> {
+class DLL_EXPORT UniformFiller : public Filler<Dtype> {
  public:
   explicit UniformFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
@@ -62,7 +62,7 @@ class UniformFiller : public Filler<Dtype> {
 
 /// @brief Fills a Blob with Gaussian-distributed values @f$ x = a @f$.
 template <typename Dtype>
-class GaussianFiller : public Filler<Dtype> {
+class DLL_EXPORT GaussianFiller : public Filler<Dtype> {
  public:
   explicit GaussianFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
@@ -98,7 +98,7 @@ class GaussianFiller : public Filler<Dtype> {
  *         such that @f$ \forall i \sum_j x_{ij} = 1 @f$.
  */
 template <typename Dtype>
-class PositiveUnitballFiller : public Filler<Dtype> {
+class DLL_EXPORT PositiveUnitballFiller : public Filler<Dtype> {
  public:
   explicit PositiveUnitballFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
@@ -141,7 +141,7 @@ class PositiveUnitballFiller : public Filler<Dtype> {
  * TODO(dox): make notation in above comment consistent with rest & use LaTeX.
  */
 template <typename Dtype>
-class XavierFiller : public Filler<Dtype> {
+class DLL_EXPORT XavierFiller : public Filler<Dtype> {
  public:
   explicit XavierFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
@@ -183,7 +183,7 @@ class XavierFiller : public Filler<Dtype> {
  * is currently not the case for inner product layers.
  */
 template <typename Dtype>
-class MSRAFiller : public Filler<Dtype> {
+class DLL_EXPORT MSRAFiller : public Filler<Dtype> {
  public:
   explicit MSRAFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
@@ -241,7 +241,7 @@ out = skimage.transform.rescale(img, factor, mode='constant', cval=0)
 \endcode
  */
 template <typename Dtype>
-class BilinearFiller : public Filler<Dtype> {
+class DLL_EXPORT BilinearFiller : public Filler<Dtype> {
  public:
   explicit BilinearFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
@@ -268,7 +268,7 @@ class BilinearFiller : public Filler<Dtype> {
  * this way for now.
  */
 template <typename Dtype>
-Filler<Dtype>* GetFiller(const FillerParameter& param) {
+DLL_EXPORT Filler<Dtype>* GetFiller(const FillerParameter& param) {
   const std::string& type = param.type();
   if (type == "constant") {
     return new ConstantFiller<Dtype>(param);

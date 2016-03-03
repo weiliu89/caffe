@@ -16,7 +16,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward, Backward, and proto params.
  */
 template <typename Dtype>
-class EltwiseLayer : public Layer<Dtype> {
+class DLL_EXPORT EltwiseLayer : public Layer<Dtype> {
  public:
   explicit EltwiseLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}
