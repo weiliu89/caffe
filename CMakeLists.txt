@@ -87,7 +87,7 @@ include_directories(${Caffe_INCLUDE_DIR} ${PROJECT_BINARY_DIR})
 include_directories(BEFORE src) # This is needed for gtest.
 IF(MSVC)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS};/FI${CMAKE_CURRENT_SOURCE_DIR}/include/caffe/proto/caffe_pb.h")
-message(/FI${CMAKE_CURRENT_SOURCE_DIR}/include/caffe/proto/caffe_pb.h)
+#message(/FI${CMAKE_CURRENT_SOURCE_DIR}/include/caffe/proto/caffe_pb.h)
 ENDIF(MSVC)
 
 # ---[ Subdirectories

@@ -8,12 +8,10 @@
   #endif
 #endif
 
-#ifndef PROTO_EXPORTS
-  #if defined proto_EXPORTS && defined _MSC_VER
-    #define PROTO_EXPORTS __declspec(dllexport)
-  #else
-    #define PROTO_EXPORTS
-  #endif
+#if defined proto_EXPORTS && defined _MSC_VER
+#define PROTO_EXPORTS __declspec(dllexport)
+#else
+#define PROTO_EXPORTS
 #endif
 
 #ifdef STRICT // Boost 1.60+ on windows defines this

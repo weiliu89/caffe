@@ -1,7 +1,7 @@
 #include "caffe/proto/caffe_pb.h"
 
 using namespace caffe;
-
+/*
 LayerParameter* LayerParameter::default_instance_;
 TransformationParameter* TransformationParameter::default_instance_;
 AccuracyParameter* AccuracyParameter::default_instance_;
@@ -28,3 +28,4 @@ LRNParameter* LRNParameter::default_instance_;
 MemoryDataParameter* MemoryDataParameter::default_instance_;
 MVNParameter* MVNParameter::default_instance_;
 PoolingParameter* PoolingParameter::default_instance_;
+*/
