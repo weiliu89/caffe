@@ -27,6 +27,12 @@ endif()
 
 # ---[ Adding test target
 add_executable(${the_target} EXCLUDE_FROM_ALL ${test_srcs})
+IF(WIN32)
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/common.hpp")
+	SET_TARGET_PROPERTIES(${the_target} PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS")
+ELSE(WIN32)
+    SET_TARGET_PROPERTIES(${the_target} PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp")
+ENDIF(WIN32)
 target_link_libraries(${the_target} gtest ${Caffe_LINK})
 caffe_default_properties(${the_target})
 caffe_set_runtime_directory(${the_target} "${PROJECT_BINARY_DIR}/test")

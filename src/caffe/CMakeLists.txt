@@ -16,7 +16,6 @@ ADD_DEFINITIONS(-Dlibcaffe_EXPORTS)
 caffe_default_properties(proto)
 
 IF(WIN32)
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/common.hpp")
 	SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS")
 ELSE(WIN32)
     SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp")
