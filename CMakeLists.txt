@@ -13,6 +13,13 @@ project(Caffe C CXX)
 set(CAFFE_TARGET_VERSION "1.0.0-rc3")
 set(CAFFE_TARGET_SOVERSION "1.0.0-rc3")
 add_definitions(-DCAFFE_VERSION=${CAFFE_TARGET_VERSION})
+IF(MSVC)
+  ADD_DEFINITIONS( -D_VARIADIC_MAX=10 )
+  ADD_DEFINITIONS( -DGTEST_HAS_TR1_TUPLE=0 )
+  ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS)
+  add_definitions( -DBOOST_ALL_DYN_LINK)
+  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} /MP)
+ENDIF(MSVC)
 
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
@@ -80,7 +87,7 @@ add_subdirectory(docs)
 add_custom_target(lint COMMAND ${CMAKE_COMMAND} -P ${PROJECT_SOURCE_DIR}/cmake/lint.cmake)
 
 # ---[ pytest target
-if(BUILD_python)
+if(BUILD_python AND HAVE_PYTHON)
   add_custom_target(pytest COMMAND python${python_version} -m unittest discover -s caffe/test WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/python )
   add_dependencies(pytest pycaffe)
 endif()

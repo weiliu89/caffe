@@ -46,7 +46,11 @@ if (NOT __GFLAGS_INCLUDED) # guard against multiple includes
 
     set(GFLAGS_FOUND TRUE)
     set(GFLAGS_INCLUDE_DIRS ${gflags_INSTALL}/include)
-    set(GFLAGS_LIBRARIES ${gflags_INSTALL}/lib/libgflags.a ${CMAKE_THREAD_LIBS_INIT})
+    if(MSVC)
+      set(GFLAGS_LIBRARIES ${gflags_INSTALL}/lib/gflags.lib ${CMAKE_THREAD_LIBS_INIT})
+    else(MSVC)
+      set(GFLAGS_LIBRARIES ${gflags_INSTALL}/lib/libgflags.a ${CMAKE_THREAD_LIBS_INIT})
+    endif(MSVC)
     set(GFLAGS_LIBRARY_DIRS ${gflags_INSTALL}/lib)
     set(GFLAGS_EXTERNAL TRUE)
 
