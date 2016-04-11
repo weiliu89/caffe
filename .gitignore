@@ -93,3 +93,7 @@ LOCK
 LOG*
 CURRENT
 MANIFEST-*
+/windows/Caffe.sdf
+/windows/Caffe.v12.suo
+/windows/CommonSettings.props
+/windows/libcaffe/x64/Debug/libcaffe.log
