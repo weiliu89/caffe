@@ -1,25 +1,23 @@
 # generate protobuf sources
 file(GLOB proto_files proto/*.proto)
 caffe_protobuf_generate_cpp_py(${proto_gen_folder} proto_srcs proto_hdrs proto_python ${proto_files})
+if(MSVC)
+  set(caffe_lib_name libcaffe)
+else(MSVC)
+  set(caffe_lib_name caffe)
+endif(MSVC)
 
 # include python files either to force generation
-
-
-
 add_library(proto STATIC ${proto_hdrs} ${proto_srcs} ${proto_python})
-IF(WIN32)
-target_link_libraries(proto ${Caffe_LINKER_LIBS})
-ENDIF(WIN32)
-set(Caffe_LINKER_LIBS proto ${Caffe_LINKER_LIBS}) # note, crucial to prepend!
-ADD_DEFINITIONS(-Dlibcaffe_EXPORTS)
+IF(MSVC)
+  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS")
+else(MSVC)
+  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp")
+endif(MSVC)
 
+set(Caffe_LINKER_LIBS proto ${Caffe_LINKER_LIBS}) # note, crucial to prepend!
 caffe_default_properties(proto)
 
-IF(WIN32)
-	SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS")
-ELSE(WIN32)
-    SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp")
-ENDIF(WIN32)
 # --[ Caffe library
 
 # creates 'test_srcs', 'srcs', 'test_cuda', 'cuda' lists
@@ -30,24 +28,14 @@ if(HAVE_CUDA)
   list(APPEND srcs ${cuda_objs} ${cuda})
 endif()
 
-IF(WIN32)
-  #add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  #add_definitions(-D_VARIADIC_MAX=10)
-  #add_definitions(-DGTEST_HAS_TR1_TUPLE=0)
-  LINK_DIRECTORIES(${Boost_LIBRARY_DIR_DEBUG})
-  
-  add_library(libcaffe_${LINK_TYPE} ${LINK_TYPE} ${srcs})
-  
-  target_link_libraries(libcaffe_${LINK_TYPE} proto ${Caffe_LINKER_LIBS})
-  caffe_default_properties(libcaffe_${LINK_TYPE})
 
-else(WIN32)
-  add_library(caffe ${srcs})
-  target_link_libraries(caffe proto ${Caffe_LINKER_LIBS})
-  caffe_default_properties(caffe)
-ENDIF(WIN32)
-
-
+add_library(${caffe_lib_name} ${srcs})
+target_link_libraries(${caffe_lib_name} proto ${Caffe_LINKER_LIBS})
+caffe_default_properties(${caffe_lib_name})
+set_target_properties(${caffe_lib_name} PROPERTIES
+  VERSION   ${CAFFE_TARGET_VERSION}
+  SOVERSION ${CAFFE_TARGET_SOVERSION}
+)
 
 # ---[ Tests
  add_subdirectory(test)
@@ -55,11 +43,8 @@ ENDIF(WIN32)
 # ---[ Install
 install(DIRECTORY ${Caffe_INCLUDE_DIR}/caffe DESTINATION include)
 install(FILES ${proto_hdrs} DESTINATION include/caffe/proto)
-IF(WIN32)
-	install(TARGETS libcaffe_${LINK_TYPE} proto EXPORT CaffeTargets DESTINATION lib)
-ELSE(WIN32)
-	install(TARGETS caffe proto EXPORT CaffeTargets DESTINATION lib)
-ENDIF(WIN32)
+
+install(TARGETS ${caffe_lib_name} proto EXPORT CaffeTargets DESTINATION lib)
 
 file(WRITE ${PROJECT_BINARY_DIR}/__init__.py)
 list(APPEND proto_python ${PROJECT_BINARY_DIR}/__init__.py)
