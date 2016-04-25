@@ -471,6 +471,11 @@ int main(int argc, char** argv)
 		"snapshot, stop or none.")
 		("sighup_effect", boost::program_options::value<std::string>()->default_value("snapshot"), "Optional; action to take when a SIGHUP signal is received: "
 		"snapshot, stop or none.");
+	if (argc < 2)
+	{
+		std::cout << desc;
+		return 0;
+	}
 	auto brew_function  = boost::lexical_cast<std::string>(argv[1]);
 	boost::program_options::variables_map vm;
 	boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);

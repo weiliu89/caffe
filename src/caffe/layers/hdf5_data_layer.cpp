@@ -112,6 +112,7 @@ void HDF5DataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
   // Reshape blobs.
   const int batch_size = this->layer_param_.hdf5_data_param().batch_size();
+  CHECK_GT(batch_size, 0) << "must have non zero batch size";
   const int top_size = this->layer_param_.top_size();
   vector<int> top_shape;
   for (int i = 0; i < top_size; ++i) {

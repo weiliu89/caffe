@@ -17,8 +17,8 @@ add_definitions(-DCAFFE_VERSION=${CAFFE_TARGET_VERSION})
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 set(Boost_dynamic_link ON CACHE BOOL "Link boost dynamically")
+SET(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo")
 IF(${Boost_dynamic_link})
-	
     set(Boost_USE_STATIC_LIBS        OFF)
     set(Boost_USE_MULTITHREADED      ON)
     set(Boost_USE_STATIC_RUNTIME     OFF)
@@ -27,7 +27,6 @@ ELSE(${Boost_dynamic_link})
     set(Boost_USE_STATIC_LIBS        ON)
     set(Boost_USE_MULTITHREADED      ON)
     set(Boost_USE_STATIC_RUNTIME     ON)
-    
 ENDIF(${Boost_dynamic_link})
 if(${BUILD_SHARED_LIBS})
 	SET(LINK_TYPE SHARED)
@@ -70,7 +69,20 @@ include(cmake/Dependencies.cmake)
 # ---[ Flags
 if(UNIX OR APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall")
+  
+else()
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zo /Oy-")
+  list(APPEND CMAKE_SHARED_LINKER_FLAGS_RELEASE " /DEBUG")
+  list(APPEND CMAKE_MODULE_LINKER_FLAGS_RELEASE " /DEBUG")
+  
 endif()
+list(REMOVE_DUPLICATES CMAKE_CXX_FLAGS)
+list(REMOVE_DUPLICATES CMAKE_CXX_FLAGS_RELEASE)
+list(REMOVE_DUPLICATES CMAKE_SHARED_LINKER_FLAGS_RELEASE)
 
 caffe_set_caffe_link()
 
@@ -91,10 +103,7 @@ configure_file(cmake/Templates/caffe_config.h.in "${PROJECT_BINARY_DIR}/caffe_co
 set(Caffe_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 include_directories(${Caffe_INCLUDE_DIR} ${PROJECT_BINARY_DIR})
 include_directories(BEFORE src) # This is needed for gtest.
-IF(MSVC)
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS};/FI${CMAKE_CURRENT_SOURCE_DIR}/include/caffe/proto/caffe_pb.h")
-#message(/FI${CMAKE_CURRENT_SOURCE_DIR}/include/caffe/proto/caffe_pb.h)
-ENDIF(MSVC)
+
 
 # ---[ Subdirectories
 add_subdirectory(src/gtest)
@@ -116,6 +125,5 @@ endif()
 
 # ---[ Configuration summary
 caffe_print_configuration_summary()
-
 # ---[ Export configs generation
 caffe_generate_export_configs()
