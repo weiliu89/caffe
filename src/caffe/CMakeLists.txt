@@ -38,7 +38,9 @@ set_target_properties(${caffe_lib_name} PROPERTIES
 )
 
 # ---[ Tests
+if(NOT MSVC)
  add_subdirectory(test)
+endif()
 
 # ---[ Install
 install(DIRECTORY ${Caffe_INCLUDE_DIR}/caffe DESTINATION include)
