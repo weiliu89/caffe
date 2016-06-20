@@ -16,7 +16,8 @@ class DLL_EXPORT PythonLayer : public Layer<Dtype> {
   PythonLayer(PyObject* self, const LayerParameter& param);
 
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
+                          const vector<Blob<Dtype>*>& top);
+
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 

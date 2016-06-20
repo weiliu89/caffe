@@ -1,6 +1,8 @@
 #include <functional>
 #include <utility>
 #include <vector>
+#include <sstream>
+#include <map>
 
 #include "caffe/layers/accuracy_layer.hpp"
 #include "caffe/util/math_functions.hpp"
@@ -59,6 +61,7 @@ void AccuracyLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     caffe_set(top[1]->count(), Dtype(0), top[1]->mutable_cpu_data());
   }
   int count = 0;
+  std::map<int, int> class_distribution;
   for (int i = 0; i < outer_num_; ++i) {
     for (int j = 0; j < inner_num_; ++j) {
       const int label_value =
@@ -69,6 +72,11 @@ void AccuracyLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       if (top.size() > 1) ++nums_buffer_.mutable_cpu_data()[label_value];
       DCHECK_GE(label_value, 0);
       DCHECK_LT(label_value, num_labels);
+      auto itr = class_distribution.find(label_value);
+      if(itr != class_distribution.end())
+          itr->second++;
+      else
+          class_distribution[label_value] = 1;
       // Top-k accuracy
       std::vector<std::pair<Dtype, int> > bottom_data_vector;
       for (int k = 0; k < num_labels; ++k) {
@@ -89,7 +97,13 @@ void AccuracyLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       ++count;
     }
   }
-
+  auto f = [&class_distribution]()->std::string{
+      std::stringstream ss; 
+      for(auto& itr : class_distribution)
+          ss << itr.first << ":" << itr.second << ",";
+      return ss.str();
+      };
+  LOG(INFO) << "Class distribution: " << f();
   // LOG(INFO) << "Accuracy: " << accuracy;
   top[0]->mutable_cpu_data()[0] = accuracy / count;
   if (top.size() > 1) {

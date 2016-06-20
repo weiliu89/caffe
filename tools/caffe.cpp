@@ -467,8 +467,10 @@ int main(int argc, char** argv)
 			"Use '-gpu all' to run on all available GPUs. The effective training "
 			"batch size is multiplied by the number of devices.")
 		("iterations", boost::program_options::value<int>()->default_value(50), "The number of iterations to run.")
-		("sigint_effect", boost::program_options::value<std::string>()->default_value("stop"), "Optional; action to take when a SIGINT signal is received: "
-		"snapshot, stop or none.")
+		("sigint_effect", boost::program_options::value<std::string>()->default_value("stop"), "Optional; action to take when a SIGINT signal is received: snapshot, stop or none.")
+#ifdef USE_OPENCV
+        ("plot_loss", boost::program_options::value<bool>()->default_value(true), "Plot loss with respect to iteration")
+#endif
 		("sighup_effect", boost::program_options::value<std::string>()->default_value("snapshot"), "Optional; action to take when a SIGHUP signal is received: "
 		"snapshot, stop or none.");
 	if (argc < 2)
@@ -483,6 +485,8 @@ int main(int argc, char** argv)
 	{
 		if (vm.count("solver"))
 		{
+
+
 			caffe::SolverParameter solver_param;
 			caffe::ReadSolverParamsFromTextFileOrDie(vm["solver"].as<std::string>(), &solver_param);
 			// If the gpus flag is not provided, allow the mode and device to be set
