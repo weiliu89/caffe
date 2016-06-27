@@ -97,3 +97,11 @@ MANIFEST-*
 /windows/Caffe.v12.suo
 /windows/CommonSettings.props
 /windows/libcaffe/x64/Debug/libcaffe.log
+
+#Visual Studio files
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.pdb
+*.props
