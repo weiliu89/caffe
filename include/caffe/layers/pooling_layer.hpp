@@ -18,7 +18,16 @@ template <typename Dtype>
 class DLL_EXPORT PoolingLayer : public Layer<Dtype> {
  public:
   explicit PoolingLayer(const LayerParameter& param)
-      : Layer<Dtype>(param) {}
+      : Layer<Dtype>(param) {
+      switch(this->layer_param_.pooling_param().pool())
+      {
+        case PoolingParameter_PoolMethod_MAX: break;
+        case PoolingParameter_PoolMethod_AVE: break;
+        case PoolingParameter_PoolMethod_STOCHASTIC: break;
+        default: LOG(fatal) << "Unknown pooling method.";
+      }
+    
+  }
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,

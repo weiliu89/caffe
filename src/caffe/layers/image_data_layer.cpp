@@ -35,7 +35,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       "new_height and new_width to be set at the same time.";
   // Read the file with filenames and labels
   const string& source = this->layer_param_.image_data_param().source();
-  LOG(INFO) << "Opening file " << source;
+  LOG(info) << "Opening file " << source;
   std::ifstream infile(source.c_str());
   string line;
   size_t pos;
@@ -50,19 +50,19 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
   if (this->layer_param_.image_data_param().shuffle()) {
     // randomly shuffle data
-    LOG(INFO) << "Shuffling data";
+    LOG(info) << "Shuffling data";
     const unsigned int prefetch_rng_seed = caffe_rng_rand();
     prefetch_rng_.reset(new Caffe::RNG(prefetch_rng_seed));
     ShuffleImages();
   }
-  LOG(INFO) << "A total of " << lines_.size() << " images.";
+  LOG(info) << "A total of " << lines_.size() << " images.";
 
   lines_id_ = 0;
   // Check if we would need to randomly skip a few data points
   if (this->layer_param_.image_data_param().rand_skip()) {
     unsigned int skip = caffe_rng_rand() %
         this->layer_param_.image_data_param().rand_skip();
-    LOG(INFO) << "Skipping first " << skip << " data points.";
+    LOG(info) << "Skipping first " << skip << " data points.";
     CHECK_GT(lines_.size(), skip) << "Not enough points to skip";
     lines_id_ = skip;
   }
@@ -82,7 +82,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   }
   top[0]->Reshape(top_shape);
 
-  LOG(INFO) << "output data size: " << top[0]->num() << ","
+  LOG(info) << "output data size: " << top[0]->num() << ","
       << top[0]->channels() << "," << top[0]->height() << ","
       << top[0]->width();
   // label
@@ -154,7 +154,7 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     lines_id_++;
     if (lines_id_ >= lines_size) {
       // We have reached the end. Restart from the first.
-      DLOG(INFO) << "Restarting data prefetching from start.";
+      DLOG(info) << "Restarting data prefetching from start.";
       lines_id_ = 0;
       if (this->layer_param_.image_data_param().shuffle()) {
         ShuffleImages();
@@ -162,9 +162,9 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
   }
   batch_timer.Stop();
-  DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";
-  DLOG(INFO) << "     Read time: " << read_time / 1000 << " ms.";
-  DLOG(INFO) << "Transform time: " << trans_time / 1000 << " ms.";
+  DLOG(info) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";
+  DLOG(info) << "     Read time: " << read_time / 1000 << " ms.";
+  DLOG(info) << "Transform time: " << trans_time / 1000 << " ms.";
 }
 
 INSTANTIATE_CLASS(ImageDataLayer);

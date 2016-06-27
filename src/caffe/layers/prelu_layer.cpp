@@ -17,7 +17,7 @@ void PReLULayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   int channels = bottom[0]->channels();
   channel_shared_ = prelu_param.channel_shared();
   if (this->blobs_.size() > 0) {
-    LOG(INFO) << "Skipping parameter initialization";
+    LOG(info) << "Skipping parameter initialization";
   } else {
     this->blobs_.resize(1);
     if (channel_shared_) {

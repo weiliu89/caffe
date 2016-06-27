@@ -16,7 +16,7 @@ void EmbedLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   bias_term_ = this->layer_param_.embed_param().bias_term();
   // Check if we need to set up the weights
   if (this->blobs_.size() > 0) {
-    LOG(INFO) << "Skipping parameter initialization";
+    LOG(info) << "Skipping parameter initialization";
   } else {
     if (bias_term_) {
       this->blobs_.resize(2);

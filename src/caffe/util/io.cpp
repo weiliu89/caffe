@@ -85,7 +85,7 @@ cv::Mat ReadImageToCVMat(const string& filename,
     CV_LOAD_IMAGE_GRAYSCALE);
   cv::Mat cv_img_origin = cv::imread(filename, cv_read_flag);
   if (!cv_img_origin.data) {
-    LOG(ERROR) << "Could not open or find file " << filename;
+    LOG(error) << "Could not open or find file " << filename;
     return cv_img_origin;
   }
   if (height > 0 && width > 0) {
@@ -178,7 +178,7 @@ cv::Mat DecodeDatumToCVMatNative(const Datum& datum) {
   std::vector<char> vec_data(data.c_str(), data.c_str() + data.size());
   cv_img = cv::imdecode(vec_data, -1);
   if (!cv_img.data) {
-    LOG(ERROR) << "Could not decode datum ";
+    LOG(error) << "Could not decode datum ";
   }
   return cv_img;
 }
@@ -191,7 +191,7 @@ cv::Mat DecodeDatumToCVMat(const Datum& datum, bool is_color) {
     CV_LOAD_IMAGE_GRAYSCALE);
   cv_img = cv::imdecode(vec_data, cv_read_flag);
   if (!cv_img.data) {
-    LOG(ERROR) << "Could not decode datum ";
+    LOG(error) << "Could not decode datum ";
   }
   return cv_img;
 }

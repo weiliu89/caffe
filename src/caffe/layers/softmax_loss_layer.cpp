@@ -77,7 +77,7 @@ Dtype SoftmaxWithLossLayer<Dtype>::get_normalizer(
       normalizer = Dtype(1);
       break;
     default:
-      LOG(FATAL) << "Unknown normalization mode: "
+      LOG(fatal) << "Unknown normalization mode: "
           << LossParameter_NormalizationMode_Name(normalization_mode);
   }
   // Some users will have no labels for some examples in order to 'turn off' a
@@ -118,7 +118,7 @@ template <typename Dtype>
 void SoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
   if (propagate_down[1]) {
-    LOG(FATAL) << this->type()
+    LOG(fatal) << this->type()
                << " Layer cannot backpropagate to label inputs.";
   }
   if (propagate_down[0]) {

@@ -1,5 +1,6 @@
 #include <boost/bind.hpp>
-#include <glog/logging.h>
+//#include <glog/logging.h>
+#include "caffe/logging.hpp"
 
 #include <signal.h>
 #include <csignal>
@@ -15,29 +16,34 @@ namespace {
   {
     switch (signal) 
 	{
-#ifndef _MSC_VER
+#ifdef _MSC_VER
+    case SIGBREAK:  // there is no SIGHUP in windows, take SIGBREAK instead.
+      got_sighup = true;
+      break;
+#else
     case SIGHUP:
-	{
-		got_sighup = true;
-		break;
-	}
+      got_sighup = true;
+      break;
 #endif
     case SIGINT:
-	{
-		got_sigint = true;
-		break;
-	}
+      got_sigint = true;
+      break;
     }
   }
 
-  void HookupHandler() 
-  {
-#ifndef _MSC_VER
-    if (already_hooked_up) 
-	{
-      LOG(FATAL) << "Tried to hookup signal handlers more than once.";
+void HookupHandler() {
+    if (already_hooked_up) {
+      LOG(fatal) << "Tried to hookup signal handlers more than once.";
     }
     already_hooked_up = true;
+#ifdef _MSC_VER
+    if (signal(SIGBREAK, handle_signal) == SIG_ERR) {
+      LOG(fatal) << "Cannot install SIGBREAK handler.";
+    }
+    if (signal(SIGINT, handle_signal) == SIG_ERR) {
+      LOG(fatal) << "Cannot install SIGINT handler.";
+    }
+#else
     struct sigaction sa;
     // Setup the handler
     sa.sa_handler = &handle_signal;
@@ -46,23 +52,26 @@ namespace {
     // Block every signal during the handler
     sigfillset(&sa.sa_mask);
     // Intercept SIGHUP and SIGINT
-    if (sigaction(SIGHUP, &sa, NULL) == -1) 
-	{
-      LOG(FATAL) << "Cannot install SIGHUP handler.";
+    if (sigaction(SIGHUP, &sa, NULL) == -1) {
+      LOG(fatal) << "Cannot install SIGHUP handler.";
     }
-    if (sigaction(SIGINT, &sa, NULL) == -1) 
-	{
-      LOG(FATAL) << "Cannot install SIGINT handler.";
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
+      LOG(fatal) << "Cannot install SIGINT handler.";
     }
 #endif
   }
 
   // Set the signal handlers to the default.
-  void UnhookHandler() 
-  {
-#ifndef _MSC_VER
-    if (already_hooked_up) 
-	{
+void UnhookHandler() {
+    if (already_hooked_up) {
+#ifdef _MSC_VER
+      if (signal(SIGBREAK, SIG_DFL) == SIG_ERR) {
+        LOG(fatal) << "Cannot uninstall SIGBREAK handler.";
+      }
+      if (signal(SIGINT, SIG_DFL) == SIG_ERR) {
+        LOG(fatal) << "Cannot uninstall SIGINT handler.";
+      }
+#else
       struct sigaction sa;
       // Setup the sighub handler
       sa.sa_handler = SIG_DFL;
@@ -72,14 +81,14 @@ namespace {
       sigfillset(&sa.sa_mask);
       // Intercept SIGHUP and SIGINT
       if (sigaction(SIGHUP, &sa, NULL) == -1) {
-        LOG(FATAL) << "Cannot uninstall SIGHUP handler.";
+        LOG(fatal) << "Cannot uninstall SIGHUP handler.";
       }
       if (sigaction(SIGINT, &sa, NULL) == -1) {
-        LOG(FATAL) << "Cannot uninstall SIGINT handler.";
+        LOG(fatal) << "Cannot uninstall SIGINT handler.";
       }
+#endif
       already_hooked_up = false;
     }
-#endif
   }
 
   // Return true iff a SIGINT has been received since the last time this

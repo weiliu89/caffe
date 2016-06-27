@@ -60,7 +60,7 @@ void AdaGradSolver<Dtype>::ComputeUpdateValue(int param_id, Dtype rate) {
     break;
   }
   default:
-    LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
+    LOG(fatal) << "Unknown caffe mode: " << Caffe::mode();
   }
 }
 

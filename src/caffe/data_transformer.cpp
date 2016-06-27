@@ -22,7 +22,7 @@ DataTransformer<Dtype>::DataTransformer(const TransformationParameter& param,
       "Cannot specify mean_file and mean_value at the same time";
     const string& mean_file = param.mean_file();
     if (Caffe::root_solver()) {
-      LOG(INFO) << "Loading mean file from: " << mean_file;
+      LOG(info) << "Loading mean file from: " << mean_file;
     }
     BlobProto blob_proto;
     ReadProtoFromBinaryFileOrDie(mean_file.c_str(), &blob_proto);
@@ -145,11 +145,11 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
     // Transform the cv::image into blob.
     return Transform(cv_img, transformed_blob);
 #else
-    LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
+    LOG(fatal) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
 #endif  // USE_OPENCV
   } else {
     if (param_.force_color() || param_.force_gray()) {
-      LOG(ERROR) << "force_color and force_gray only for encoded datum";
+      LOG(error) << "force_color and force_gray only for encoded datum";
     }
   }
 
@@ -433,7 +433,7 @@ void DataTransformer<Dtype>::Transform(Blob<Dtype>* input_blob,
     }
   }
   if (scale != Dtype(1)) {
-    DLOG(INFO) << "Scale: " << scale;
+    DLOG(info) << "Scale: " << scale;
     caffe_scal(size, scale, transformed_data);
   }
 }
@@ -454,7 +454,7 @@ vector<int> DataTransformer<Dtype>::InferBlobShape(const Datum& datum) {
     // InferBlobShape using the cv::image.
     return InferBlobShape(cv_img);
 #else
-    LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
+    LOG(fatal) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
 #endif  // USE_OPENCV
   }
   const int crop_size = param_.crop_size();

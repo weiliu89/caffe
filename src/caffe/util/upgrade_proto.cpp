@@ -22,53 +22,53 @@ bool UpgradeNetAsNeeded(const string& param_file, NetParameter* param) {
   if (NetNeedsV0ToV1Upgrade(*param)) {
     // NetParameter was specified using the old style (V0LayerParameter); try to
     // upgrade it.
-    LOG(INFO) << "Attempting to upgrade input file specified using deprecated "
+    LOG(info) << "Attempting to upgrade input file specified using deprecated "
               << "V0LayerParameter: " << param_file;
     NetParameter original_param(*param);
     if (!UpgradeV0Net(original_param, param)) {
       success = false;
-      LOG(ERROR) << "Warning: had one or more problems upgrading "
+      LOG(error) << "Warning: had one or more problems upgrading "
           << "V0NetParameter to NetParameter (see above); continuing anyway.";
     } else {
-      LOG(INFO) << "Successfully upgraded file specified using deprecated "
+      LOG(info) << "Successfully upgraded file specified using deprecated "
                 << "V0LayerParameter";
     }
-    LOG(WARNING) << "Note that future Caffe releases will not support "
+    LOG(warning) << "Note that future Caffe releases will not support "
         << "V0NetParameter; use ./build/tools/upgrade_net_proto_text for "
         << "prototxt and ./build/tools/upgrade_net_proto_binary for model "
         << "weights upgrade this and any other net protos to the new format.";
   }
   // NetParameter uses old style data transformation fields; try to upgrade it.
   if (NetNeedsDataUpgrade(*param)) {
-    LOG(INFO) << "Attempting to upgrade input file specified using deprecated "
+    LOG(info) << "Attempting to upgrade input file specified using deprecated "
               << "transformation parameters: " << param_file;
     UpgradeNetDataTransformation(param);
-    LOG(INFO) << "Successfully upgraded file specified using deprecated "
+    LOG(info) << "Successfully upgraded file specified using deprecated "
               << "data transformation parameters.";
-    LOG(WARNING) << "Note that future Caffe releases will only support "
+    LOG(warning) << "Note that future Caffe releases will only support "
                  << "transform_param messages for transformation fields.";
   }
   if (NetNeedsV1ToV2Upgrade(*param)) {
-    LOG(INFO) << "Attempting to upgrade input file specified using deprecated "
+    LOG(info) << "Attempting to upgrade input file specified using deprecated "
               << "V1LayerParameter: " << param_file;
     NetParameter original_param(*param);
     if (!UpgradeV1Net(original_param, param)) {
       success = false;
-      LOG(ERROR) << "Warning: had one or more problems upgrading "
+      LOG(error) << "Warning: had one or more problems upgrading "
                  << "V1LayerParameter (see above); continuing anyway.";
     } else {
-      LOG(INFO) << "Successfully upgraded file specified using deprecated "
+      LOG(info) << "Successfully upgraded file specified using deprecated "
                 << "V1LayerParameter";
     }
   }
   // NetParameter uses old style input fields; try to upgrade it.
   if (NetNeedsInputUpgrade(*param)) {
-    LOG(INFO) << "Attempting to upgrade input file specified using deprecated "
+    LOG(info) << "Attempting to upgrade input file specified using deprecated "
               << "input fields: " << param_file;
     UpgradeNetInput(param);
-    LOG(INFO) << "Successfully upgraded file specified using deprecated "
+    LOG(info) << "Successfully upgraded file specified using deprecated "
               << "input fields.";
-    LOG(WARNING) << "Note that future Caffe releases will only support "
+    LOG(warning) << "Note that future Caffe releases will only support "
                  << "input layers and not input fields.";
   }
   return success;
@@ -151,7 +151,7 @@ void UpgradeV0PaddingLayers(const NetParameter& param,
       const string& blob_name = layer_connection.bottom(j);
       if (blob_name_to_last_top_idx.find(blob_name) ==
           blob_name_to_last_top_idx.end()) {
-        LOG(FATAL) << "Unknown blob input " << blob_name << " to layer " << j;
+        LOG(fatal) << "Unknown blob input " << blob_name << " to layer " << j;
       }
       const int top_idx = blob_name_to_last_top_idx[blob_name];
       if (top_idx == -1) {
@@ -223,7 +223,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_inner_product_param()->set_num_output(
             v0_layer_param.num_output());
       } else {
-        LOG(ERROR) << "Unknown parameter num_output for layer type " << type;
+        LOG(error) << "Unknown parameter num_output for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -235,7 +235,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_inner_product_param()->set_bias_term(
             v0_layer_param.biasterm());
       } else {
-        LOG(ERROR) << "Unknown parameter biasterm for layer type " << type;
+        LOG(error) << "Unknown parameter biasterm for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -247,7 +247,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_inner_product_param()->
             mutable_weight_filler()->CopyFrom(v0_layer_param.weight_filler());
       } else {
-        LOG(ERROR) << "Unknown parameter weight_filler for layer type " << type;
+        LOG(error) << "Unknown parameter weight_filler for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -259,7 +259,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_inner_product_param()->
             mutable_bias_filler()->CopyFrom(v0_layer_param.bias_filler());
       } else {
-        LOG(ERROR) << "Unknown parameter bias_filler for layer type " << type;
+        LOG(error) << "Unknown parameter bias_filler for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -269,7 +269,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
       } else if (type == "pool") {
         layer_param->mutable_pooling_param()->set_pad(v0_layer_param.pad());
       } else {
-        LOG(ERROR) << "Unknown parameter pad for layer type " << type;
+        LOG(error) << "Unknown parameter pad for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -281,7 +281,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_pooling_param()->set_kernel_size(
             v0_layer_param.kernelsize());
       } else {
-        LOG(ERROR) << "Unknown parameter kernelsize for layer type " << type;
+        LOG(error) << "Unknown parameter kernelsize for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -290,7 +290,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_convolution_param()->set_group(
             v0_layer_param.group());
       } else {
-        LOG(ERROR) << "Unknown parameter group for layer type " << type;
+        LOG(error) << "Unknown parameter group for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -302,7 +302,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_pooling_param()->set_stride(
             v0_layer_param.stride());
       } else {
-        LOG(ERROR) << "Unknown parameter stride for layer type " << type;
+        LOG(error) << "Unknown parameter stride for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -323,11 +323,11 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
               PoolingParameter_PoolMethod_STOCHASTIC);
           break;
         default:
-          LOG(ERROR) << "Unknown pool method " << pool;
+          LOG(error) << "Unknown pool method " << pool;
           is_fully_compatible = false;
         }
       } else {
-        LOG(ERROR) << "Unknown parameter pool for layer type " << type;
+        LOG(error) << "Unknown parameter pool for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -336,7 +336,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_dropout_param()->set_dropout_ratio(
             v0_layer_param.dropout_ratio());
       } else {
-        LOG(ERROR) << "Unknown parameter dropout_ratio for layer type " << type;
+        LOG(error) << "Unknown parameter dropout_ratio for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -345,7 +345,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_lrn_param()->set_local_size(
             v0_layer_param.local_size());
       } else {
-        LOG(ERROR) << "Unknown parameter local_size for layer type " << type;
+        LOG(error) << "Unknown parameter local_size for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -353,7 +353,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
       if (type == "lrn") {
         layer_param->mutable_lrn_param()->set_alpha(v0_layer_param.alpha());
       } else {
-        LOG(ERROR) << "Unknown parameter alpha for layer type " << type;
+        LOG(error) << "Unknown parameter alpha for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -361,7 +361,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
       if (type == "lrn") {
         layer_param->mutable_lrn_param()->set_beta(v0_layer_param.beta());
       } else {
-        LOG(ERROR) << "Unknown parameter beta for layer type " << type;
+        LOG(error) << "Unknown parameter beta for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -369,7 +369,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
       if (type == "lrn") {
         layer_param->mutable_lrn_param()->set_k(v0_layer_param.k());
       } else {
-        LOG(ERROR) << "Unknown parameter k for layer type " << type;
+        LOG(error) << "Unknown parameter k for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -389,7 +389,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_infogain_loss_param()->set_source(
             v0_layer_param.source());
       } else {
-        LOG(ERROR) << "Unknown parameter source for layer type " << type;
+        LOG(error) << "Unknown parameter source for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -415,7 +415,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_window_data_param()->set_batch_size(
             v0_layer_param.batchsize());
       } else {
-        LOG(ERROR) << "Unknown parameter batchsize for layer type " << type;
+        LOG(error) << "Unknown parameter batchsize for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -435,7 +435,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_image_data_param()->set_rand_skip(
             v0_layer_param.rand_skip());
       } else {
-        LOG(ERROR) << "Unknown parameter rand_skip for layer type " << type;
+        LOG(error) << "Unknown parameter rand_skip for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -444,7 +444,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_image_data_param()->set_shuffle(
             v0_layer_param.shuffle_images());
       } else {
-        LOG(ERROR) << "Unknown parameter shuffle for layer type " << type;
+        LOG(error) << "Unknown parameter shuffle for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -453,7 +453,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_image_data_param()->set_new_height(
             v0_layer_param.new_height());
       } else {
-        LOG(ERROR) << "Unknown parameter new_height for layer type " << type;
+        LOG(error) << "Unknown parameter new_height for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -462,7 +462,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_image_data_param()->set_new_width(
             v0_layer_param.new_width());
       } else {
-        LOG(ERROR) << "Unknown parameter new_width for layer type " << type;
+        LOG(error) << "Unknown parameter new_width for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -471,7 +471,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_concat_param()->set_concat_dim(
             v0_layer_param.concat_dim());
       } else {
-        LOG(ERROR) << "Unknown parameter concat_dim for layer type " << type;
+        LOG(error) << "Unknown parameter concat_dim for layer type " << type;
         is_fully_compatible = false;
       }
     }
@@ -480,7 +480,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_window_data_param()->set_fg_threshold(
             v0_layer_param.det_fg_threshold());
       } else {
-        LOG(ERROR) << "Unknown parameter det_fg_threshold for layer type "
+        LOG(error) << "Unknown parameter det_fg_threshold for layer type "
                    << type;
         is_fully_compatible = false;
       }
@@ -490,7 +490,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_window_data_param()->set_bg_threshold(
             v0_layer_param.det_bg_threshold());
       } else {
-        LOG(ERROR) << "Unknown parameter det_bg_threshold for layer type "
+        LOG(error) << "Unknown parameter det_bg_threshold for layer type "
                    << type;
         is_fully_compatible = false;
       }
@@ -500,7 +500,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_window_data_param()->set_fg_fraction(
             v0_layer_param.det_fg_fraction());
       } else {
-        LOG(ERROR) << "Unknown parameter det_fg_fraction for layer type "
+        LOG(error) << "Unknown parameter det_fg_fraction for layer type "
                    << type;
         is_fully_compatible = false;
       }
@@ -510,7 +510,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_window_data_param()->set_context_pad(
             v0_layer_param.det_context_pad());
       } else {
-        LOG(ERROR) << "Unknown parameter det_context_pad for layer type "
+        LOG(error) << "Unknown parameter det_context_pad for layer type "
                    << type;
         is_fully_compatible = false;
       }
@@ -520,7 +520,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_window_data_param()->set_crop_mode(
             v0_layer_param.det_crop_mode());
       } else {
-        LOG(ERROR) << "Unknown parameter det_crop_mode for layer type "
+        LOG(error) << "Unknown parameter det_crop_mode for layer type "
                    << type;
         is_fully_compatible = false;
       }
@@ -530,7 +530,7 @@ bool UpgradeV0LayerParameter(const V1LayerParameter& v0_layer_connection,
         layer_param->mutable_hdf5_output_param()->CopyFrom(
             v0_layer_param.hdf5_output_param());
       } else {
-        LOG(ERROR) << "Unknown parameter hdf5_output_param for layer type "
+        LOG(error) << "Unknown parameter hdf5_output_param for layer type "
                    << type;
         is_fully_compatible = false;
       }
@@ -589,7 +589,7 @@ V1LayerParameter_LayerType UpgradeV0LayerType(const string& type) {
   } else if (type == "window_data") {
     return V1LayerParameter_LayerType_WINDOW_DATA;
   } else {
-    LOG(FATAL) << "Unknown layer name: " << type;
+    LOG(fatal) << "Unknown layer name: " << type;
     return V1LayerParameter_LayerType_NONE;
   }
 }
@@ -657,7 +657,7 @@ void UpgradeNetDataTransformation(NetParameter* net_param) {
 
 bool UpgradeV1Net(const NetParameter& v1_net_param, NetParameter* net_param) {
   if (v1_net_param.layer_size() > 0) {
-    LOG(FATAL) << "Refusing to upgrade inconsistent NetParameter input; "
+    LOG(fatal) << "Refusing to upgrade inconsistent NetParameter input; "
         << "the definition includes both 'layer' and 'layers' fields. "
         << "The current format defines 'layer' fields with string type like "
         << "layer { type: 'Layer' ... } and not layers { type: LAYER ... }. "
@@ -670,7 +670,7 @@ bool UpgradeV1Net(const NetParameter& v1_net_param, NetParameter* net_param) {
   for (int i = 0; i < v1_net_param.layers_size(); ++i) {
     if (!UpgradeV1LayerParameter(v1_net_param.layers(i),
                                  net_param->add_layer())) {
-      LOG(ERROR) << "Upgrade of input layer " << i << " failed.";
+      LOG(error) << "Upgrade of input layer " << i << " failed.";
       is_fully_compatible = false;
     }
   }
@@ -717,7 +717,7 @@ bool UpgradeV1LayerParameter(const V1LayerParameter& v1_layer_param,
       mode = ParamSpec_DimCheckMode_PERMISSIVE;
       break;
     default:
-      LOG(FATAL) << "Unknown blob_share_mode: "
+      LOG(fatal) << "Unknown blob_share_mode: "
                  << v1_layer_param.blob_share_mode(i);
       break;
     }
@@ -856,7 +856,7 @@ bool UpgradeV1LayerParameter(const V1LayerParameter& v1_layer_param,
         v1_layer_param.loss_param());
   }
   if (v1_layer_param.has_layer()) {
-    LOG(ERROR) << "Input NetParameter has V0 layer -- ignoring.";
+    LOG(error) << "Input NetParameter has V0 layer -- ignoring.";
     is_fully_compatible = false;
   }
   return is_fully_compatible;
@@ -945,7 +945,7 @@ const char* UpgradeV1LayerType(const V1LayerParameter_LayerType type) {
   case V1LayerParameter_LayerType_THRESHOLD:
     return "Threshold";
   default:
-    LOG(FATAL) << "Unknown V1LayerParameter layer type: " << type;
+    LOG(fatal) << "Unknown V1LayerParameter layer type: " << type;
     return "";
   }
 }
@@ -1025,12 +1025,12 @@ bool UpgradeSolverType(SolverParameter* solver_param) {
       type = "Adam";
       break;
     default:
-      LOG(FATAL) << "Unknown SolverParameter solver_type: " << type;
+      LOG(fatal) << "Unknown SolverParameter solver_type: " << type;
     }
     solver_param->set_type(type);
     solver_param->clear_solver_type();
   } else {
-    LOG(ERROR) << "Warning: solver type already up to date. ";
+    LOG(error) << "Warning: solver type already up to date. ";
     return false;
   }
   return true;
@@ -1041,16 +1041,16 @@ bool UpgradeSolverAsNeeded(const string& param_file, SolverParameter* param) {
   bool success = true;
   // Try to upgrade old style solver_type enum fields into new string type
   if (SolverNeedsTypeUpgrade(*param)) {
-    LOG(INFO) << "Attempting to upgrade input file specified using deprecated "
+    LOG(info) << "Attempting to upgrade input file specified using deprecated "
               << "'solver_type' field (enum)': " << param_file;
     if (!UpgradeSolverType(param)) {
       success = false;
-      LOG(ERROR) << "Warning: had one or more problems upgrading "
+      LOG(error) << "Warning: had one or more problems upgrading "
                  << "SolverType (see above).";
     } else {
-      LOG(INFO) << "Successfully upgraded file specified using deprecated "
+      LOG(info) << "Successfully upgraded file specified using deprecated "
                 << "'solver_type' field (enum) to 'type' field (string).";
-      LOG(WARNING) << "Note that future Caffe releases will only support "
+      LOG(warning) << "Note that future Caffe releases will only support "
                    << "'type' field (string) for a solver's type.";
     }
   }

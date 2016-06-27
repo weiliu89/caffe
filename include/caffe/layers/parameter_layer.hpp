@@ -15,7 +15,7 @@ class ParameterLayer : public Layer<Dtype> {
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
     if (this->blobs_.size() > 0) {
-      LOG(INFO) << "Skipping parameter initialization";
+      LOG(info) << "Skipping parameter initialization";
     } else {
       this->blobs_.resize(1);
       this->blobs_[0].reset(new Blob<Dtype>());

@@ -7,7 +7,7 @@
 //    http://yann.lecun.com/exdb/mnist/
 
 #include <gflags/gflags.h>
-#include <glog/logging.h>
+//#include <glog/logging.h>
 #include <google/protobuf/text_format.h>
 
 #if defined(USE_LEVELDB) && defined(USE_LMDB)
@@ -89,8 +89,8 @@ void convert_dataset(const char* image_filename, const char* label_filename,
   datum.set_channels(1);
   datum.set_height(rows);
   datum.set_width(cols);
-  LOG(INFO) << "A total of " << num_items << " items.";
-  LOG(INFO) << "Rows: " << rows << " Cols: " << cols;
+  LOG(info) << "A total of " << num_items << " items.";
+  LOG(info) << "Rows: " << rows << " Cols: " << cols;
   for (int item_id = 0; item_id < num_items; ++item_id) {
     image_file.read(pixels, rows * cols);
     label_file.read(&label, 1);
@@ -110,7 +110,7 @@ void convert_dataset(const char* image_filename, const char* label_filename,
   if (count % 1000 != 0) {
       txn->Commit();
   }
-  LOG(INFO) << "Processed " << count << " files.";
+  LOG(info) << "Processed " << count << " files.";
   delete[] pixels;
   db->Close();
 }
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
   namespace gflags = google;
 #endif
 
-  FLAGS_alsologtostderr = 1;
+  //FLAGS_alsologtostderr = 1;
 
   gflags::SetUsageMessage("This script converts the MNIST dataset to\n"
         "the lmdb/leveldb format used by Caffe to load data.\n"
@@ -139,14 +139,14 @@ int main(int argc, char** argv) {
     gflags::ShowUsageWithFlagsRestrict(argv[0],
         "examples/mnist/convert_mnist_data");
   } else {
-    google::InitGoogleLogging(argv[0]);
+    //google::InitGoogleLogging(argv[0]);
     convert_dataset(argv[1], argv[2], argv[3], db_backend);
   }
   return 0;
 }
 #else
 int main(int argc, char** argv) {
-  LOG(FATAL) << "This example requires LevelDB and LMDB; " <<
+  LOG(fatal) << "This example requires LevelDB and LMDB; " <<
   "compile with USE_LEVELDB and USE_LMDB.";
 }
 #endif  // USE_LEVELDB and USE_LMDB

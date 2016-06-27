@@ -16,10 +16,10 @@ using std::ofstream;
 using namespace caffe;  // NOLINT(build/namespaces)
 
 int main(int argc, char** argv) {
-  FLAGS_alsologtostderr = 1;  // Print output to stderr (while still logging)
-  ::google::InitGoogleLogging(argv[0]);
+//  FLAGS_alsologtostderr = 1;  // Print output to stderr (while still logging)
+//  ::google::InitGoogleLogging(argv[0]);
   if (argc != 3) {
-    LOG(ERROR) << "Usage: "
+    LOG(error) << "Usage: "
         << "upgrade_net_proto_binary v0_net_proto_file_in net_proto_file_out";
     return 1;
   }
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
   NetParameter net_param;
   string input_filename(argv[1]);
   if (!ReadProtoFromBinaryFile(input_filename, &net_param)) {
-    LOG(ERROR) << "Failed to parse input binary file as NetParameter: "
+    LOG(error) << "Failed to parse input binary file as NetParameter: "
                << input_filename;
     return 2;
   }
@@ -36,15 +36,15 @@ int main(int argc, char** argv) {
   if (need_upgrade) {
     success = UpgradeNetAsNeeded(input_filename, &net_param);
     if (!success) {
-      LOG(ERROR) << "Encountered error(s) while upgrading prototxt; "
+      LOG(error) << "Encountered error(s) while upgrading prototxt; "
                  << "see details above.";
     }
   } else {
-    LOG(ERROR) << "File already in latest proto format: " << input_filename;
+    LOG(error) << "File already in latest proto format: " << input_filename;
   }
 
   WriteProtoToBinaryFile(net_param, argv[2]);
 
-  LOG(INFO) << "Wrote upgraded NetParameter binary proto to " << argv[2];
+  LOG(info) << "Wrote upgraded NetParameter binary proto to " << argv[2];
   return !success;
 }

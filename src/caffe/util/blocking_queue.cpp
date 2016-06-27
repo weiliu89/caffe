@@ -47,7 +47,7 @@ T BlockingQueue<T>::pop(const string& log_on_wait) {
 
   while (queue_.empty()) {
     if (!log_on_wait.empty()) {
-      LOG_EVERY_N(INFO, 1000)<< log_on_wait;
+      LOG_EVERY_N(info, 1000)<< log_on_wait;
     }
     sync_->condition_.wait(lock);
   }

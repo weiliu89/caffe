@@ -60,7 +60,7 @@ void RMSPropSolver<Dtype>::ComputeUpdateValue(int param_id, Dtype rate) {
 #endif
     break;
   default:
-    LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
+    LOG(fatal) << "Unknown caffe mode: " << Caffe::mode();
   }
 }
 

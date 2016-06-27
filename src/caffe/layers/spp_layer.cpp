@@ -55,7 +55,7 @@ LayerParameter SPPLayer<Dtype>::GetPoolingParam(const int pyramid_level,
         PoolingParameter_PoolMethod_STOCHASTIC);
     break;
   default:
-    LOG(FATAL) << "Unknown pooling method.";
+    LOG(fatal) << "Unknown pooling method.";
   }
 
   return pooling_param;

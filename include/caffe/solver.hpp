@@ -147,13 +147,13 @@ class DLL_EXPORT WorkerSolver : public Solver<Dtype> {
  protected:
   void ApplyUpdate() {}
   void SnapshotSolverState(const string& model_filename) {
-    LOG(FATAL) << "Should not be called on worker solver.";
+    LOG(fatal) << "Should not be called on worker solver.";
   }
   void RestoreSolverStateFromBinaryProto(const string& state_file) {
-    LOG(FATAL) << "Should not be called on worker solver.";
+    LOG(fatal) << "Should not be called on worker solver.";
   }
   void RestoreSolverStateFromHDF5(const string& state_file) {
-    LOG(FATAL) << "Should not be called on worker solver.";
+    LOG(fatal) << "Should not be called on worker solver.";
   }
 };
 

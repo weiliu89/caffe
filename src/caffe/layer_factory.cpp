@@ -50,7 +50,7 @@ namespace caffe {
 	template<typename T> shared_ptr<Layer<T> > LayerRegistry<T>::CreateLayer(const LayerParameter& param)
 	{
 		if (Caffe::root_solver()) {
-			LOG(INFO) << "Creating layer " << param.name();
+			LOG(info) << "Creating layer " << param.name();
 		}
 		const string& type = param.type();
 		CreatorRegistry& registry = Registry();
@@ -112,13 +112,13 @@ shared_ptr<Layer<Dtype> > GetConvolutionLayer(
 #ifdef USE_CUDNN
   } else if (engine == ConvolutionParameter_Engine_CUDNN) {
     if (use_dilation) {
-      LOG(FATAL) << "CuDNN doesn't support the dilated convolution at Layer "
+      LOG(fatal) << "CuDNN doesn't support the dilated convolution at Layer "
                  << param.name();
     }
     return shared_ptr<Layer<Dtype> >(new CuDNNConvolutionLayer<Dtype>(param));
 #endif
   } else {
-    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+    LOG(fatal) << "Layer " << param.name() << " has unknown engine.";
   }
   return shared_ptr<Layer<Dtype> >();
 }
@@ -140,7 +140,7 @@ shared_ptr<Layer<Dtype> > GetPoolingLayer(const LayerParameter& param) {
 #ifdef USE_CUDNN
   } else if (engine == PoolingParameter_Engine_CUDNN) {
     if (param.top_size() > 1) {
-      LOG(INFO) << "cuDNN does not support multiple tops. "
+      LOG(info) << "cuDNN does not support multiple tops. "
                 << "Using Caffe's own pooling layer.";
       return shared_ptr<Layer<Dtype> >(new PoolingLayer<Dtype>(param));
     }
@@ -156,7 +156,7 @@ shared_ptr<Layer<Dtype> > GetPoolingLayer(const LayerParameter& param) {
     }
 #endif
   } else {
-    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+    LOG(fatal) << "Layer " << param.name() << " has unknown engine.";
   }
   return shared_ptr<Layer<Dtype> >();
 }
@@ -194,7 +194,7 @@ shared_ptr<Layer<Dtype> > GetLRNLayer(const LayerParameter& param) {
     }
 #endif
   } else {
-    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+    LOG(fatal) << "Layer " << param.name() << " has unknown engine.";
   }
 }
 
@@ -217,7 +217,7 @@ shared_ptr<Layer<Dtype> > GetReLULayer(const LayerParameter& param) {
     return shared_ptr<Layer<Dtype> >(new CuDNNReLULayer<Dtype>(param));
 #endif
   } else {
-    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+    LOG(fatal) << "Layer " << param.name() << " has unknown engine.";
   }
   return shared_ptr<Layer<Dtype> >();
 }
@@ -241,7 +241,7 @@ shared_ptr<Layer<Dtype> > GetSigmoidLayer(const LayerParameter& param) {
     return shared_ptr<Layer<Dtype> >(new CuDNNSigmoidLayer<Dtype>(param));
 #endif
   } else {
-    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+    LOG(fatal) << "Layer " << param.name() << " has unknown engine.";
   }
   return shared_ptr<Layer<Dtype> >();
 }
@@ -265,7 +265,7 @@ shared_ptr<Layer<Dtype> > GetSoftmaxLayer(const LayerParameter& param) {
     return shared_ptr<Layer<Dtype> >(new CuDNNSoftmaxLayer<Dtype>(param));
 #endif
   } else {
-    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+    LOG(fatal) << "Layer " << param.name() << " has unknown engine.";
   }
   return shared_ptr<Layer<Dtype> >();
 }
@@ -289,7 +289,7 @@ shared_ptr<Layer<Dtype> > GetTanHLayer(const LayerParameter& param) {
     return shared_ptr<Layer<Dtype> >(new CuDNNTanHLayer<Dtype>(param));
 #endif
   } else {
-    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+    LOG(fatal) << "Layer " << param.name() << " has unknown engine.";
   }
   return shared_ptr<Layer<Dtype> >();
 }

@@ -1,7 +1,7 @@
 #ifndef CPU_ONLY
 #include <cuda_runtime.h>
 #endif
-#include <glog/logging.h>
+//#include <glog/logging.h>
 #include <stdio.h>
 #ifdef _MSC_VER
 
@@ -138,7 +138,7 @@ void DevicePair::compute(const vector<int> devices, vector<DevicePair>* pairs) {
         if (a.isMultiGpuBoard && b.isMultiGpuBoard) {
           if (a.multiGpuBoardGroupID == b.multiGpuBoardGroupID) {
             pairs->push_back(DevicePair(remaining[i], remaining[j]));
-            DLOG(INFO) << "GPU board: " << remaining[i] << ":" << remaining[j];
+            DLOG(info) << "GPU board: " << remaining[i] << ":" << remaining[j];
             remaining.erase(remaining.begin() + j);
             break;
           }
@@ -150,7 +150,7 @@ void DevicePair::compute(const vector<int> devices, vector<DevicePair>* pairs) {
   for (int i = 0; i < remaining.size(); ++i) {
     s << (i ? ", " : "") << remaining[i];
   }
-  DLOG(INFO) << "GPUs paired by boards, remaining: " << s.str();
+  DLOG(info) << "GPUs paired by boards, remaining: " << s.str();
 
   // Group by P2P accessibility
   remaining_depth = ceil(log2(remaining.size()));
@@ -162,7 +162,7 @@ void DevicePair::compute(const vector<int> devices, vector<DevicePair>* pairs) {
             cudaDeviceCanAccessPeer(&access, remaining[i], remaining[j]));
         if (access) {
           pairs->push_back(DevicePair(remaining[i], remaining[j]));
-          DLOG(INFO) << "P2P pair: " << remaining[i] << ":" << remaining[j];
+          DLOG(info) << "P2P pair: " << remaining[i] << ":" << remaining[j];
           remaining.erase(remaining.begin() + j);
           break;
         }
@@ -173,14 +173,14 @@ void DevicePair::compute(const vector<int> devices, vector<DevicePair>* pairs) {
   for (int i = 0; i < remaining.size(); ++i) {
     s << (i ? ", " : "") << remaining[i];
   }
-  DLOG(INFO) << "GPUs paired by P2P access, remaining: " << s.str();
+  DLOG(info) << "GPUs paired by P2P access, remaining: " << s.str();
 
   // Group remaining
   remaining_depth = ceil(log2(remaining.size()));
   for (int d = 0; d < remaining_depth; ++d) {
     for (int i = 0; i < remaining.size(); ++i) {
       pairs->push_back(DevicePair(remaining[i], remaining[i + 1]));
-      DLOG(INFO) << "Remaining pair: " << remaining[i] << ":"
+      DLOG(info) << "Remaining pair: " << remaining[i] << ":"
                  << remaining[i + 1];
       remaining.erase(remaining.begin() + i + 1);
     }
@@ -238,7 +238,7 @@ P2PSync<Dtype>::P2PSync(shared_ptr<Solver<Dtype> > root_solver,
     if (access) {
       CUDA_CHECK(cudaDeviceEnablePeerAccess(peer, 0));
     } else {
-      LOG(INFO)<< "GPU " << self << " does not have p2p access to GPU " << peer;
+      LOG(info)<< "GPU " << self << " does not have p2p access to GPU " << peer;
     }
     // Allocate receiving buffer on parent
     CUDA_CHECK(cudaSetDevice(peer));
@@ -396,7 +396,7 @@ void P2PSync<Dtype>::Prepare(const vector<int>& gpus,
   for (int i = 1; i < pairs.size(); ++i) {
     s << (i == 1 ? "" : ", ") << pairs[i].parent() << ":" << pairs[i].device();
   }
-  LOG(INFO)<< "GPUs pairs " << s.str();
+  LOG(info)<< "GPUs pairs " << s.str();
 
   SolverParameter param(solver_->param());
 
@@ -429,7 +429,7 @@ void P2PSync<Dtype>::Run(const vector<int>& gpus) {
   vector<shared_ptr<P2PSync<Dtype> > > syncs(gpus.size());
   Prepare(gpus, &syncs);
 
-  LOG(INFO)<< "Starting Optimization";
+  LOG(info)<< "Starting Optimization";
 
   for (int i = 1; i < syncs.size(); ++i) {
     syncs[i]->StartInternalThread();

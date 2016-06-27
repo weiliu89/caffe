@@ -10,7 +10,7 @@
 #include <string>
 
 #include "boost/scoped_ptr.hpp"
-#include "glog/logging.h"
+//#include "glog/logging.h"
 #include "google/protobuf/text_format.h"
 #include "stdint.h"
 
@@ -49,10 +49,10 @@ void convert_dataset(const string& input_folder, const string& output_folder,
   datum.set_height(kCIFARSize);
   datum.set_width(kCIFARSize);
 
-  LOG(INFO) << "Writing Training data";
+  LOG(info) << "Writing Training data";
   for (int fileid = 0; fileid < kCIFARTrainBatches; ++fileid) {
     // Open files
-    LOG(INFO) << "Training Batch " << fileid + 1;
+    LOG(info) << "Training Batch " << fileid + 1;
     string batchFileName = input_folder + "/data_batch_"
       + caffe::format_int(fileid+1) + ".bin";
     std::ifstream data_file(batchFileName.c_str(),
@@ -70,7 +70,7 @@ void convert_dataset(const string& input_folder, const string& output_folder,
   txn->Commit();
   train_db->Close();
 
-  LOG(INFO) << "Writing Testing data";
+  LOG(info) << "Writing Testing data";
   scoped_ptr<db::DB> test_db(db::GetDB(db_type));
   test_db->Open(output_folder + "/cifar10_test_" + db_type, db::NEW);
   txn.reset(test_db->NewTransaction());
@@ -91,7 +91,7 @@ void convert_dataset(const string& input_folder, const string& output_folder,
 }
 
 int main(int argc, char** argv) {
-  FLAGS_alsologtostderr = 1;
+  //FLAGS_alsologtostderr = 1;
 
   if (argc != 4) {
     printf("This script converts the CIFAR dataset to the leveldb format used\n"
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
            "    http://www.cs.toronto.edu/~kriz/cifar.html\n"
            "You should gunzip them after downloading.\n");
   } else {
-    google::InitGoogleLogging(argv[0]);
+    //google::InitGoogleLogging(argv[0]);
     convert_dataset(string(argv[1]), string(argv[2]), string(argv[3]));
   }
   return 0;

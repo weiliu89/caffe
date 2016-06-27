@@ -3,7 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <gflags/gflags.h>
-#include <glog/logging.h>
+
 
 #include <climits>
 #include <cmath>
@@ -17,17 +17,8 @@
 #include <vector>
 
 #include "caffe/util/device_alternate.hpp"
-#ifdef _MSC_VER
-#define TEMPLATE_EXTERN
-#if defined libcaffe_EXPORTS
-#define DLL_EXPORT __declspec(dllexport)
-#else
-#define DLL_EXPORT
-#endif
-#else
-#define DLL_EXPORT
-#define TEMPLATE_EXTERN extern
-#endif
+#include "caffe/export.hpp"
+#include "caffe/logging.hpp"
 
 // Convert macro to string
 #define STRINGIFY(m) #m
@@ -78,7 +69,7 @@ private:\
 
 // A simple macro to mark codes that are not implemented, so that when the code
 // is executed we will see a fatal log.
-#define NOT_IMPLEMENTED LOG(FATAL) << "Not Implemented Yet"
+#define NOT_IMPLEMENTED LOG(fatal) << "Not Implemented Yet"
 
 // See PR #1236
 namespace cv { class Mat; }

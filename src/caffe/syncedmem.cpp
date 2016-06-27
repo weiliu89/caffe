@@ -4,6 +4,41 @@
 
 namespace caffe {
 
+void CaffeMallocHost(void** ptr, size_t size, bool* use_cuda) {
+#ifndef CPU_ONLY
+  if (Caffe::mode() == Caffe::GPU) {
+    CUDA_CHECK(cudaMallocHost(ptr, size));
+    *use_cuda = true;
+    return;
+  }
+#endif
+  *ptr = malloc(size);
+  *use_cuda = false;
+  CHECK(*ptr) << "host allocation of size " << size << " failed";
+}
+
+void CaffeFreeHost(void* ptr, bool use_cuda) {
+#ifndef CPU_ONLY
+  if (use_cuda) {
+    CUDA_CHECK(cudaFreeHost(ptr));
+    return;
+  }
+#endif
+  free(ptr);
+}
+
+
+SyncedMemory::SyncedMemory()
+    : cpu_ptr_(NULL), gpu_ptr_(NULL), size_(0), head_(UNINITIALIZED),
+    own_cpu_data_(false), cpu_malloc_use_cuda_(false), own_gpu_data_(false),
+    gpu_device_(-1) {}
+
+SyncedMemory::SyncedMemory(size_t size)
+    : cpu_ptr_(NULL), gpu_ptr_(NULL), size_(size), head_(UNINITIALIZED),
+    own_cpu_data_(false), cpu_malloc_use_cuda_(false), own_gpu_data_(false),
+    gpu_device_(-1) {}
+
+
 SyncedMemory::~SyncedMemory() {
   if (cpu_ptr_ && own_cpu_data_) {
     CaffeFreeHost(cpu_ptr_, cpu_malloc_use_cuda_);

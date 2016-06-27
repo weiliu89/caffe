@@ -26,7 +26,7 @@ void InsertSplits(const NetParameter& param, NetParameter* param_split) {
       const string& blob_name = layer_param.bottom(j);
       if (blob_name_to_last_top_idx.find(blob_name) ==
           blob_name_to_last_top_idx.end()) {
-        LOG(FATAL) << "Unknown bottom blob '" << blob_name << "' (layer '"
+        LOG(fatal) << "Unknown bottom blob '" << blob_name << "' (layer '"
                    << layer_param.name() << "', bottom index " << j << ")";
       }
       const pair<int, int>& bottom_idx = make_pair(i, j);

@@ -16,7 +16,7 @@
 
 #include "boost/scoped_ptr.hpp"
 #include "gflags/gflags.h"
-#include "glog/logging.h"
+//#include "glog/logging.h"
 
 #include "caffe/proto/caffe_pb.h"
 #include "caffe/util/db.hpp"
@@ -45,9 +45,9 @@ DEFINE_string(encode_type, "",
 
 int main(int argc, char** argv) {
 #ifdef USE_OPENCV
-  ::google::InitGoogleLogging(argv[0]);
+//  ::google::InitGoogleLogging(argv[0]);
   // Print output to stderr (while still logging)
-  FLAGS_alsologtostderr = 1;
+//  FLAGS_alsologtostderr = 1;
 
 #ifndef GFLAGS_GFLAGS_H_
   namespace gflags = google;
@@ -83,13 +83,13 @@ int main(int argc, char** argv) {
   }
   if (FLAGS_shuffle) {
     // randomly shuffle data
-    LOG(INFO) << "Shuffling data";
+    LOG(info) << "Shuffling data";
     shuffle(lines.begin(), lines.end());
   }
-  LOG(INFO) << "A total of " << lines.size() << " images.";
+  LOG(info) << "A total of " << lines.size() << " images.";
 
   if (encode_type.size() && !encoded)
-    LOG(INFO) << "encode_type specified, assuming encoded=true.";
+    LOG(info) << "encode_type specified, assuming encoded=true.";
 
   int resize_height = std::max<int>(0, FLAGS_resize_height);
   int resize_width = std::max<int>(0, FLAGS_resize_width);
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
       string fn = lines[line_id].first;
       size_t p = fn.rfind('.');
       if ( p == fn.npos )
-        LOG(WARNING) << "Failed to guess the encoding of '" << fn << "'";
+        LOG(warning) << "Failed to guess the encoding of '" << fn << "'";
       enc = fn.substr(p);
       std::transform(enc.begin(), enc.end(), enc.begin(), ::tolower);
     }
@@ -144,16 +144,16 @@ int main(int argc, char** argv) {
       // Commit db
       txn->Commit();
       txn.reset(db->NewTransaction());
-      LOG(INFO) << "Processed " << count << " files.";
+      LOG(info) << "Processed " << count << " files.";
     }
   }
   // write the last batch
   if (count % 1000 != 0) {
     txn->Commit();
-    LOG(INFO) << "Processed " << count << " files.";
+    LOG(info) << "Processed " << count << " files.";
   }
 #else
-  LOG(FATAL) << "This tool requires OpenCV; compile with USE_OPENCV.";
+  LOG(fatal) << "This tool requires OpenCV; compile with USE_OPENCV.";
 #endif  // USE_OPENCV
   return 0;
 }

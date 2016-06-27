@@ -97,14 +97,7 @@ void AccuracyLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       ++count;
     }
   }
-  auto f = [&class_distribution]()->std::string{
-      std::stringstream ss; 
-      for(auto& itr : class_distribution)
-          ss << itr.first << ":" << itr.second << ",";
-      return ss.str();
-      };
-  LOG(INFO) << "Class distribution: " << f();
-  // LOG(INFO) << "Accuracy: " << accuracy;
+  // LOG(info) << "Accuracy: " << accuracy;
   top[0]->mutable_cpu_data()[0] = accuracy / count;
   if (top.size() > 1) {
     for (int i = 0; i < top[1]->count(); ++i) {

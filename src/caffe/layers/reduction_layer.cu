@@ -26,9 +26,6 @@ void ReductionLayer<Dtype>::Forward_gpu(
     case ReductionParameter_ReductionOp_SUMSQ:
       caffe_gpu_dot(dim_, bottom_data, bottom_data, top_data);
       break;
-    default:
-      LOG(FATAL) << "Unknown reduction op: "
-          << ReductionParameter_ReductionOp_Name(op_);
     }
     bottom_data += dim_;
     ++top_data;
@@ -56,9 +53,6 @@ void ReductionLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   case ReductionParameter_ReductionOp_SUMSQ:
     bottom_data = bottom[0]->gpu_data();
     break;
-  default:
-    LOG(FATAL) << "Unknown reduction op: "
-        << ReductionParameter_ReductionOp_Name(op_);
   }
   const Dtype* top_diff = top[0]->cpu_diff();
   Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
@@ -76,9 +70,6 @@ void ReductionLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     case ReductionParameter_ReductionOp_SUMSQ:
       caffe_gpu_scale(dim_, 2 * bottom_coeff, bottom_data, bottom_diff);
       break;
-    default:
-      LOG(FATAL) << "Unknown reduction op: "
-          << ReductionParameter_ReductionOp_Name(op_);
     }
     bottom_data += dim_;
     bottom_diff += dim_;

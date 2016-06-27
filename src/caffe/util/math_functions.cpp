@@ -10,8 +10,34 @@
 #define __builtin_popcount __popcnt 
 #define __builtin_popcountl __popcnt
 #endif
-namespace caffe {
 
+#define DEFINE_CAFFE_CPU_UNARY_FUNC(name, operation) \
+  template<typename Dtype> \
+  DLL_EXPORT void caffe_cpu_##name(const int n, const Dtype* x, Dtype* y) { \
+    CHECK_GT(n, 0); CHECK(x); CHECK(y); \
+    for (int i = 0; i < n; ++i) { \
+      operation; \
+    } \
+  } \
+  template DLL_EXPORT void caffe_cpu_##name<float>(const int n, const float* x, float* y); \
+  template DLL_EXPORT void caffe_cpu_##name<double>(const int n, const double* x, double* y);
+
+namespace caffe {
+    DEFINE_CAFFE_CPU_UNARY_FUNC(sign, y[i] = caffe_sign<Dtype>(x[i]));
+
+    DEFINE_CAFFE_CPU_UNARY_FUNC(sgnbit, \
+    y[i] = static_cast<bool>((std::signbit)(x[i])));
+
+    DEFINE_CAFFE_CPU_UNARY_FUNC(fabs, y[i] = std::fabs(x[i]));
+
+
+    inline void caffe_gpu_memset(const size_t N, const int alpha, void* X) {
+#ifndef CPU_ONLY
+  CUDA_CHECK(cudaMemset(X, alpha, N));  // NOLINT(caffe/alt_fn)
+#else
+  NO_GPU;
+#endif
+}
 template<>
 void caffe_cpu_gemm<float>(const CBLAS_TRANSPOSE TransA,
     const CBLAS_TRANSPOSE TransB, const int M, const int N, const int K,
@@ -78,9 +104,6 @@ template DLL_EXPORT void caffe_cpu_gemv<float>(const CBLAS_TRANSPOSE TransA, con
 
 template DLL_EXPORT void caffe_axpy<float>(const int N, const float alpha, const float* X,
     float* Y);
-
-
-
 
 template DLL_EXPORT void caffe_cpu_gemm<double>(const CBLAS_TRANSPOSE TransA,
     const CBLAS_TRANSPOSE TransB, const int M, const int N, const int K,
@@ -164,101 +187,101 @@ template DLL_EXPORT void caffe_cpu_axpby<double>(const int N, const double alpha
 template <>
 void caffe_add<float>(const int n, const float* a, const float* b,
     float* y) {
-  vsAdd(n, a, b, y);
+  vAdd(n, a, b, y);
 }
 
 template <>
 void caffe_add<double>(const int n, const double* a, const double* b,
     double* y) {
-  vdAdd(n, a, b, y);
+  vAdd(n, a, b, y);
 }
 
 template <>
 void caffe_sub<float>(const int n, const float* a, const float* b,
     float* y) {
-  vsSub(n, a, b, y);
+  vSub(n, a, b, y);
 }
 
 template <>
 void caffe_sub<double>(const int n, const double* a, const double* b,
     double* y) {
-  vdSub(n, a, b, y);
+  vSub(n, a, b, y);
 }
 
 template <>
 void caffe_mul<float>(const int n, const float* a, const float* b,
     float* y) {
-  vsMul(n, a, b, y);
+  vMul(n, a, b, y);
 }
 
 template <>
 void caffe_mul<double>(const int n, const double* a, const double* b,
     double* y) {
-  vdMul(n, a, b, y);
+  vMul(n, a, b, y);
 }
 
 template <>
 void caffe_div<float>(const int n, const float* a, const float* b,
     float* y) {
-  vsDiv(n, a, b, y);
+  vDiv(n, a, b, y);
 }
 
 template <>
 void caffe_div<double>(const int n, const double* a, const double* b,
     double* y) {
-  vdDiv(n, a, b, y);
+  vDiv(n, a, b, y);
 }
 
 template <>
 void caffe_powx<float>(const int n, const float* a, const float b,
     float* y) {
-  vsPowx(n, a, b, y);
+  vPowx(n, a, b, y);
 }
 
 template <>
 void caffe_powx<double>(const int n, const double* a, const double b,
     double* y) {
-  vdPowx(n, a, b, y);
+  vPowx(n, a, b, y);
 }
 
 template <>
 void caffe_sqr<float>(const int n, const float* a, float* y) {
-  vsSqr(n, a, y);
+  vSqr(n, a, y);
 }
 
 template <>
 void caffe_sqr<double>(const int n, const double* a, double* y) {
-  vdSqr(n, a, y);
+  vSqr(n, a, y);
 }
 
 template <>
 void caffe_exp<float>(const int n, const float* a, float* y) {
-  vsExp(n, a, y);
+  vExp(n, a, y);
 }
 
 template <>
 void caffe_exp<double>(const int n, const double* a, double* y) {
-  vdExp(n, a, y);
+  vExp(n, a, y);
 }
 
 template <>
 void caffe_log<float>(const int n, const float* a, float* y) {
-  vsLn(n, a, y);
+  vLn(n, a, y);
 }
 
 template <>
 void caffe_log<double>(const int n, const double* a, double* y) {
-  vdLn(n, a, y);
+  vLn(n, a, y);
 }
 
 template <>
 void caffe_abs<float>(const int n, const float* a, float* y) {
-    vsAbs(n, a, y);
+    vAbs(n, a, y);
 }
 
 template <>
 void caffe_abs<double>(const int n, const double* a, double* y) {
-    vdAbs(n, a, y);
+    vAbs(n, a, y);
 }
 
 unsigned int caffe_rng_rand() {
@@ -411,5 +434,11 @@ void caffe_cpu_scale<double>(const int n, const double alpha, const double *x,
   cblas_dcopy(n, x, 1, y, 1);
   cblas_dscal(n, alpha, y, 1);
 }
+
+template DLL_EXPORT float caffe_cpu_asum<float>(const int n, const float* x);
+template DLL_EXPORT void caffe_cpu_scale<float>(const int n, const float alpha, const float* x, float* y);
+
+template DLL_EXPORT double caffe_cpu_asum<double>(const int n, const double* x);
+template DLL_EXPORT void caffe_cpu_scale<double>(const int n, const double alpha, const double* x, double* y);
 
 }  // namespace caffe

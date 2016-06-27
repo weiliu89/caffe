@@ -8,7 +8,7 @@
 #include <fstream>  // NOLINT(readability/streams)
 #include <string>
 
-#include "glog/logging.h"
+//#include "glog/logging.h"
 #include "google/protobuf/text_format.h"
 #include "stdint.h"
 
@@ -82,8 +82,8 @@ void convert_dataset(const char* image_filename, const char* label_filename,
   datum.set_channels(2);  // one channel for each image in the pair
   datum.set_height(rows);
   datum.set_width(cols);
-  LOG(INFO) << "A total of " << num_items << " items.";
-  LOG(INFO) << "Rows: " << rows << " Cols: " << cols;
+  LOG(info) << "A total of " << num_items << " items.";
+  LOG(info) << "Rows: " << rows << " Cols: " << cols;
   for (int itemid = 0; itemid < num_items; ++itemid) {
     int i = caffe::caffe_rng_rand() % num_items;  // pick a random  pair
     int j = caffe::caffe_rng_rand() % num_items;
@@ -117,13 +117,13 @@ int main(int argc, char** argv) {
            "    http://yann.lecun.com/exdb/mnist/\n"
            "You should gunzip them after downloading.\n");
   } else {
-    google::InitGoogleLogging(argv[0]);
+    //google::InitGoogleLogging(argv[0]);
     convert_dataset(argv[1], argv[2], argv[3]);
   }
   return 0;
 }
 #else
 int main(int argc, char** argv) {
-  LOG(FATAL) << "This example requires LevelDB; compile with USE_LEVELDB.";
+  LOG(fatal) << "This example requires LevelDB; compile with USE_LEVELDB.";
 }
 #endif  // USE_LEVELDB

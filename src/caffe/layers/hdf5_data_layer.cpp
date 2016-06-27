@@ -25,10 +25,10 @@ HDF5DataLayer<Dtype>::~HDF5DataLayer<Dtype>() { }
 // Load data and label from HDF5 filename into the class property blobs.
 template <typename Dtype>
 void HDF5DataLayer<Dtype>::LoadHDF5FileData(const char* filename) {
-  DLOG(INFO) << "Loading HDF5 file: " << filename;
+  DLOG(info) << "Loading HDF5 file: " << filename;
   hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
   if (file_id < 0) {
-    LOG(FATAL) << "Failed opening HDF5 file: " << filename;
+    LOG(fatal) << "Failed opening HDF5 file: " << filename;
   }
 
   int top_size = this->layer_param_.top_size();
@@ -61,10 +61,10 @@ void HDF5DataLayer<Dtype>::LoadHDF5FileData(const char* filename) {
   // Shuffle if needed.
   if (this->layer_param_.hdf5_data_param().shuffle()) {
     std::random_shuffle(data_permutation_.begin(), data_permutation_.end());
-    DLOG(INFO) << "Successully loaded " << hdf_blobs_[0]->shape(0)
+    DLOG(info) << "Successully loaded " << hdf_blobs_[0]->shape(0)
                << " rows (shuffled)";
   } else {
-    DLOG(INFO) << "Successully loaded " << hdf_blobs_[0]->shape(0) << " rows";
+    DLOG(info) << "Successully loaded " << hdf_blobs_[0]->shape(0) << " rows";
   }
 }
 
@@ -76,7 +76,7 @@ void HDF5DataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       this->type() << " does not transform data.";
   // Read the source to parse the filenames.
   const string& source = this->layer_param_.hdf5_data_param().source();
-  LOG(INFO) << "Loading list of HDF5 filenames from: " << source;
+  LOG(info) << "Loading list of HDF5 filenames from: " << source;
   hdf_filenames_.clear();
   std::ifstream source_file(source.c_str());
   if (source_file.is_open()) {
@@ -85,12 +85,12 @@ void HDF5DataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       hdf_filenames_.push_back(line);
     }
   } else {
-    LOG(FATAL) << "Failed to open source file: " << source;
+    LOG(fatal) << "Failed to open source file: " << source;
   }
   source_file.close();
   num_files_ = hdf_filenames_.size();
   current_file_ = 0;
-  LOG(INFO) << "Number of HDF5 files: " << num_files_;
+  LOG(info) << "Number of HDF5 files: " << num_files_;
   CHECK_GE(num_files_, 1) << "Must have at least 1 HDF5 filename listed in "
     << source;
 
@@ -139,7 +139,7 @@ void HDF5DataLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
             std::random_shuffle(file_permutation_.begin(),
                                 file_permutation_.end());
           }
-          DLOG(INFO) << "Looping around to first file.";
+          DLOG(info) << "Looping around to first file.";
         }
         LoadHDF5FileData(
             hdf_filenames_[file_permutation_[current_file_]].c_str());

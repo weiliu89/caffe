@@ -12,28 +12,9 @@ namespace caffe {
 // The improvement in performance seems negligible in the single GPU case,
 // but might be more significant for parallel training. Most importantly,
 // it improved stability for large models on many GPUs.
-inline void CaffeMallocHost(void** ptr, size_t size, bool* use_cuda) {
-#ifndef CPU_ONLY
-  if (Caffe::mode() == Caffe::GPU) {
-    CUDA_CHECK(cudaMallocHost(ptr, size));
-    *use_cuda = true;
-    return;
-  }
-#endif
-  *ptr = malloc(size);
-  *use_cuda = false;
-  CHECK(*ptr) << "host allocation of size " << size << " failed";
-}
+DLL_EXPORT void CaffeMallocHost(void** ptr, size_t size, bool* use_cuda);
 
-inline void CaffeFreeHost(void* ptr, bool use_cuda) {
-#ifndef CPU_ONLY
-  if (use_cuda) {
-    CUDA_CHECK(cudaFreeHost(ptr));
-    return;
-  }
-#endif
-  free(ptr);
-}
+DLL_EXPORT void CaffeFreeHost(void* ptr, bool use_cuda);
 
 
 /**
@@ -44,14 +25,8 @@ inline void CaffeFreeHost(void* ptr, bool use_cuda) {
  */
 class DLL_EXPORT SyncedMemory {
  public:
-  SyncedMemory()
-      : cpu_ptr_(NULL), gpu_ptr_(NULL), size_(0), head_(UNINITIALIZED),
-        own_cpu_data_(false), cpu_malloc_use_cuda_(false), own_gpu_data_(false),
-        gpu_device_(-1) {}
-  explicit SyncedMemory(size_t size)
-      : cpu_ptr_(NULL), gpu_ptr_(NULL), size_(size), head_(UNINITIALIZED),
-        own_cpu_data_(false), cpu_malloc_use_cuda_(false), own_gpu_data_(false),
-        gpu_device_(-1) {}
+  SyncedMemory();
+  explicit SyncedMemory(size_t size);
   ~SyncedMemory();
   const void* cpu_data();
   void set_cpu_data(void* data);

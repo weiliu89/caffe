@@ -62,8 +62,8 @@ void EltwiseLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
           count, top_data, bottom[i]->gpu_data(), i-1, top_data, mask);
     }
     break;
-  default:
-    LOG(FATAL) << "Unknown elementwise operation.";
+  default: break;
+    //LOG(fatal) << "Unknown elementwise operation.";
   }
 }
 
@@ -122,8 +122,8 @@ void EltwiseLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
             <<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
             count, top_diff, i, mask, bottom_diff);
         break;
-      default:
-        LOG(FATAL) << "Unknown elementwise operation.";
+      default: break;
+        //LOG(fatal) << "Unknown elementwise operation.";
       }
     }
   }

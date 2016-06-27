@@ -66,10 +66,10 @@ void BasePrefetchingDataLayer<Dtype>::LayerSetUp(
     }
   }
 #endif
-  DLOG(INFO) << "Initializing prefetch";
+  DLOG(info) << "Initializing prefetch";
   this->data_transformer_->InitRand();
   StartInternalThread();
-  DLOG(INFO) << "Prefetch initialized.";
+  DLOG(info) << "Prefetch initialized.";
 }
 
 template <typename Dtype>
@@ -112,7 +112,7 @@ void BasePrefetchingDataLayer<Dtype>::Forward_cpu(
   // Copy the data
   caffe_copy(batch->data_.count(), batch->data_.cpu_data(),
              top[0]->mutable_cpu_data());
-  DLOG(INFO) << "Prefetch copied";
+  DLOG(info) << "Prefetch copied";
   if (this->output_labels_) {
     // Reshape to loaded labels.
     top[1]->ReshapeLike(batch->label_);

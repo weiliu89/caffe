@@ -48,7 +48,7 @@ template <typename Dtype>
 void Solver<Dtype>::Init(const SolverParameter& param) {
   CHECK(Caffe::root_solver() || root_solver_)
       << "root_solver_ needs to be set for all non-root solvers";
-  LOG_IF(INFO, Caffe::root_solver()) << "Initializing solver from parameters: "
+  LOG_IF(info, Caffe::root_solver()) << "Initializing solver from parameters: "
     << std::endl << param.DebugString();
   param_ = param;
   iter_ = 0;
@@ -61,7 +61,7 @@ void Solver<Dtype>::Init(const SolverParameter& param) {
   InitTrainNet();
   if (Caffe::root_solver()) {
     InitTestNets();
-    LOG(INFO) << "Solver scaffolding done.";
+    LOG(info) << "Solver scaffolding done.";
   }
   
   current_step_ = 0;
@@ -78,21 +78,21 @@ void Solver<Dtype>::InitTrainNet() {
       << "one of these fields specifying a train_net: " << field_names;
   NetParameter net_param;
   if (param_.has_train_net_param()) {
-    LOG_IF(INFO, Caffe::root_solver())
+    LOG_IF(info, Caffe::root_solver())
         << "Creating training net specified in train_net_param.";
     net_param.CopyFrom(param_.train_net_param());
   } else if (param_.has_train_net()) {
-    LOG_IF(INFO, Caffe::root_solver())
+    LOG_IF(info, Caffe::root_solver())
         << "Creating training net from train_net file: " << param_.train_net();
     ReadNetParamsFromTextFileOrDie(param_.train_net(), &net_param);
   }
   if (param_.has_net_param()) {
-    LOG_IF(INFO, Caffe::root_solver())
+    LOG_IF(info, Caffe::root_solver())
         << "Creating training net specified in net_param.";
     net_param.CopyFrom(param_.net_param());
   }
   if (param_.has_net()) {
-    LOG_IF(INFO, Caffe::root_solver())
+    LOG_IF(info, Caffe::root_solver())
         << "Creating training net from net file: " << param_.net();
     ReadNetParamsFromTextFileOrDie(param_.net(), &net_param);
   }
@@ -182,7 +182,7 @@ void Solver<Dtype>::InitTestNets() {
       net_state.MergeFrom(param_.test_state(i));
     }
     net_params[i].mutable_state()->CopyFrom(net_state);
-    LOG(INFO)
+    LOG(info)
         << "Creating test net (#" << i << ") specified by " << sources[i];
     if (Caffe::root_solver()) {
       test_nets_[i].reset(new Net<Dtype>(net_params[i]));
@@ -229,7 +229,7 @@ void Solver<Dtype>::Step(int iters) {
     // average the loss across iterations for smoothed reporting
     UpdateSmoothedLoss(loss, start_iter, average_loss);
     if (display) {
-      LOG_IF(INFO, Caffe::root_solver()) << "Iteration " << iter_
+      LOG_IF(info, Caffe::root_solver()) << "Iteration " << iter_
           << ", loss = " << smoothed_loss_;
       const vector<Blob<Dtype>*>& result = net_->output_blobs();
       int score_index = 0;
@@ -245,7 +245,7 @@ void Solver<Dtype>::Step(int iters) {
             loss_msg_stream << " (* " << loss_weight
                             << " = " << loss_weight * result_vec[k] << " loss)";
           }
-          LOG_IF(INFO, Caffe::root_solver()) << "    Train net output #"
+          LOG_IF(info, Caffe::root_solver()) << "    Train net output #"
               << score_index++ << ": " << output_name << " = "
               << result_vec[k] << loss_msg_stream.str();
         }
@@ -280,14 +280,14 @@ void Solver<Dtype>::Step(int iters) {
 template <typename Dtype>
 void Solver<Dtype>::Solve(const char* resume_file) {
   CHECK(Caffe::root_solver());
-  LOG(INFO) << "Solving " << net_->name();
-  LOG(INFO) << "Learning Rate Policy: " << param_.lr_policy();
+  LOG(info) << "Solving " << net_->name();
+  LOG(info) << "Learning Rate Policy: " << param_.lr_policy();
 
   // Initialize to false every time we start solving.
   requested_early_exit_ = false;
 
   if (resume_file) {
-    LOG(INFO) << "Restoring previous solver status from " << resume_file;
+    LOG(info) << "Restoring previous solver status from " << resume_file;
     Restore(resume_file);
   }
 
@@ -302,7 +302,7 @@ void Solver<Dtype>::Solve(const char* resume_file) {
     Snapshot();
   }
   if (requested_early_exit_) {
-    LOG(INFO) << "Optimization stopped early.";
+    LOG(info) << "Optimization stopped early.";
     return;
   }
   // After the optimization is done, run an additional train and test pass to
@@ -318,12 +318,12 @@ void Solver<Dtype>::Solve(const char* resume_file) {
 
     UpdateSmoothedLoss(loss, start_iter, average_loss);
 
-    LOG(INFO) << "Iteration " << iter_ << ", loss = " << smoothed_loss_;
+    LOG(info) << "Iteration " << iter_ << ", loss = " << smoothed_loss_;
   }
   if (param_.test_interval() && iter_ % param_.test_interval() == 0) {
     TestAll();
   }
-  LOG(INFO) << "Optimization Done.";
+  LOG(info) << "Optimization Done.";
 }
 
 template <typename Dtype>
@@ -338,7 +338,7 @@ void Solver<Dtype>::TestAll() {
 template <typename Dtype>
 void Solver<Dtype>::Test(const int test_net_id) {
   CHECK(Caffe::root_solver());
-  LOG(INFO) << "Iteration " << iter_
+  LOG(info) << "Iteration " << iter_
             << ", Testing net (#" << test_net_id << ")";
   CHECK_NOTNULL(test_nets_[test_net_id].get())->
       ShareTrainedLayersWith(net_.get());
@@ -387,12 +387,12 @@ void Solver<Dtype>::Test(const int test_net_id) {
     }
   }
   if (requested_early_exit_) {
-    LOG(INFO)     << "Test interrupted.";
+    LOG(info)     << "Test interrupted.";
     return;
   }
   if (param_.test_compute_loss()) {
     loss /= param_.test_iter(test_net_id);
-    LOG(INFO) << "Test loss: " << loss;
+    LOG(info) << "Test loss: " << loss;
   }
   for (int i = 0; i < test_score.size(); ++i) {
     const int output_blob_index =
@@ -405,7 +405,7 @@ void Solver<Dtype>::Test(const int test_net_id) {
       loss_msg_stream << " (* " << loss_weight
                       << " = " << loss_weight * mean_score << " loss)";
     }
-    LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
+    LOG(info) << "    Test net output #" << i << ": " << output_name << " = "
               << mean_score << loss_msg_stream.str();
   }
 }
@@ -422,7 +422,7 @@ void Solver<Dtype>::Snapshot() {
     model_filename = SnapshotToHDF5();
     break;
   default:
-    LOG(FATAL) << "Unsupported snapshot format.";
+    LOG(fatal) << "Unsupported snapshot format.";
   }
 
   SnapshotSolverState(model_filename);
@@ -439,7 +439,7 @@ void Solver<Dtype>::CheckSnapshotWritePermissions() {
       probe_ofs.close();
       std::remove(probe_filename.c_str());
     } else {
-      LOG(FATAL) << "Cannot write to snapshot prefix '"
+      LOG(fatal) << "Cannot write to snapshot prefix '"
           << param_.snapshot_prefix() << "'.  Make sure "
           << "that the directory exists and is writeable.";
     }
@@ -455,7 +455,7 @@ string Solver<Dtype>::SnapshotFilename(const string extension) {
 template <typename Dtype>
 string Solver<Dtype>::SnapshotToBinaryProto() {
   string model_filename = SnapshotFilename(".caffemodel");
-  LOG(INFO) << "Snapshotting to binary proto file " << model_filename;
+  LOG(info) << "Snapshotting to binary proto file " << model_filename;
   NetParameter net_param;
   net_->ToProto(&net_param, param_.snapshot_diff());
   WriteProtoToBinaryFile(net_param, model_filename);
@@ -465,7 +465,7 @@ string Solver<Dtype>::SnapshotToBinaryProto() {
 template <typename Dtype>
 string Solver<Dtype>::SnapshotToHDF5() {
   string model_filename = SnapshotFilename(".caffemodel.h5");
-  LOG(INFO) << "Snapshotting to HDF5 file " << model_filename;
+  LOG(info) << "Snapshotting to HDF5 file " << model_filename;
   net_->ToHDF5(model_filename, param_.snapshot_diff());
   return model_filename;
 }

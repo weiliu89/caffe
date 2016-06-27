@@ -14,7 +14,7 @@ template<typename Dtype> void PythonLayer<Dtype>::LayerSetUp(const vector<Blob<D
     // Details: https://github.com/BVLC/caffe/issues/2936
     if (this->phase_ == TRAIN && Caffe::solver_count() > 1
         && !ShareInParallel()) {
-      LOG(FATAL) << "PythonLayer is not implemented in Multi-GPU training";
+      LOG(fatal) << "PythonLayer is not implemented in Multi-GPU training";
     }
     self_.attr("param_str") = bp::str(
         this->layer_param_.python_param().param_str());

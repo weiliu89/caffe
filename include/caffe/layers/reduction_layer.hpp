@@ -20,7 +20,16 @@ template <typename Dtype>
 class DLL_EXPORT ReductionLayer : public Layer<Dtype> {
  public:
   explicit ReductionLayer(const LayerParameter& param)
-      : Layer<Dtype>(param) {}
+      : Layer<Dtype>(param) 
+  {
+    switch (op_) {
+        case ReductionParameter_ReductionOp_SUM: break;
+        case ReductionParameter_ReductionOp_MEAN: break;
+        case ReductionParameter_ReductionOp_ASUM: break;
+        case ReductionParameter_ReductionOp_SUMSQ: break;
+        default: LOG(fatal) << "Unknown reduction op: " << ReductionParameter_ReductionOp_Name(op_);
+    }
+  }
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,

@@ -34,7 +34,7 @@ inline void MakeTempDir(string* temp_dirname) {
       return;
     }
   }
-  LOG(FATAL) << "Failed to create a temporary directory.";
+  LOG(fatal) << "Failed to create a temporary directory.";
 }
 
 inline void MakeTempFilename(string* temp_filename) {

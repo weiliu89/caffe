@@ -10,7 +10,7 @@ template <typename Dtype>
 void BiasLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   if (bottom.size() == 1 && this->blobs_.size() > 0) {
-    LOG(INFO) << "Skipping parameter initialization";
+    LOG(info) << "Skipping parameter initialization";
   } else if (bottom.size() == 1) {
     // bias is a learned parameter; initialize it
     const BiasParameter& param = this->layer_param_.bias_param();

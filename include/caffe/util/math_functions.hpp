@@ -4,9 +4,7 @@
 #include <stdint.h>
 #include <cmath>  // for std::fabs and std::signbit
 
-#include "glog/logging.h"
-
-#include "caffe/common.hpp"
+#include "caffe/export.hpp"
 #include "caffe/util/device_alternate.hpp"
 #include "caffe/util/mkl_alternate.hpp"
 
@@ -118,26 +116,20 @@ inline int8_t caffe_sign(Dtype val) {
 // Git cherry picking that commit caused a conflict hard to resolve and
 //   copying that file in convenient for code reviewing.
 // So they have to be pasted here temporarily.
-#define DEFINE_CAFFE_CPU_UNARY_FUNC(name, operation) \
-  template<typename Dtype> \
-  DLL_EXPORT void caffe_cpu_##name(const int n, const Dtype* x, Dtype* y) { \
-    CHECK_GT(n, 0); CHECK(x); CHECK(y); \
-    for (int i = 0; i < n; ++i) { \
-      operation; \
-    } \
-  }
+#define DECLARE_CAFFE_CPU_UNARY_FUNC(name) \
+template<typename Dtype> \
+DLL_EXPORT void caffe_cpu_##name(const int n, const Dtype* x, Dtype* y);
 
 // output is 1 for the positives, 0 for zero, and -1 for the negatives
-DEFINE_CAFFE_CPU_UNARY_FUNC(sign, y[i] = caffe_sign<Dtype>(x[i]));
+DECLARE_CAFFE_CPU_UNARY_FUNC(sign);
 
 // This returns a nonzero value if the input has its sign bit set.
 // The name sngbit is meant to avoid conflicts with std::signbit in the macro.
 // The extra parens are needed because CUDA < 6.5 defines signbit as a macro,
 // and we don't want that to expand here when CUDA headers are also included.
-DEFINE_CAFFE_CPU_UNARY_FUNC(sgnbit, \
-    y[i] = static_cast<bool>((std::signbit)(x[i])));
+DECLARE_CAFFE_CPU_UNARY_FUNC(sgnbit);
 
-DEFINE_CAFFE_CPU_UNARY_FUNC(fabs, y[i] = std::fabs(x[i]));
+DECLARE_CAFFE_CPU_UNARY_FUNC(fabs);
 
 template <typename Dtype>
 DLL_EXPORT void caffe_cpu_scale(const int n, const Dtype alpha, const Dtype *x, Dtype* y);
@@ -171,13 +163,7 @@ DLL_EXPORT void caffe_gpu_memcpy(const size_t N, const void *X, void *Y);
 template <typename Dtype>
 DLL_EXPORT void caffe_gpu_set(const int N, const Dtype alpha, Dtype *X);
 
-inline void caffe_gpu_memset(const size_t N, const int alpha, void* X) {
-#ifndef CPU_ONLY
-  CUDA_CHECK(cudaMemset(X, alpha, N));  // NOLINT(caffe/alt_fn)
-#else
-  NO_GPU;
-#endif
-}
+DLL_EXPORT void caffe_gpu_memset(const size_t N, const int alpha, void* X);
 
 template <typename Dtype>
 DLL_EXPORT void caffe_gpu_add_scalar(const int N, const Dtype alpha, Dtype *X);

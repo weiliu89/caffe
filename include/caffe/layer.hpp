@@ -10,7 +10,7 @@
 #include "caffe/layer_factory.hpp"
 #include "caffe/proto/caffe_pb.h"
 #include "caffe/util/math_functions.hpp"
-
+#include "caffe/logging.hpp"
 /**
  Forward declare boost::thread instead of including boost/thread.hpp
  to avoid a boost/NVCC issues (#1009, #1010) on OSX.
@@ -340,7 +340,7 @@ class DLL_EXPORT Layer {
    */
   virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-    // LOG(WARNING) << "Using CPU code as backup.";
+    // LOG(warning) << "Using CPU code as backup.";
     return Forward_cpu(bottom, top);
   }
 
@@ -359,7 +359,7 @@ class DLL_EXPORT Layer {
   virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down,
       const vector<Blob<Dtype>*>& bottom) {
-    // LOG(WARNING) << "Using CPU code as backup.";
+    // LOG(warning) << "Using CPU code as backup.";
     Backward_cpu(top, propagate_down, bottom);
   }
 
@@ -480,7 +480,7 @@ inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
 #endif
     break;
   default:
-    LOG(FATAL) << "Unknown caffe mode.";
+    LOG(fatal) << "Unknown caffe mode.";
   }
   Unlock();
   return loss;
@@ -498,7 +498,7 @@ inline void Layer<Dtype>::Backward(const vector<Blob<Dtype>*>& top,
     Backward_gpu(top, propagate_down, bottom);
     break;
   default:
-    LOG(FATAL) << "Unknown caffe mode.";
+    LOG(fatal) << "Unknown caffe mode.";
   }
 }
 

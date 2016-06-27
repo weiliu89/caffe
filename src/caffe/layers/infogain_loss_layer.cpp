@@ -72,11 +72,11 @@ void InfogainLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
   if (propagate_down[1]) {
-    LOG(FATAL) << this->type()
+    LOG(fatal) << this->type()
                << " Layer cannot backpropagate to label inputs.";
   }
   if (propagate_down.size() > 2 && propagate_down[2]) {
-    LOG(FATAL) << this->type()
+    LOG(fatal) << this->type()
                << " Layer cannot backpropagate to infogain inputs.";
   }
   if (propagate_down[0]) {

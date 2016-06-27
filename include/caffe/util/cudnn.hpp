@@ -8,6 +8,7 @@
 
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe_pb.h"
+#include "caffe/logging.hpp"
 
 #define CUDNN_VERSION_MIN(major, minor, patch) \
     (CUDNN_VERSION >= (major * 1000 + minor * 100 + patch))
@@ -101,7 +102,7 @@ inline void createPoolingDesc(cudnnPoolingDescriptor_t* pool_desc,
     *mode = CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
     break;
   default:
-    LOG(FATAL) << "Unknown pooling method.";
+    LOG(fatal) << "Unknown pooling method.";
   }
   CUDNN_CHECK(cudnnCreatePoolingDescriptor(pool_desc));
 #if CUDNN_VERSION_MIN(5, 0, 0)

@@ -27,7 +27,7 @@ void LMDB::Open(const string& source, Mode mode) {
   MDB_CHECK(rc);
 #else
   if (rc == EACCES) {
-    LOG(WARNING) << "Permission denied. Trying with MDB_NOLOCK ...";
+    LOG(warning) << "Permission denied. Trying with MDB_NOLOCK ...";
     // Close and re-open environment handle
     mdb_env_close(mdb_env_);
     MDB_CHECK(mdb_env_create(&mdb_env_));
@@ -38,7 +38,7 @@ void LMDB::Open(const string& source, Mode mode) {
     MDB_CHECK(rc);
   }
 #endif
-  LOG(INFO) << "Opened lmdb " << source;
+  LOG(info) << "Opened lmdb " << source;
 }
 
 LMDBCursor* LMDB::NewCursor() {
@@ -110,7 +110,7 @@ void LMDBTransaction::DoubleMapSize() {
   struct MDB_envinfo current_info;
   MDB_CHECK(mdb_env_info(mdb_env_, &current_info));
   size_t new_size = current_info.me_mapsize * 2;
-  DLOG(INFO) << "Doubling LMDB map size to " << (new_size>>20) << "MB ...";
+  DLOG(info) << "Doubling LMDB map size to " << (new_size>>20) << "MB ...";
   MDB_CHECK(mdb_env_set_mapsize(mdb_env_, new_size));
 }
 
