@@ -6,7 +6,7 @@
 // The MNIST dataset could be downloaded at
 //    http://yann.lecun.com/exdb/mnist/
 
-#include <gflags/gflags.h>
+//#include <gflags/gflags.h>
 //#include <glog/logging.h>
 #include <google/protobuf/text_format.h>
 
@@ -30,6 +30,7 @@
 
 #include "caffe/proto/caffe_pb.h"
 #include "caffe/util/db.hpp"
+#include "caffe/util/db.hpp"
 #include "caffe/util/format.hpp"
 #ifdef _MSC_VER
 #include <direct.h>
@@ -44,7 +45,7 @@ using namespace caffe;  // NOLINT(build/namespaces)
 using boost::scoped_ptr;
 using std::string;
 
-DEFINE_string(backend, "lmdb", "The backend for storing the result");
+//DEFINE_string(backend, "lmdb", "The backend for storing the result");
 
 uint32_t swap_endian(uint32_t val) {
     val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
@@ -81,9 +82,11 @@ void convert_dataset(const char* image_filename, const char* label_filename,
   image_file.read(reinterpret_cast<char*>(&cols), 4);
   cols = swap_endian(cols);
 
+
   scoped_ptr<db::DB> db(db::GetDB(db_backend));
   db->Open(db_path, db::NEW);
   scoped_ptr<db::Transaction> txn(db->NewTransaction());
+
   // Storing to db
   char label;
   char* pixels = new char[rows * cols];
@@ -120,14 +123,15 @@ void convert_dataset(const char* image_filename, const char* label_filename,
   db->Close();
 }
 
+// TODO: Convert to Boost program_options
 int main(int argc, char** argv) {
 #ifndef GFLAGS_GFLAGS_H_
-  namespace gflags = google;
+  //namespace gflags = google;
 #endif
 
   //FLAGS_alsologtostderr = 1;
 
-  gflags::SetUsageMessage("This script converts the MNIST dataset to\n"
+  /*gflags::SetUsageMessage("This script converts the MNIST dataset to\n"
         "the lmdb/leveldb format used by Caffe to load data.\n"
         "Usage:\n"
         "    convert_mnist_data [FLAGS] input_image_file input_label_file "
@@ -136,16 +140,16 @@ int main(int argc, char** argv) {
         "    http://yann.lecun.com/exdb/mnist/\n"
         "You should gunzip them after downloading,"
         "or directly use data/mnist/get_mnist.sh\n");
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  gflags::ParseCommandLineFlags(&argc, &argv, true);*/
 
-  const string& db_backend = FLAGS_backend;
+  //const string& db_backend = FLAGS_backend;
 
   if (argc != 4) {
-    gflags::ShowUsageWithFlagsRestrict(argv[0],
-        "examples/mnist/convert_mnist_data");
+    //gflags::ShowUsageWithFlagsRestrict(argv[0],
+    //    "examples/mnist/convert_mnist_data");
   } else {
     //google::InitGoogleLogging(argv[0]);
-    convert_dataset(argv[1], argv[2], argv[3], db_backend);
+    //convert_dataset(argv[1], argv[2], argv[3], db_backend);
   }
   return 0;
 }
