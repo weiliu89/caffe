@@ -40,7 +40,7 @@
   caffe::CheckNotNull(__FILE__, __LINE__, "'" #val "' Must be non NULL", (val))
 #ifdef _DEBUG
 
-#define DLOG(sverity) false ? (void)0 : LOG(sverity)
+#define DLOG(sverity) LOG(sverity)
 #define DCHECK_EQ(lhs, rhs)  CHECK_OP(==, lhs, rhs)
 #define DCHECK_NE(lhs, rhs)  CHECK_OP(!=, lhs, rhs)
 #define DCHECK_LE(lhs, rhs)  CHECK_OP(<=, lhs, rhs)
