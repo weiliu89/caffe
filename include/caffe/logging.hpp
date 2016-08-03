@@ -47,7 +47,7 @@
 #define DCHECK_LT(lhs, rhs)  CHECK_OP(< , lhs, rhs)
 #define DCHECK_GE(lhs, rhs)  CHECK_OP(>=, lhs, rhs)
 #define DCHECK_GT(lhs, rhs)  CHECK_OP(> , lhs, rhs)
-#define DCHECK(exp) if(!exp) caffe::throw_on_destroy(__FUNCTION__, __FILE__, __LINE__).stream()
+#define DCHECK(exp) if(!(exp)) caffe::throw_on_destroy(__FUNCTION__, __FILE__, __LINE__).stream()
 
 #else
 

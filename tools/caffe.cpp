@@ -3,7 +3,7 @@
 namespace bp = boost::python;
 #endif
 
-#include <gflags/gflags.h>
+//#include <gflags/gflags.h>
 //#include <glog/logging.h>
 
 #include <cstring>
@@ -28,8 +28,8 @@ using caffe::vector;
 using std::ostringstream;
 
 
-
 // Load the weights from the specified caffemodel(s) into the train and
+
 // test nets.
 void CopyLayers(caffe::Solver<float>* solver, const std::string& model_list) {
 	std::vector<std::string> model_names;
