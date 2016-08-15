@@ -34,7 +34,22 @@ list(APPEND Caffe_LINKER_LIBS ${GFLAGS_LIBRARIES})
 include(cmake/ProtoBuf.cmake)
 
 # ---[ HDF5
-find_package(HDF5 COMPONENTS HL REQUIRED)
+#find_package(HDF5 COMPONENTS HL REQUIRED)
+set(HDF5_ROOT_DIRECTORY CACHE PATH "")
+set(HDF5_INCLUDE_DIR "${HDF5_ROOT_DIRECTORY}/include")
+set(HDF5_LIBRARY_DIR "${HDF5_ROOT_DIRECTORY}/lib")
+if(MSVC)
+    file(GLOB HDF5_LIBRARIES 
+		${HDF5_LIBRARY_DIR}/libhdf5.lib
+		${HDF5_LIBRARY_DIR}/libhdf5_hl.lib
+	)
+else(MSVC)
+    file(GLOB HDF5_LIBRARIES 
+		${HDF5_LIBRARY_DIR}/libhdf5.a
+		${HDF5_LIBRARY_DIR}/libhdf5_hl.a
+	)
+endif(MSVC)
+set(HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIR})
 include_directories(SYSTEM ${HDF5_INCLUDE_DIRS} ${HDF5_HL_INCLUDE_DIR})
 list(APPEND Caffe_LINKER_LIBS ${HDF5_LIBRARIES})
 
