@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -16,7 +16,7 @@ namespace caffe {
  * item needs to stay).
  */
 template <typename Dtype>
-class FilterLayer : public Layer<Dtype> {
+class DLL_EXPORT FilterLayer : public Layer<Dtype> {
  public:
   explicit FilterLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

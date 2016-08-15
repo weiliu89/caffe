@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -20,7 +20,7 @@ namespace caffe {
  * (see Blob::ShareDiff).
  */
 template <typename Dtype>
-class FlattenLayer : public Layer<Dtype> {
+class DLL_EXPORT FlattenLayer : public Layer<Dtype> {
  public:
   explicit FlattenLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

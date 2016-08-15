@@ -26,6 +26,38 @@ using caffe::Timer;
 using caffe::vector;
 using std::ostringstream;
 
+
+
+// Load the weights from the specified caffemodel(s) into the train and
+// test nets.
+void CopyLayers(caffe::Solver<float>* solver, const std::string& model_list) {
+	std::vector<std::string> model_names;
+	boost::split(model_names, model_list, boost::is_any_of(","));
+	for (int i = 0; i < model_names.size(); ++i) {
+		LOG(INFO) << "Finetuning from " << model_names[i];
+		solver->net()->CopyTrainedLayersFrom(model_names[i]);
+		for (int j = 0; j < solver->test_nets().size(); ++j) {
+			solver->test_nets()[j]->CopyTrainedLayersFrom(model_names[i]);
+		}
+	}
+}
+
+// Translate the signal effect the user specified on the command-line to the
+// corresponding enumeration.
+caffe::SolverAction::Enum GetRequestedAction(
+	const std::string& flag_value) {
+	if (flag_value == "stop") {
+		return caffe::SolverAction::STOP;
+	}
+	if (flag_value == "snapshot") {
+		return caffe::SolverAction::SNAPSHOT;
+	}
+	if (flag_value == "none") {
+		return caffe::SolverAction::NONE;
+	}
+	LOG(FATAL) << "Invalid signal effect \"" << flag_value << "\" was specified";
+}
+#ifndef _MSC_VER
 DEFINE_string(gpu, "",
     "Optional; run in GPU mode on given device IDs separated by ','."
     "Use '-gpu all' to run on all available GPUs. The effective training "
@@ -120,35 +152,8 @@ int device_query() {
 }
 RegisterBrewFunction(device_query);
 
-// Load the weights from the specified caffemodel(s) into the train and
-// test nets.
-void CopyLayers(caffe::Solver<float>* solver, const std::string& model_list) {
-  std::vector<std::string> model_names;
-  boost::split(model_names, model_list, boost::is_any_of(",") );
-  for (int i = 0; i < model_names.size(); ++i) {
-    LOG(INFO) << "Finetuning from " << model_names[i];
-    solver->net()->CopyTrainedLayersFrom(model_names[i]);
-    for (int j = 0; j < solver->test_nets().size(); ++j) {
-      solver->test_nets()[j]->CopyTrainedLayersFrom(model_names[i]);
-    }
-  }
-}
 
-// Translate the signal effect the user specified on the command-line to the
-// corresponding enumeration.
-caffe::SolverAction::Enum GetRequestedAction(
-    const std::string& flag_value) {
-  if (flag_value == "stop") {
-    return caffe::SolverAction::STOP;
-  }
-  if (flag_value == "snapshot") {
-    return caffe::SolverAction::SNAPSHOT;
-  }
-  if (flag_value == "none") {
-    return caffe::SolverAction::NONE;
-  }
-  LOG(FATAL) << "Invalid signal effect \""<< flag_value << "\" was specified";
-}
+
 
 // Train / Finetune a model.
 int train() {
@@ -416,3 +421,212 @@ int main(int argc, char** argv) {
     gflags::ShowUsageWithFlagsRestrict(argv[0], "tools/caffe");
   }
 }
+
+#else // _MSC_VER
+// GFLAGS is buggy on windows, use boost program options instead
+#include "boost/program_options.hpp"
+static void get_gpus(vector<int>* gpus, std::string FLAGS_gpu) {
+	if (FLAGS_gpu == "all") {
+		int count = 0;
+#ifndef CPU_ONLY
+		CUDA_CHECK(cudaGetDeviceCount(&count));
+#else
+		NO_GPU;
+#endif
+		for (int i = 0; i < count; ++i) {
+			gpus->push_back(i);
+		}
+	}
+	else if (FLAGS_gpu.size()) {
+		vector<string> strings;
+		boost::split(strings, FLAGS_gpu, boost::is_any_of(","));
+		for (int i = 0; i < strings.size(); ++i) {
+			gpus->push_back(boost::lexical_cast<int>(strings[i]));
+		}
+	}
+	else {
+		CHECK_EQ(gpus->size(), 0);
+	}
+}
+
+int main(int argc, char** argv)
+{
+	// Print output to stderr (while still logging).
+	boost::program_options::options_description desc("Allowed options");
+	desc.add_options()
+		("solver", boost::program_options::value<std::string>(), "The solver definition protocol buffer text file.")
+		("model", boost::program_options::value<std::string>(), "The model definition protocol buffer text file..")
+		("snapshot", boost::program_options::value<std::string>(), "Optional; the snapshot solver state to resume training.")
+		("weights", boost::program_options::value<std::string>(),
+		"Optional; the pretrained weights to initialize finetuning, "
+		"separated by ','. Cannot be set simultaneously with snapshot.")
+		("gpu", boost::program_options::value<std::string>()->default_value("all"),
+			"Optional; run in GPU mode on given device IDs separated by ','."
+			"Use '-gpu all' to run on all available GPUs. The effective training "
+			"batch size is multiplied by the number of devices.")
+		("iterations", boost::program_options::value<int>()->default_value(50), "The number of iterations to run.")
+		("sigint_effect", boost::program_options::value<std::string>()->default_value("stop"), "Optional; action to take when a SIGINT signal is received: snapshot, stop or none.")
+#ifdef USE_OPENCV
+        ("plot_loss", boost::program_options::value<bool>()->default_value(true), "Plot loss with respect to iteration")
+#endif
+		("sighup_effect", boost::program_options::value<std::string>()->default_value("snapshot"), "Optional; action to take when a SIGHUP signal is received: "
+		"snapshot, stop or none.");
+	if (argc < 2)
+	{
+		std::cout << desc;
+		return 0;
+	}
+	auto brew_function  = boost::lexical_cast<std::string>(argv[1]);
+	boost::program_options::variables_map vm;
+	boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
+	if (brew_function == "train")
+	{
+		if (vm.count("solver"))
+		{
+
+
+			caffe::SolverParameter solver_param;
+			caffe::ReadSolverParamsFromTextFileOrDie(vm["solver"].as<std::string>(), &solver_param);
+			// If the gpus flag is not provided, allow the mode and device to be set
+			// in the solver prototxt.
+			if (solver_param.solver_mode() == caffe::SolverParameter_SolverMode_GPU) 
+			{
+				std::string gpu;
+				if (solver_param.has_device_id()) {
+					gpu = "" + boost::lexical_cast<std::string>(solver_param.device_id());
+				}
+				else 
+				{  // Set default GPU if unspecified
+					gpu = "0";
+				}
+				vector<int> gpus;
+				get_gpus(&gpus, vm["gpu"].as<std::string>());
+
+				if (gpus.size() == 0) 
+				{
+					LOG(INFO) << "Use CPU.";
+					Caffe::set_mode(Caffe::CPU);
+				}
+				else 
+				{
+					ostringstream s;
+					for (int i = 0; i < gpus.size(); ++i) 
+					{
+						s << (i ? ", " : "") << gpus[i];
+					}
+					LOG(INFO) << "Using GPUs " << s.str();
+
+					solver_param.set_device_id(gpus[0]);
+					Caffe::SetDevice(gpus[0]);
+					Caffe::set_mode(Caffe::GPU);
+					Caffe::set_solver_count(gpus.size());
+				}
+				caffe::SignalHandler signal_handler(
+					GetRequestedAction(vm["sigint_effect"].as<std::string>()),
+					GetRequestedAction(vm["sighup_effect"].as<std::string>()));
+
+				boost::shared_ptr<caffe::Solver<float> >
+					solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
+
+				solver->SetActionFunction(signal_handler.GetActionFunction());
+
+				if (vm.count("snapshot")) 
+				{
+					LOG(INFO) << "Resuming from " << vm["snapshot"].as<std::string>();
+					solver->Restore(vm["snapshot"].as<std::string>().c_str());
+				}
+				else if (vm.count("weight")) 
+				{
+					CopyLayers(solver.get(), vm["weights"].as<std::string>());
+				}
+
+				if (gpus.size() > 1) 
+				{
+					caffe::P2PSync<float> sync(solver, NULL, solver->param());
+					sync.Run(gpus);
+				}
+				else 
+				{
+					LOG(INFO) << "Starting Optimization";
+					solver->Solve();
+				}
+				LOG(INFO) << "Optimization Done.";
+				return 0;
+			}
+		}
+	}
+    if(brew_function == "test")
+    {
+        if(vm.count("model") && vm.count("weights") && vm.count("iterations"))
+        {
+            vector<int> gpus;
+            get_gpus(&gpus, vm["gpu"].as<std::string>());
+            if (gpus.size() != 0) 
+            {
+                LOG(INFO) << "Use GPU with device ID " << gpus[0];
+                Caffe::SetDevice(gpus[0]);
+                Caffe::set_mode(Caffe::GPU);
+            } else 
+            {
+                LOG(INFO) << "Use CPU.";
+                Caffe::set_mode(Caffe::CPU);
+            }
+
+            Net<float> caffe_net(vm["model"].as<string>(), caffe::TEST);
+            caffe_net.CopyTrainedLayersFrom(vm["weights"].as<string>());
+            int iterations = vm["iterations"].as<int>();
+            LOG(INFO) << "Running for " << iterations << " iterations.";
+            
+            vector<Blob<float>* > bottom_vec;
+            vector<int> test_score_output_id;
+            vector<float> test_score;
+            float loss = 0;
+            for (int i = 0; i < iterations; ++i) 
+            {
+                float iter_loss;
+                const vector<Blob<float>*>& result =
+                    caffe_net.Forward(bottom_vec, &iter_loss);
+                loss += iter_loss;
+                int idx = 0;
+                for (int j = 0; j < result.size(); ++j) 
+                {
+                    const float* result_vec = result[j]->cpu_data();
+                    for (int k = 0; k < result[j]->count(); ++k, ++idx) 
+                    {
+                        const float score = result_vec[k];
+                        if (i == 0) {
+                            test_score.push_back(score);
+                            test_score_output_id.push_back(j);
+                        } else {
+                            test_score[idx] += score;
+                        }
+                        const std::string& output_name = caffe_net.blob_names()[caffe_net.output_blob_indices()[j]];
+                        LOG(INFO) << "Batch " << i << ", " << output_name << " = " << score;
+                    }
+                }
+            }
+            loss /= iterations;
+            LOG(INFO) << "Loss: " << loss;
+            for (int i = 0; i < test_score.size(); ++i) 
+            {
+                const std::string& output_name = caffe_net.blob_names()[
+                    caffe_net.output_blob_indices()[test_score_output_id[i]]];
+                const float loss_weight = caffe_net.blob_loss_weights()[
+                    caffe_net.output_blob_indices()[test_score_output_id[i]]];
+                std::ostringstream loss_msg_stream;
+                const float mean_score = test_score[i] / iterations;
+                if (loss_weight) 
+                {
+                    loss_msg_stream << " (* " << loss_weight
+                        << " = " << loss_weight * mean_score << " loss)";
+                }
+                LOG(INFO) << output_name << " = " << mean_score << loss_msg_stream.str();
+            }
+        }
+        return 0;
+    }
+	return -1;
+}
+
+
+#endif

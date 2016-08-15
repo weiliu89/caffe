@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/pooling_layer.hpp"
 
@@ -17,7 +17,7 @@ namespace caffe {
  *        Fallback to PoolingLayer for CPU mode.
 */
 template <typename Dtype>
-class CuDNNPoolingLayer : public PoolingLayer<Dtype> {
+class DLL_EXPORT CuDNNPoolingLayer : public PoolingLayer<Dtype> {
  public:
   explicit CuDNNPoolingLayer(const LayerParameter& param)
       : PoolingLayer<Dtype>(param), handles_setup_(false) {}

@@ -22,8 +22,11 @@
 #include <fstream>  // NOLINT(readability/streams)
 #include <string>
 
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/format.hpp"
+#ifdef _MSC_VER
+#include <direct.h>
+#endif
 
 #if defined(USE_LEVELDB) && defined(USE_LMDB)
 

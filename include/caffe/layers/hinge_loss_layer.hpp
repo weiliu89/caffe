@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/loss_layer.hpp"
 
@@ -55,7 +55,7 @@ namespace caffe {
  * HingeLossLayer).
  */
 template <typename Dtype>
-class HingeLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT HingeLossLayer : public LossLayer<Dtype> {
  public:
   explicit HingeLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param) {}

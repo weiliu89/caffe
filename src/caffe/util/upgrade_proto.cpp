@@ -6,7 +6,7 @@
 #include <string>
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/io.hpp"
 #include "caffe/util/upgrade_proto.hpp"
 

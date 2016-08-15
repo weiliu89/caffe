@@ -8,7 +8,7 @@
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/layer_factory.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/math_functions.hpp"
 
 /**
@@ -30,7 +30,7 @@ namespace caffe {
  * their output Blob%s.
  */
 template <typename Dtype>
-class Layer {
+class DLL_EXPORT Layer {
  public:
   /**
    * You should not implement your own constructor. Any set up code should go

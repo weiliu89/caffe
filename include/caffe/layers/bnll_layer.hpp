@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/neuron_layer.hpp"
 
@@ -29,7 +29,7 @@ namespace caffe {
  *      @f$
  */
 template <typename Dtype>
-class BNLLLayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT BNLLLayer : public NeuronLayer<Dtype> {
  public:
   explicit BNLLLayer(const LayerParameter& param)
       : NeuronLayer<Dtype>(param) {}

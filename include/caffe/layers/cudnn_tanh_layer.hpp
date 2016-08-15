@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/neuron_layer.hpp"
 #include "caffe/layers/tanh_layer.hpp"
@@ -17,7 +17,7 @@ namespace caffe {
  * @brief CuDNN acceleration of TanHLayer.
  */
 template <typename Dtype>
-class CuDNNTanHLayer : public TanHLayer<Dtype> {
+class DLL_EXPORT CuDNNTanHLayer : public TanHLayer<Dtype> {
  public:
   explicit CuDNNTanHLayer(const LayerParameter& param)
       : TanHLayer<Dtype>(param), handles_setup_(false) {}

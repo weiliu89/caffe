@@ -8,7 +8,7 @@
 #include "caffe/common.hpp"
 #include "caffe/filler.hpp"
 #include "caffe/layers/split_layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/insert_splits.hpp"
 
 #include "caffe/test/test_caffe_main.hpp"

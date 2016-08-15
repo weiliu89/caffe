@@ -42,7 +42,7 @@ inline void CaffeFreeHost(void* ptr, bool use_cuda) {
  *
  * TODO(dox): more thorough description.
  */
-class SyncedMemory {
+class DLL_EXPORT SyncedMemory {
  public:
   SyncedMemory()
       : cpu_ptr_(NULL), gpu_ptr_(NULL), size_(0), head_(UNINITIALIZED),

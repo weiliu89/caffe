@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/base_conv_layer.hpp"
 
@@ -28,7 +28,7 @@ namespace caffe {
  *   the output channel N' columns of the output matrix.
  */
 template <typename Dtype>
-class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
+class DLL_EXPORT ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
  public:
   /**
    * @param param provides ConvolutionParameter convolution_param,

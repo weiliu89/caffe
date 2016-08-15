@@ -43,7 +43,7 @@
 #include <vector>
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -51,7 +51,7 @@ template <typename Dtype>
 class Solver;
 
 template <typename Dtype>
-class SolverRegistry {
+class DLL_EXPORT SolverRegistry {
  public:
   typedef Solver<Dtype>* (*Creator)(const SolverParameter&);
   typedef std::map<string, Creator> CreatorRegistry;
@@ -109,7 +109,7 @@ class SolverRegistry {
 
 
 template <typename Dtype>
-class SolverRegisterer {
+class DLL_EXPORT SolverRegisterer {
  public:
   SolverRegisterer(const string& type,
       Solver<Dtype>* (*creator)(const SolverParameter&)) {

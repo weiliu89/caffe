@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -21,7 +21,7 @@ namespace caffe {
  * NOTE: does not implement Backwards operation.
  */
 template <typename Dtype>
-class ArgMaxLayer : public Layer<Dtype> {
+class DLL_EXPORT ArgMaxLayer : public Layer<Dtype> {
  public:
   /**
    * @param param provides ArgMaxParameter argmax_param,

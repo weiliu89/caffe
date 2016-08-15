@@ -9,13 +9,13 @@
 #include "caffe/internal_thread.hpp"
 #include "caffe/layer.hpp"
 #include "caffe/layers/base_data_layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/db.hpp"
 
 namespace caffe {
 
 template <typename Dtype>
-class DataLayer : public BasePrefetchingDataLayer<Dtype> {
+class DLL_EXPORT DataLayer : public BasePrefetchingDataLayer<Dtype> {
  public:
   explicit DataLayer(const LayerParameter& param);
   virtual ~DataLayer();

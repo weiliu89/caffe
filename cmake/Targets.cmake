@@ -3,7 +3,11 @@
 # some objects which are not addressed directly but are registered via static constructors
 macro(caffe_set_caffe_link)
   if(BUILD_SHARED_LIBS)
-    set(Caffe_LINK caffe)
+    if(MSVC)
+      set(Caffe_LINK libcaffe)
+	else(MSVC)
+	  set(Caffe_LINK caffe)
+	endif(MSVC)
   else()
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
       set(Caffe_LINK -Wl,-force_load caffe)

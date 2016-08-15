@@ -8,6 +8,9 @@
 #include "caffe/util/hdf5.hpp"
 #include "caffe/util/io.hpp"
 #include "caffe/util/upgrade_proto.hpp"
+#ifdef _MSC_VER 
+#define snprintf sprintf_s 
+#endif
 
 namespace caffe {
 
@@ -48,6 +51,7 @@ void Solver<Dtype>::Init(const SolverParameter& param) {
   LOG_IF(INFO, Caffe::root_solver()) << "Initializing solver from parameters: "
     << std::endl << param.DebugString();
   param_ = param;
+  iter_ = 0;
   CHECK_GE(param_.average_loss(), 1) << "average_loss should be non-negative.";
   CheckSnapshotWritePermissions();
   if (Caffe::root_solver() && param_.random_seed() >= 0) {
@@ -59,7 +63,7 @@ void Solver<Dtype>::Init(const SolverParameter& param) {
     InitTestNets();
     LOG(INFO) << "Solver scaffolding done.";
   }
-  iter_ = 0;
+  
   current_step_ = 0;
 }
 

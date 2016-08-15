@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/neuron_layer.hpp"
 
@@ -20,7 +20,7 @@ namespace caffe {
  *        equal to 2. The 1st axis (0-based) is seen as channels.
  */
 template <typename Dtype>
-class PReLULayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT PReLULayer : public NeuronLayer<Dtype> {
  public:
   /**
    * @param param provides PReLUParameter prelu_param,

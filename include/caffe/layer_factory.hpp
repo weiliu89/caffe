@@ -45,7 +45,7 @@
 
 #include "caffe/common.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -53,7 +53,7 @@ template <typename Dtype>
 class Layer;
 
 template <typename Dtype>
-class LayerRegistry {
+class DLL_EXPORT LayerRegistry {
  public:
   typedef shared_ptr<Layer<Dtype> > (*Creator)(const LayerParameter&);
   typedef std::map<string, Creator> CreatorRegistry;
@@ -114,7 +114,7 @@ class LayerRegistry {
 
 
 template <typename Dtype>
-class LayerRegisterer {
+class DLL_EXPORT LayerRegisterer {
  public:
   LayerRegisterer(const string& type,
                   shared_ptr<Layer<Dtype> > (*creator)(const LayerParameter&)) {

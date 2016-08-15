@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -16,7 +16,7 @@ namespace caffe {
  *        images are of the same size.
  */
 template <typename Dtype>
-class SPPLayer : public Layer<Dtype> {
+class DLL_EXPORT SPPLayer : public Layer<Dtype> {
  public:
   explicit SPPLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/neuron_layer.hpp"
 
@@ -20,7 +20,7 @@ namespace caffe {
  * The ReLULayer is often a better choice for this reason.
  */
 template <typename Dtype>
-class SigmoidLayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT SigmoidLayer : public NeuronLayer<Dtype> {
  public:
   explicit SigmoidLayer(const LayerParameter& param)
       : NeuronLayer<Dtype>(param) {}

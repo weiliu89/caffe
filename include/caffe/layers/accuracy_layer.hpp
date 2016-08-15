@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/loss_layer.hpp"
 
@@ -16,7 +16,7 @@ namespace caffe {
  *        classification task.
  */
 template <typename Dtype>
-class AccuracyLayer : public Layer<Dtype> {
+class DLL_EXPORT AccuracyLayer : public Layer<Dtype> {
  public:
   /**
    * @param param provides AccuracyParameter accuracy_param,

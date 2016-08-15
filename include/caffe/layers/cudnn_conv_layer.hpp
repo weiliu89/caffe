@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/conv_layer.hpp"
 
@@ -27,7 +27,7 @@ namespace caffe {
  * faster as long as it fits in memory.
 */
 template <typename Dtype>
-class CuDNNConvolutionLayer : public ConvolutionLayer<Dtype> {
+class DLL_EXPORT CuDNNConvolutionLayer : public ConvolutionLayer<Dtype> {
  public:
   explicit CuDNNConvolutionLayer(const LayerParameter& param)
       : ConvolutionLayer<Dtype>(param), handles_setup_(false) {}

@@ -8,7 +8,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/base_data_layer.hpp"
 
@@ -20,7 +20,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward and proto params.
  */
 template <typename Dtype>
-class HDF5DataLayer : public Layer<Dtype> {
+class DLL_EXPORT HDF5DataLayer : public Layer<Dtype> {
  public:
   explicit HDF5DataLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

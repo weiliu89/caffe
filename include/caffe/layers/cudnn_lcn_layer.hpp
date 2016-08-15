@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/lrn_layer.hpp"
 #include "caffe/layers/power_layer.hpp"
@@ -14,7 +14,7 @@ namespace caffe {
 
 #ifdef USE_CUDNN
 template <typename Dtype>
-class CuDNNLCNLayer : public LRNLayer<Dtype> {
+class DLL_EXPORT CuDNNLCNLayer : public LRNLayer<Dtype> {
  public:
   explicit CuDNNLCNLayer(const LayerParameter& param)
       : LRNLayer<Dtype>(param), handles_setup_(false), tempDataSize(0),

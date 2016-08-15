@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -16,7 +16,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward, Backward, and proto params.
  */
 template <typename Dtype>
-class InnerProductLayer : public Layer<Dtype> {
+class DLL_EXPORT InnerProductLayer : public Layer<Dtype> {
  public:
   explicit InnerProductLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

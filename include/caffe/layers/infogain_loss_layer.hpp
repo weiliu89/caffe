@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/loss_layer.hpp"
 
@@ -44,7 +44,7 @@ namespace caffe {
  *      @f$, where @f$ H_{l_n} @f$ denotes row @f$l_n@f$ of @f$H@f$.
  */
 template <typename Dtype>
-class InfogainLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT InfogainLossLayer : public LossLayer<Dtype> {
  public:
   explicit InfogainLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param), infogain_() {}

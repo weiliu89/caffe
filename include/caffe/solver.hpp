@@ -6,6 +6,7 @@
 
 #include "caffe/net.hpp"
 #include "caffe/solver_factory.hpp"
+#include "caffe/common.hpp"
 
 namespace caffe {
 
@@ -38,7 +39,7 @@ typedef boost::function<SolverAction::Enum()> ActionCallback;
  * given the current state of the Net parameters.
  */
 template <typename Dtype>
-class Solver {
+class DLL_EXPORT Solver {
  public:
   explicit Solver(const SolverParameter& param,
       const Solver* root_solver = NULL);
@@ -137,7 +138,7 @@ class Solver {
  *        for multi-GPU training.
  */
 template <typename Dtype>
-class WorkerSolver : public Solver<Dtype> {
+class DLL_EXPORT WorkerSolver : public Solver<Dtype> {
  public:
   explicit WorkerSolver(const SolverParameter& param,
       const Solver<Dtype>* root_solver = NULL)

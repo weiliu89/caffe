@@ -10,7 +10,7 @@
 #include "caffe/internal_thread.hpp"
 #include "caffe/layer.hpp"
 #include "caffe/layers/base_data_layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -20,7 +20,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward and proto params.
  */
 template <typename Dtype>
-class ImageDataLayer : public BasePrefetchingDataLayer<Dtype> {
+class DLL_EXPORT ImageDataLayer : public BasePrefetchingDataLayer<Dtype> {
  public:
   explicit ImageDataLayer(const LayerParameter& param)
       : BasePrefetchingDataLayer<Dtype>(param) {}

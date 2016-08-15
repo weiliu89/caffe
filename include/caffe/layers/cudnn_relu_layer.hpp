@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/neuron_layer.hpp"
 #include "caffe/layers/relu_layer.hpp"
@@ -17,7 +17,7 @@ namespace caffe {
  * @brief CuDNN acceleration of ReLULayer.
  */
 template <typename Dtype>
-class CuDNNReLULayer : public ReLULayer<Dtype> {
+class DLL_EXPORT CuDNNReLULayer : public ReLULayer<Dtype> {
  public:
   explicit CuDNNReLULayer(const LayerParameter& param)
       : ReLULayer<Dtype>(param), handles_setup_(false) {}

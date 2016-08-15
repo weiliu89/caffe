@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 
 #include <string>
+#include <boost/filesystem.hpp>
 
 namespace caffe { namespace db {
 

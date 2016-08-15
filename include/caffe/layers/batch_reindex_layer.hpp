@@ -6,7 +6,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -18,7 +18,7 @@ namespace caffe {
  * first axis of the first blob.
  */
 template <typename Dtype>
-class BatchReindexLayer : public Layer<Dtype> {
+class DLL_EXPORT BatchReindexLayer : public Layer<Dtype> {
  public:
   explicit BatchReindexLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

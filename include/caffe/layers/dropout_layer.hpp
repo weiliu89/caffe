@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/neuron_layer.hpp"
 
@@ -23,7 +23,7 @@ namespace caffe {
  *      the computed outputs @f$ y = |x| @f$
  */
 template <typename Dtype>
-class DropoutLayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT DropoutLayer : public NeuronLayer<Dtype> {
  public:
   /**
    * @param param provides DropoutParameter dropout_param,

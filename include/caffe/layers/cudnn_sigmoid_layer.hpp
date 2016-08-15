@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/neuron_layer.hpp"
 #include "caffe/layers/sigmoid_layer.hpp"
@@ -17,7 +17,7 @@ namespace caffe {
  * @brief CuDNN acceleration of SigmoidLayer.
  */
 template <typename Dtype>
-class CuDNNSigmoidLayer : public SigmoidLayer<Dtype> {
+class DLL_EXPORT CuDNNSigmoidLayer : public SigmoidLayer<Dtype> {
  public:
   explicit CuDNNSigmoidLayer(const LayerParameter& param)
       : SigmoidLayer<Dtype>(param), handles_setup_(false) {}

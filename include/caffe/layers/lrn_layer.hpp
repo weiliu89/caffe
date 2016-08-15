@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/eltwise_layer.hpp"
 #include "caffe/layers/pooling_layer.hpp"
@@ -20,7 +20,7 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward, Backward, and proto params.
  */
 template <typename Dtype>
-class LRNLayer : public Layer<Dtype> {
+class DLL_EXPORT LRNLayer : public Layer<Dtype> {
  public:
   explicit LRNLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

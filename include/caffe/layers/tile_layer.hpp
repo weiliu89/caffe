@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -13,7 +13,7 @@ namespace caffe {
  * @brief Copy a Blob along specified dimensions.
  */
 template <typename Dtype>
-class TileLayer : public Layer<Dtype> {
+class DLL_EXPORT TileLayer : public Layer<Dtype> {
  public:
   explicit TileLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/loss_layer.hpp"
 #include "caffe/layers/softmax_layer.hpp"
@@ -41,7 +41,7 @@ namespace caffe {
  *      @f$, for softmax output class probabilites @f$ \hat{p} @f$
  */
 template <typename Dtype>
-class SoftmaxWithLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT SoftmaxWithLossLayer : public LossLayer<Dtype> {
  public:
    /**
     * @param param provides LossParameter loss_param, with options:

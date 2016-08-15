@@ -8,14 +8,31 @@ endif()
 
 # ---[ Caffe project
 project(Caffe C CXX)
-
+set(CMAKE_DEBUG_POSTFIX "d")
 # ---[ Caffe version
-set(CAFFE_TARGET_VERSION "1.0.0-rc3")
-set(CAFFE_TARGET_SOVERSION "1.0.0-rc3")
+set(CAFFE_TARGET_VERSION "1.0.0-rc3" CACHE STRING "Caffe logical version")
+set(CAFFE_TARGET_SOVERSION "1.0.0-rc3" CACHE STRING "Caffe soname version")
 add_definitions(-DCAFFE_VERSION=${CAFFE_TARGET_VERSION})
 
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+set(Boost_dynamic_link OFF CACHE BOOL "Link boost dynamically")
+SET(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo")
+IF(${Boost_dynamic_link})
+    set(Boost_USE_STATIC_LIBS        OFF)
+    set(Boost_USE_MULTITHREADED      ON)
+    set(Boost_USE_STATIC_RUNTIME     OFF)
+	ADD_DEFINITIONS( -DBOOST_ALL_DYN_LINK )
+ELSE(${Boost_dynamic_link})
+    set(Boost_USE_STATIC_LIBS        ON)
+    set(Boost_USE_MULTITHREADED      ON)
+    set(Boost_USE_STATIC_RUNTIME     ON)
+ENDIF(${Boost_dynamic_link})
+if(${BUILD_SHARED_LIBS})
+	SET(LINK_TYPE SHARED)
+else(${BUILD_SHARED_LIBS})
+	SET(LINK_TYPE STATIC)
+endif(${BUILD_SHARED_LIBS})
 
 include(ExternalProject)
 
@@ -24,6 +41,13 @@ include(cmake/Targets.cmake)
 include(cmake/Misc.cmake)
 include(cmake/Summary.cmake)
 include(cmake/ConfigGen.cmake)
+
+IF(MSVC)
+  ADD_DEFINITIONS( -D_VARIADIC_MAX=10 )
+  ADD_DEFINITIONS( -DGTEST_HAS_TR1_TUPLE=0 )
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+ENDIF(MSVC)
+
 
 # ---[ Options
 caffe_option(CPU_ONLY  "Build Caffe without CUDA support" OFF) # TODO: rename to USE_CUDA
@@ -45,7 +69,18 @@ include(cmake/Dependencies.cmake)
 # ---[ Flags
 if(UNIX OR APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall")
+  
+else()
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zo /Oy-")
+  set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
 endif()
+list(REMOVE_DUPLICATES CMAKE_CXX_FLAGS)
+list(REMOVE_DUPLICATES CMAKE_CXX_FLAGS_RELEASE)
+list(REMOVE_DUPLICATES CMAKE_SHARED_LINKER_FLAGS_RELEASE)
 
 caffe_set_caffe_link()
 

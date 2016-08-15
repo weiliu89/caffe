@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/loss_layer.hpp"
 
@@ -41,7 +41,7 @@ namespace caffe {
  *      @f$
  */
 template <typename Dtype>
-class MultinomialLogisticLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT MultinomialLogisticLossLayer : public LossLayer<Dtype> {
  public:
   explicit MultinomialLogisticLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param) {}

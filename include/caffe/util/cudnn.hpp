@@ -1,11 +1,13 @@
 #ifndef CAFFE_UTIL_CUDNN_H_
 #define CAFFE_UTIL_CUDNN_H_
 #ifdef USE_CUDNN
-
+#if _MSC_VER
+#include "mkstemp.h"
+#endif
 #include <cudnn.h>
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #define CUDNN_VERSION_MIN(major, minor, patch) \
     (CUDNN_VERSION >= (major * 1000 + minor * 100 + patch))
@@ -17,7 +19,7 @@
       << cudnnGetErrorString(status); \
   } while (0)
 
-inline const char* cudnnGetErrorString(cudnnStatus_t status) {
+inline const char* CUDNNWINAPI cudnnGetErrorString(cudnnStatus_t status) {
   switch (status) {
     case CUDNN_STATUS_SUCCESS:
       return "CUDNN_STATUS_SUCCESS";

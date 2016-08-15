@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -14,7 +14,7 @@ namespace caffe {
  *        or channel dimension, outputting the result.
  */
 template <typename Dtype>
-class ConcatLayer : public Layer<Dtype> {
+class DLL_EXPORT ConcatLayer : public Layer<Dtype> {
  public:
   explicit ConcatLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

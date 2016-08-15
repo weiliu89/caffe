@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -14,7 +14,7 @@ namespace caffe {
  *        to suppress outputs during testing.)
  */
 template <typename Dtype>
-class SilenceLayer : public Layer<Dtype> {
+class DLL_EXPORT SilenceLayer : public Layer<Dtype> {
  public:
   explicit SilenceLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

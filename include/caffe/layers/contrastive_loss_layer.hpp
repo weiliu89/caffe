@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/loss_layer.hpp"
 
@@ -36,7 +36,7 @@ namespace caffe {
  * This can be used to train siamese networks.
  */
 template <typename Dtype>
-class ContrastiveLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT ContrastiveLossLayer : public LossLayer<Dtype> {
  public:
   explicit ContrastiveLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param), diff_() {}

@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/loss_layer.hpp"
 
@@ -38,7 +38,7 @@ namespace caffe {
  * linear least squares problems! We use it only as an instructive example.)
  */
 template <typename Dtype>
-class EuclideanLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT EuclideanLossLayer : public LossLayer<Dtype> {
  public:
   explicit EuclideanLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param), diff_() {}

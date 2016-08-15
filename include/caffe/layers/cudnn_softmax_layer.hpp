@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/softmax_layer.hpp"
 
@@ -17,7 +17,7 @@ namespace caffe {
  *        Fallback to SoftmaxLayer for CPU mode.
  */
 template <typename Dtype>
-class CuDNNSoftmaxLayer : public SoftmaxLayer<Dtype> {
+class DLL_EXPORT CuDNNSoftmaxLayer : public SoftmaxLayer<Dtype> {
  public:
   explicit CuDNNSoftmaxLayer(const LayerParameter& param)
       : SoftmaxLayer<Dtype>(param), handles_setup_(false) {}
