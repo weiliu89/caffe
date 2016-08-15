@@ -4,11 +4,12 @@
 #include <vector>
 
 #include "caffe/layer.hpp"
+#include "caffe/common.hpp"
 
 namespace caffe {
 
 template <typename Dtype>
-class ParameterLayer : public Layer<Dtype> {
+class DLL_EXPORT ParameterLayer : public Layer<Dtype> {
  public:
   explicit ParameterLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

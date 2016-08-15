@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/bias_layer.hpp"
 
@@ -21,7 +21,7 @@ namespace caffe {
  * of the layer.
  */
 template <typename Dtype>
-class ScaleLayer: public Layer<Dtype> {
+class DLL_EXPORT ScaleLayer: public Layer<Dtype> {
  public:
   explicit ScaleLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -16,7 +16,7 @@ namespace caffe {
  * forward, backward, and reshape are all no-ops.
  */
 template <typename Dtype>
-class InputLayer : public Layer<Dtype> {
+class DLL_EXPORT InputLayer : public Layer<Dtype> {
  public:
   explicit InputLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}
