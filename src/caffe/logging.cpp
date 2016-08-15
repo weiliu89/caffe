@@ -291,7 +291,11 @@ std::string caffe::print_callstack(size_t skipLevels, bool makeFunctionNamesStan
         
 	return caffe::print_callstack(skipLevels, makeFunctionNamesStandOut, ss);
 }
-
+bool _currently_throwing_exception = false;
+IExceptionWithCallStackBase::~IExceptionWithCallStackBase()
+{
+    _currently_throwing_exception = false;
+}
 throw_on_destroy::throw_on_destroy(const char* function, const char* file, int line) 
 {
     log_stream_ <<"[" << function << "-"
@@ -302,9 +306,14 @@ std::ostringstream &throw_on_destroy::stream()
 { 
     return log_stream_; 
 }
+
 throw_on_destroy::~throw_on_destroy() 
 {
     std::stringstream ss;
     LOG(debug) << "\nException at" << print_callstack(0, true, ss) << "\n" << log_stream_.str();
-	throw ExceptionWithCallStack<std::string>(log_stream_.str(), ss.str());
+    if(!_currently_throwing_exception)
+    {
+        _currently_throwing_exception  = true;
+        throw ExceptionWithCallStack<std::string>(log_stream_.str(), ss.str());
+    }
 }

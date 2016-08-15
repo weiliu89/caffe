@@ -129,7 +129,7 @@ namespace caffe
     public:
         throw_on_destroy(const char* function, const char* file, int line);
         std::ostringstream &stream();
-        ~throw_on_destroy();
+        ~throw_on_destroy() throw();
 
     private:
         std::ostringstream log_stream_;
@@ -139,7 +139,7 @@ namespace caffe
     struct DLL_EXPORT IExceptionWithCallStackBase
 	{
 		virtual const char * CallStack() const = 0;
-		virtual ~IExceptionWithCallStackBase() throw() {}
+		virtual ~IExceptionWithCallStackBase() throw();
 	};
     DLL_EXPORT void collect_callstack(size_t skipLevels, bool makeFunctionNamesStandOut, const std::function<void(const std::string&)>& write);
     DLL_EXPORT std::string print_callstack(size_t skipLevels, bool makeFunctionNamesStandOut);
