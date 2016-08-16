@@ -10,24 +10,29 @@ endif(MSVC)
 # include python files either to force generation
 add_library(proto STATIC ${proto_hdrs} ${proto_srcs} ${proto_python})
 IF(MSVC)
-  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS")
+  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS=1 /Dlibcaffe_EXPORTS=1")
 else(MSVC)
-  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp")
+  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp -DPROTO_EXPORTS= -DCAFFE_EXPORTS= ")
 endif(MSVC)
 
 set(Caffe_LINKER_LIBS proto ${Caffe_LINKER_LIBS}) # note, crucial to prepend!
 caffe_default_properties(proto)
 
-# --[ Caffe library
-
 # creates 'test_srcs', 'srcs', 'test_cuda', 'cuda' lists
 caffe_pickup_caffe_sources(${PROJECT_SOURCE_DIR})
 
+
+# ---[ Tests MSCV
+if(MSVC)
+ add_subdirectory(test)
+endif()
+
+
+# --[ Caffe library
 if(HAVE_CUDA)
   caffe_cuda_compile(cuda_objs ${cuda})
   list(APPEND srcs ${cuda_objs} ${cuda})
 endif()
-
 
 add_library(${caffe_lib_name} ${srcs})
 target_link_libraries(${caffe_lib_name} proto ${Caffe_LINKER_LIBS})
@@ -37,10 +42,12 @@ set_target_properties(${caffe_lib_name} PROPERTIES
   SOVERSION ${CAFFE_TARGET_SOVERSION}
 )
 
-# ---[ Tests
+
+# ---[ Tests Non MSVC
 if(NOT MSVC)
  add_subdirectory(test)
 endif()
+
 
 # ---[ Install
 install(DIRECTORY ${Caffe_INCLUDE_DIR}/caffe DESTINATION include)
