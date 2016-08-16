@@ -5,7 +5,7 @@ set(Caffe_LINKER_LIBS "")
 
 if(MSVC)
 	# since lmdb requires boost on windows, we need to link against additional boost libraries
-	find_package(Boost 1.46 REQUIRED COMPONENTS system thread date_time chrono filesystem)
+	find_package(Boost 1.46 REQUIRED COMPONENTS system thread date_time chrono filesystem regex)
 	list(APPEND Caffe_LINKER_LIBS "shlwapi.lib")
 	link_directories(${Boost_LIBRARY_DIR_DEBUG})
 	link_directories(${Boost_LIBRARY_DIR_RELEASE})
@@ -94,7 +94,7 @@ endif()
 
 # ---[ OpenCV
 if(USE_OPENCV)
-  find_package(OpenCV QUIET COMPONENTS core highgui imgproc imgcodecs)
+  find_package(OpenCV QUIET COMPONENTS core highgui imgproc imgcodecs videoio)
   if(NOT OpenCV_FOUND) # if not OpenCV 3.x, then imgcodecs are not found
     find_package(OpenCV REQUIRED COMPONENTS core highgui imgproc)
   endif()
