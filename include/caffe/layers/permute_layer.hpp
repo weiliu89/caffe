@@ -5,7 +5,8 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
+#include "caffe/common.hpp"
 
 namespace caffe {
 
@@ -17,12 +18,12 @@ namespace caffe {
 
 // The main function which does the permute.
 template <typename Dtype>
-void Permute(const int count, Dtype* bottom_data, const bool forward,
+DLL_EXPORT void Permute(const int count, Dtype* bottom_data, const bool forward,
     const int* permute_order, const int* old_steps, const int* new_steps,
     const int num_axes, Dtype* top_data);
 
 template <typename Dtype>
-class PermuteLayer : public Layer<Dtype> {
+class DLL_EXPORT PermuteLayer : public Layer<Dtype> {
  public:
   explicit PermuteLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

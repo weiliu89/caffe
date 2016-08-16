@@ -24,7 +24,7 @@
 #include "gflags/gflags.h"
 #include "glog/logging.h"
 
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/io.hpp"
 
 using namespace caffe;  // NOLINT(build/namespaces)

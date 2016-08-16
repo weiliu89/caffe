@@ -5,7 +5,8 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
+#include "caffe/common.hpp"
 
 namespace caffe {
 
@@ -18,7 +19,7 @@ namespace caffe {
  * NOTE: does not implement Backwards operation.
  */
 template <typename Dtype>
-class PriorBoxLayer : public Layer<Dtype> {
+class DLL_EXPORT PriorBoxLayer : public Layer<Dtype> {
  public:
   /**
    * @param param provides PriorBoxParameter prior_box_param,

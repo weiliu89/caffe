@@ -8,46 +8,46 @@
 #include <vector>
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
 // Generate random number given the probablities for each number.
-int roll_weighted_die(const std::vector<float>& probabilities);
+DLL_EXPORT int roll_weighted_die(const std::vector<float>& probabilities);
 
 template <typename T>
-bool is_border(const cv::Mat& edge, T color);
+DLL_EXPORT bool is_border(const cv::Mat& edge, T color);
 
 // Auto cropping image.
 template <typename T>
-cv::Rect CropMask(const cv::Mat& src, T point, int padding = 2);
+DLL_EXPORT cv::Rect CropMask(const cv::Mat& src, T point, int padding = 2);
 
-cv::Mat colorReduce(const cv::Mat& image, int div = 64);
+DLL_EXPORT cv::Mat colorReduce(const cv::Mat& image, int div = 64);
 
-void fillEdgeImage(const cv::Mat& edgesIn, cv::Mat* filledEdgesOut);
+DLL_EXPORT void fillEdgeImage(const cv::Mat& edgesIn, cv::Mat* filledEdgesOut);
 
-void CenterObjectAndFillBg(const cv::Mat& in_img, const bool fill_bg,
+DLL_EXPORT void CenterObjectAndFillBg(const cv::Mat& in_img, const bool fill_bg,
                            cv::Mat* out_img);
 
-cv::Mat AspectKeepingResizeAndPad(const cv::Mat& in_img,
+DLL_EXPORT cv::Mat AspectKeepingResizeAndPad(const cv::Mat& in_img,
                                   const int new_width, const int new_height,
                                   const int pad_type = cv::BORDER_CONSTANT,
                                   const cv::Scalar pad = cv::Scalar(0, 0, 0),
                                   const int interp_mode = cv::INTER_LINEAR);
 
-cv::Mat AspectKeepingResizeBySmall(const cv::Mat& in_img,
+DLL_EXPORT cv::Mat AspectKeepingResizeBySmall(const cv::Mat& in_img,
                                    const int new_width, const int new_height,
                                    const int interp_mode = cv::INTER_LINEAR);
 
-void constantNoise(const int n, const vector<uchar>& val, cv::Mat* image);
+DLL_EXPORT void constantNoise(const int n, const vector<uchar>& val, cv::Mat* image);
 
-void UpdateBBoxByResizePolicy(const ResizeParameter& param,
+DLL_EXPORT void UpdateBBoxByResizePolicy(const ResizeParameter& param,
                               const int old_width, const int old_height,
                               NormalizedBBox* bbox);
 
-cv::Mat ApplyResize(const cv::Mat& in_img, const ResizeParameter& param);
+DLL_EXPORT cv::Mat ApplyResize(const cv::Mat& in_img, const ResizeParameter& param);
 
-cv::Mat ApplyNoise(const cv::Mat& in_img, const NoiseParameter& param);
+DLL_EXPORT cv::Mat ApplyNoise(const cv::Mat& in_img, const NoiseParameter& param);
 
 }  // namespace caffe
 

@@ -16,7 +16,7 @@
 #include "caffe/layers/permute_layer.hpp"
 #include "caffe/layers/pooling_layer.hpp"
 #include "caffe/layers/prior_box_layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/db.hpp"
 #include "caffe/util/io.hpp"
 

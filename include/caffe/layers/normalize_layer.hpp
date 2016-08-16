@@ -5,7 +5,8 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
+#include "caffe/common.hpp"
 
 namespace caffe {
 
@@ -15,7 +16,7 @@ namespace caffe {
  * TODO(weiliu89): thorough documentation for Forward, Backward, and proto params.
  */
 template <typename Dtype>
-class NormalizeLayer : public Layer<Dtype> {
+class DLL_EXPORT NormalizeLayer : public Layer<Dtype> {
  public:
   explicit NormalizeLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

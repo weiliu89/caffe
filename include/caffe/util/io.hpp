@@ -129,14 +129,9 @@ inline bool DLL_EXPORT ReadFileToDatum(const string& filename, Datum* datum) {
   return ReadFileToDatum(filename, -1, datum);
 }
 
-==== BASE ====
-bool ReadImageToDatum(const string& filename, const int label,
-==== BASE ====
+bool DLL_EXPORT ReadImageToDatum(const string& filename, const int label,
     const int height, const int width, const bool is_color,
-    const std::string & encoding, Datum* datum) {
-  return ReadImageToDatum(filename, label, height, width, 0, 0, is_color,
-                          encoding, datum);
-}
+    const std::string & encoding, Datum* datum);
 
 inline bool DLL_EXPORT ReadImageToDatum(const string& filename, const int label,
     const int height, const int width, const bool is_color, Datum* datum) {
@@ -168,16 +163,16 @@ bool DLL_EXPORT DecodeDatumNative(Datum* datum);
 bool DLL_EXPORT DecodeDatum(Datum* datum, bool is_color);
 
 
-void GetImageSize(const string& filename, int* height, int* width);
+void DLL_EXPORT GetImageSize(const string& filename, int* height, int* width);
 
-bool ReadRichImageToAnnotatedDatum(const string& filename,
+bool DLL_EXPORT ReadRichImageToAnnotatedDatum(const string& filename,
     const string& labelname, const int height, const int width,
     const int min_dim, const int max_dim, const bool is_color,
     const std::string& encoding, const AnnotatedDatum_AnnotationType type,
     const string& labeltype, const std::map<string, int>& name_to_label,
     AnnotatedDatum* anno_datum);
 
-inline bool ReadRichImageToAnnotatedDatum(const string& filename,
+inline bool DLL_EXPORT ReadRichImageToAnnotatedDatum(const string& filename,
     const string& labelname, const int height, const int width,
     const bool is_color, const std::string & encoding,
     const AnnotatedDatum_AnnotationType type, const string& labeltype,
@@ -187,57 +182,55 @@ inline bool ReadRichImageToAnnotatedDatum(const string& filename,
                       anno_datum);
 }
 
-bool ReadXMLToAnnotatedDatum(const string& labelname, const int img_height,
+bool DLL_EXPORT ReadXMLToAnnotatedDatum(const string& labelname, const int img_height,
     const int img_width, const std::map<string, int>& name_to_label,
     AnnotatedDatum* anno_datum);
 
-bool ReadJSONToAnnotatedDatum(const string& labelname, const int img_height,
+bool DLL_EXPORT ReadJSONToAnnotatedDatum(const string& labelname, const int img_height,
     const int img_width, const std::map<string, int>& name_to_label,
     AnnotatedDatum* anno_datum);
 
-bool ReadTxtToAnnotatedDatum(const string& labelname, const int height,
+bool DLL_EXPORT ReadTxtToAnnotatedDatum(const string& labelname, const int height,
     const int width, AnnotatedDatum* anno_datum);
 
-bool ReadLabelFileToLabelMap(const string& filename, bool include_background,
+bool DLL_EXPORT ReadLabelFileToLabelMap(const string& filename, bool include_background,
     const string& delimiter, LabelMap* map);
 
-inline bool ReadLabelFileToLabelMap(const string& filename,
+inline bool DLL_EXPORT ReadLabelFileToLabelMap(const string& filename,
       bool include_background, LabelMap* map) {
   return ReadLabelFileToLabelMap(filename, include_background, " ", map);
 }
 
-inline bool ReadLabelFileToLabelMap(const string& filename, LabelMap* map) {
+inline bool DLL_EXPORT ReadLabelFileToLabelMap(const string& filename, LabelMap* map) {
   return ReadLabelFileToLabelMap(filename, true, map);
 }
 
-bool MapNameToLabel(const LabelMap& map, const bool strict_check,
+bool DLL_EXPORT MapNameToLabel(const LabelMap& map, const bool strict_check,
                     std::map<string, int>* name_to_label);
 
-inline bool MapNameToLabel(const LabelMap& map,
+inline bool DLL_EXPORT MapNameToLabel(const LabelMap& map,
                            std::map<string, int>* name_to_label) {
   return MapNameToLabel(map, true, name_to_label);
 }
 
-bool MapLabelToName(const LabelMap& map, const bool strict_check,
+bool DLL_EXPORT MapLabelToName(const LabelMap& map, const bool strict_check,
                     std::map<int, string>* label_to_name);
 
-inline bool MapLabelToName(const LabelMap& map,
+inline bool DLL_EXPORT MapLabelToName(const LabelMap& map,
                            std::map<int, string>* label_to_name) {
   return MapLabelToName(map, true, label_to_name);
 }
 
-bool MapLabelToDisplayName(const LabelMap& map, const bool strict_check,
+bool DLL_EXPORT MapLabelToDisplayName(const LabelMap& map, const bool strict_check,
                            std::map<int, string>* label_to_display_name);
 
-inline bool MapLabelToDisplayName(const LabelMap& map,
+inline bool DLL_EXPORT MapLabelToDisplayName(const LabelMap& map,
                               std::map<int, string>* label_to_display_name) {
   return MapLabelToDisplayName(map, true, label_to_display_name);
 }
 
 #ifdef USE_OPENCV
-==== BASE ====
-cv::Mat ReadImageToCVMat(const string& filename,
-==== BASE ====
+cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename,
     const int height, const int width, const bool is_color);
 
 cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename,
@@ -251,9 +244,7 @@ cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename);
 cv::Mat DLL_EXPORT DecodeDatumToCVMatNative(const Datum& datum);
 cv::Mat DLL_EXPORT DecodeDatumToCVMat(const Datum& datum, bool is_color);
 
-==== BASE ====
-void CVMatToDatum(const cv::Mat& cv_img, Datum* datum);
-==== BASE ====
+void DLL_EXPORT CVMatToDatum(const cv::Mat& cv_img, Datum* datum);
 #endif  // USE_OPENCV
 
 }  // namespace caffe

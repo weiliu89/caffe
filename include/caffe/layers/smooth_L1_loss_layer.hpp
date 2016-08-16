@@ -13,7 +13,8 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
+#include "caffe/common.hpp"
 
 #include "caffe/layers/loss_layer.hpp"
 
@@ -24,7 +25,7 @@ namespace caffe {
  *  Fast R-CNN, Ross Girshick, ICCV 2015.
  */
 template <typename Dtype>
-class SmoothL1LossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT SmoothL1LossLayer : public LossLayer<Dtype> {
  public:
   explicit SmoothL1LossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param), diff_() {}

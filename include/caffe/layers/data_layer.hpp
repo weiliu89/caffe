@@ -11,6 +11,7 @@
 #include "caffe/layers/base_data_layer.hpp"
 #include "caffe/proto/caffe_pb.h"
 #include "caffe/util/db.hpp"
+#include "caffe/common.hpp"
 
 namespace caffe {
 

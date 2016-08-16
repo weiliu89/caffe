@@ -17,8 +17,9 @@
 #include "caffe/internal_thread.hpp"
 #include "caffe/layer.hpp"
 #include "caffe/layers/base_data_layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/db.hpp"
+#include "caffe/common.hpp"
 
 namespace caffe {
 
@@ -28,7 +29,7 @@ namespace caffe {
  * TODO(weiliu89): thorough documentation for Forward and proto params.
  */
 template <typename Dtype>
-class VideoDataLayer : public BasePrefetchingDataLayer<Dtype> {
+class DLL_EXPORT VideoDataLayer : public BasePrefetchingDataLayer<Dtype> {
  public:
   explicit VideoDataLayer(const LayerParameter& param);
   virtual ~VideoDataLayer();

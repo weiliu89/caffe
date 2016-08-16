@@ -13,8 +13,9 @@
 #include "caffe/blob.hpp"
 #include "caffe/data_transformer.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/bbox_util.hpp"
+#include "caffe/common.hpp"
 
 using namespace boost::property_tree;  // NOLINT(build/namespaces)
 
@@ -29,7 +30,7 @@ namespace caffe {
  * NOTE: does not implement Backwards operation.
  */
 template <typename Dtype>
-class DetectionOutputLayer : public Layer<Dtype> {
+class DLL_EXPORT DetectionOutputLayer : public Layer<Dtype> {
  public:
   explicit DetectionOutputLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

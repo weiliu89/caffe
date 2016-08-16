@@ -7,8 +7,9 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/bbox_util.hpp"
+#include "caffe/common.hpp"
 
 #include "caffe/layers/loss_layer.hpp"
 
@@ -23,7 +24,7 @@ namespace caffe {
  *
  */
 template <typename Dtype>
-class MultiBoxLossLayer : public LossLayer<Dtype> {
+class DLL_EXPORT MultiBoxLossLayer : public LossLayer<Dtype> {
  public:
   explicit MultiBoxLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param) {}
