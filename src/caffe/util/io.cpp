@@ -6,6 +6,11 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <fcntl.h>
+
+#if defined(_MSC_VER)
+#include <io.h>
+#endif
+
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
@@ -26,10 +31,6 @@
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe_pb.h"
 #include "caffe/util/io.hpp"
-
-#ifdef _MSC_VER
-#include <io.h>
-#endif
 
 const int kProtoReadBytesLimit = INT_MAX;  // Max size of 2 GB minus 1 byte.
 
@@ -63,10 +64,10 @@ void WriteProtoToTextFile(const Message& proto, const char* filename) {
 }
 
 bool ReadProtoFromBinaryFile(const char* filename, Message* proto) {
-#ifdef _MSC_VER
-    int fd = open(filename, O_RDONLY | O_BINARY);
+#if defined (_MSC_VER)  // for MSC compiler binary flag needs to be specified
+  int fd = open(filename, O_RDONLY | O_BINARY);
 #else
-	int fd = open(filename, O_RDONLY);
+  int fd = open(filename, O_RDONLY);
 #endif
   CHECK_NE(fd, -1) << "File not found: " << filename;
   ZeroCopyInputStream* raw_input = new FileInputStream(fd);
@@ -195,6 +196,28 @@ void GetImageSize(const string& filename, int* height, int* width) {
   *width = cv_img.cols;
 }
 
+#endif  // USE_OPENCV
+
+bool ReadFileToDatum(const string& filename, const int label,
+    Datum* datum) {
+  std::streampos size;
+
+  fstream file(filename.c_str(), ios::in|ios::binary|ios::ate);
+  if (file.is_open()) {
+    size = file.tellg();
+    std::string buffer(size, ' ');
+    file.seekg(0, ios::beg);
+    file.read(&buffer[0], size);
+    file.close();
+    datum->set_data(buffer);
+    datum->set_label(label);
+    datum->set_encoded(true);
+    return true;
+  } else {
+    return false;
+  }
+}
+
 bool ReadRichImageToAnnotatedDatum(const string& filename,
     const string& labelfile, const int height, const int width,
     const int min_dim, const int max_dim, const bool is_color,
@@ -233,28 +256,6 @@ bool ReadRichImageToAnnotatedDatum(const string& filename,
     default:
       LOG(FATAL) << "Unknown annotation type.";
       return false;
-  }
-}
-
-#endif  // USE_OPENCV
-
-bool ReadFileToDatum(const string& filename, const int label,
-    Datum* datum) {
-  std::streampos size;
-
-  fstream file(filename.c_str(), ios::in|ios::binary|ios::ate);
-  if (file.is_open()) {
-    size = file.tellg();
-    std::string buffer(size, ' ');
-    file.seekg(0, ios::beg);
-    file.read(&buffer[0], size);
-    file.close();
-    datum->set_data(buffer);
-    datum->set_label(label);
-    datum->set_encoded(true);
-    return true;
-  } else {
-    return false;
   }
 }
 

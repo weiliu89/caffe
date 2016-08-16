@@ -10,7 +10,7 @@ if(MSVC)
 	link_directories(${Boost_LIBRARY_DIR_DEBUG})
 	link_directories(${Boost_LIBRARY_DIR_RELEASE})
 else(MSVC)
-	find_package(Boost 1.46 REQUIRED COMPONENTS system thread filesystem program_options)
+	find_package(Boost 1.46 REQUIRED COMPONENTS system thread date_time chrono filesystem regex)
 endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})

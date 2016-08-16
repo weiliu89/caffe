@@ -22,10 +22,14 @@ namespace caffe {
 using ::google::protobuf::Message;
 using ::boost::filesystem::path;
 
-inline void MakeTempDir(string* temp_dirname) {
+inline void DLL_EXPORT MakeTempDir(string* temp_dirname) {
   temp_dirname->clear();
-  const path& model =
-    boost::filesystem::temp_directory_path()/"caffe_test.%%%%-%%%%";
+  // Place all temp directories under temp_root, to be able to delete all of
+  // them at once, without knowing their name.
+  const path& temp_root =
+    boost::filesystem::temp_directory_path() / "caffe_test";
+  boost::filesystem::create_directory(temp_root);
+  const path& model = temp_root / "%%%%-%%%%";
   for ( int i = 0; i < CAFFE_TMP_DIR_RETRIES; i++ ) {
     const path& dir = boost::filesystem::unique_path(model).string();
     bool done = boost::filesystem::create_directory(dir);
@@ -37,8 +41,8 @@ inline void MakeTempDir(string* temp_dirname) {
   LOG(FATAL) << "Failed to create a temporary directory.";
 }
 
-inline void MakeTempFilename(string* temp_filename) {
-  static path temp_files_subpath;
+inline void DLL_EXPORT MakeTempFilename(string* temp_filename) {
+  path temp_files_subpath;
   static uint64_t next_temp_file = 0;
   temp_filename->clear();
   if ( temp_files_subpath.empty() ) {
@@ -49,6 +53,21 @@ inline void MakeTempFilename(string* temp_filename) {
   *temp_filename =
     (temp_files_subpath/caffe::format_int(next_temp_file++, 9)).string();
 }
+
+#ifdef _MSC_VER
+
+inline void DLL_EXPORT RemoveCaffeTempDir() {
+  boost::system::error_code err;
+  boost::filesystem::remove_all(
+    boost::filesystem::temp_directory_path() / "caffe_test", err);
+}
+
+#else
+
+inline void DLL_EXPORT RemoveCaffeTempDir() {
+}
+
+#endif
 
 inline void DLL_EXPORT GetTempDirname(string* temp_dirname) {
   temp_dirname->clear();
@@ -130,8 +149,29 @@ inline bool DLL_EXPORT ReadFileToDatum(const string& filename, Datum* datum) {
 }
 
 bool DLL_EXPORT ReadImageToDatum(const string& filename, const int label,
+    const int height, const int width, const int min_dim, const int max_dim,
+    const bool is_color, const std::string & encoding, Datum* datum);
+
+inline bool DLL_EXPORT ReadImageToDatum(const string& filename, const int label,
+    const int height, const int width, const int min_dim, const int max_dim,
+    const bool is_color, Datum* datum) {
+  return ReadImageToDatum(filename, label, height, width, min_dim, max_dim,
+                          is_color, "", datum);
+}
+
+inline bool DLL_EXPORT ReadImageToDatum(const string& filename, const int label,
+    const int height, const int width, const int min_dim, const int max_dim,
+    Datum* datum) {
+  return ReadImageToDatum(filename, label, height, width, min_dim, max_dim,
+                          true, datum);
+}
+
+inline bool DLL_EXPORT ReadImageToDatum(const string& filename, const int label,
     const int height, const int width, const bool is_color,
-    const std::string & encoding, Datum* datum);
+    const std::string & encoding, Datum* datum) {
+  return ReadImageToDatum(filename, label, height, width, 0, 0, is_color,
+                          encoding, datum);
+}
 
 inline bool DLL_EXPORT ReadImageToDatum(const string& filename, const int label,
     const int height, const int width, const bool is_color, Datum* datum) {
@@ -162,8 +202,6 @@ inline bool DLL_EXPORT ReadImageToDatum(const string& filename, const int label,
 bool DLL_EXPORT DecodeDatumNative(Datum* datum);
 bool DLL_EXPORT DecodeDatum(Datum* datum, bool is_color);
 
-
-void DLL_EXPORT GetImageSize(const string& filename, int* height, int* width);
 
 bool DLL_EXPORT ReadRichImageToAnnotatedDatum(const string& filename,
     const string& labelname, const int height, const int width,
@@ -230,6 +268,12 @@ inline bool DLL_EXPORT MapLabelToDisplayName(const LabelMap& map,
 }
 
 #ifdef USE_OPENCV
+cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename, const int height,
+    const int width, const int min_dim, const int max_dim, const bool is_color);
+
+cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename, const int height,
+    const int width, const int min_dim, const int max_dim);
+
 cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename,
     const int height, const int width, const bool is_color);
 
@@ -244,7 +288,12 @@ cv::Mat DLL_EXPORT ReadImageToCVMat(const string& filename);
 cv::Mat DLL_EXPORT DecodeDatumToCVMatNative(const Datum& datum);
 cv::Mat DLL_EXPORT DecodeDatumToCVMat(const Datum& datum, bool is_color);
 
+void DLL_EXPORT EncodeCVMatToDatum(const cv::Mat& cv_img, const string& encoding,
+                        Datum* datum);
+
 void DLL_EXPORT CVMatToDatum(const cv::Mat& cv_img, Datum* datum);
+
+void DLL_EXPORT GetImageSize(const string& filename, int* height, int* width);
 #endif  // USE_OPENCV
 
 }  // namespace caffe
