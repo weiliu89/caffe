@@ -249,7 +249,7 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
             outfiles[label_name]->close();
             delete outfiles[label_name];
           }
-        } else if (output_format_ == "COCO") {
+        }/* else if (output_format_ == "COCO") {
           boost::filesystem::path output_directory(output_directory_);
           boost::filesystem::path file(output_name_prefix_ + ".json");
           boost::filesystem::path out_file = output_directory / file;
@@ -286,7 +286,7 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
             outfile << " " << bbox[1] + bbox[3];
             outfile << std::endl;
           }
-        }
+        }*/
         name_count_ = 0;
         detections_.clear();
       }

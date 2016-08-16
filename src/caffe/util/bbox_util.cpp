@@ -10,6 +10,10 @@
 
 #include "caffe/util/bbox_util.hpp"
 
+#ifdef _MSC_VER 
+#define snprintf sprintf_s 
+#endif
+
 namespace caffe {
 
 bool SortBBoxAscend(const NormalizedBBox& bbox1, const NormalizedBBox& bbox2) {

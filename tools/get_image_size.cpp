@@ -18,6 +18,9 @@
 #include <utility>
 #include <vector>
 
+#include "caffe/common.hpp"
+#include "caffe/proto/caffe_pb.h"
+
 #include "gflags/gflags.h"
 #include "glog/logging.h"
 
