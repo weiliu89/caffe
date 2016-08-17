@@ -17,6 +17,17 @@
 
 using std::ostringstream;
 
+#ifdef _WIN32
+static inline std::string ReplaceAllSubstrings(std::string str, const std::string& from, const std::string& to) {
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+	}
+	return str;
+}
+#endif
+
 namespace caffe {
 
 template <typename TypeParam>
@@ -177,6 +188,9 @@ class GradientBasedSolverTest : public MultiDeviceTest<TypeParam> {
       proto << "momentum: " << momentum << " ";
     }
     MakeTempDir(&snapshot_prefix_);
+#ifdef _WIN32
+	snapshot_prefix_ = ReplaceAllSubstrings(snapshot_prefix_, std::string("\\"), std::string("/"));
+#endif
     proto << "snapshot_prefix: '" << snapshot_prefix_ << "/' ";
     if (snapshot) {
       proto << "snapshot: " << num_iters << " ";

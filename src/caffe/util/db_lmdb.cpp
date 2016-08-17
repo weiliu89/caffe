@@ -13,7 +13,7 @@ void LMDB::Open(const string& source, Mode mode) {
   if (mode == NEW) 
   {
 #ifdef _MSC_VER
-    CHECK_EQ(boost::filesystem::create_directory(source), 0) << "mkdir " << source << "failed";
+    CHECK_EQ(boost::filesystem::create_directory(source), 1) << "mkdir " << source << "failed";
 #else
     CHECK_EQ(mkdir(source.c_str(), 0744), 0) << "mkdir " << source << " failed";
 #endif
