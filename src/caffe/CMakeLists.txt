@@ -22,7 +22,7 @@ caffe_default_properties(proto)
 caffe_pickup_caffe_sources(${PROJECT_SOURCE_DIR})
 
 
-# ---[ Tests MSCV
+# ---[ Tests MSVC
 if(MSVC)
  add_subdirectory(test)
 endif()
@@ -37,12 +37,19 @@ endif()
 add_library(${caffe_lib_name} ${srcs})
 target_link_libraries(${caffe_lib_name} proto ${Caffe_LINKER_LIBS})
 caffe_default_properties(${caffe_lib_name})
-set_target_properties(${caffe_lib_name} PROPERTIES
-  VERSION   ${CAFFE_TARGET_VERSION}
-  SOVERSION ${CAFFE_TARGET_SOVERSION}
-  COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /Dlibcaffe_EXPORTS=1"
-)
 
+if (MSVC)
+  set_target_properties(${caffe_lib_name} PROPERTIES
+    VERSION   ${CAFFE_TARGET_VERSION}
+    SOVERSION ${CAFFE_TARGET_SOVERSION}
+    COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /Dlibcaffe_EXPORTS=1"
+  )
+else(MSVC)
+  set_target_properties(${caffe_lib_name} PROPERTIES
+    VERSION   ${CAFFE_TARGET_VERSION}
+    SOVERSION ${CAFFE_TARGET_SOVERSION}
+  )
+endif(MSVC)
 
 # ---[ Tests Non MSVC
 if(NOT MSVC)
