@@ -10,7 +10,7 @@ endif(MSVC)
 # include python files either to force generation
 add_library(proto STATIC ${proto_hdrs} ${proto_srcs} ${proto_python})
 IF(MSVC)
-  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS=1")
+  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS")
 else(MSVC)
   SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp")
 endif(MSVC)
@@ -42,7 +42,6 @@ if (MSVC)
   set_target_properties(${caffe_lib_name} PROPERTIES
     VERSION   ${CAFFE_TARGET_VERSION}
     SOVERSION ${CAFFE_TARGET_SOVERSION}
-    COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /Dlibcaffe_EXPORTS=1"
   )
 else(MSVC)
   set_target_properties(${caffe_lib_name} PROPERTIES

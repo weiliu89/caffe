@@ -8,12 +8,8 @@
   #endif
 #endif
 
-#ifndef PROTO_EXPORTS
 #if defined proto_EXPORTS && defined _MSC_VER
 #define PROTO_EXPORTS __declspec(dllexport)
-#else
-#define PROTO_EXPORTS
-#endif
 #else
 #define PROTO_EXPORTS
 #endif
