@@ -12,7 +12,7 @@ add_library(proto STATIC ${proto_hdrs} ${proto_srcs} ${proto_python})
 IF(MSVC)
   SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} /FIcaffe/proto/caffe_pb.h /Dproto_EXPORTS=1 /Dlibcaffe_EXPORTS=1")
 else(MSVC)
-  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp -DPROTO_EXPORTS= -DCAFFE_EXPORTS= ")
+  SET_TARGET_PROPERTIES(proto PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -include caffe/common.hpp")
 endif(MSVC)
 
 set(Caffe_LINKER_LIBS proto ${Caffe_LINKER_LIBS}) # note, crucial to prepend!
