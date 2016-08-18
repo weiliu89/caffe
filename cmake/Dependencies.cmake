@@ -39,10 +39,9 @@ set(HDF5_INCLUDE_DIR "${HDF5_ROOT_DIRECTORY}/include")
 set(HDF5_LIBRARY_DIR "${HDF5_ROOT_DIRECTORY}/lib")
 if(MSVC)
     file(GLOB HDF5_LIBRARIES 
-		${HDF5_LIBRARY_DIR}/hdf5.lib
-		${HDF5_LIBRARY_DIR}/hdf5_hl.lib
-		${HDF5_LIBRARY_DIR}/zlib.lib
-		${HDF5_LIBRARY_DIR}/szip.lib
+		${HDF5_LIBRARY_DIR}/libhdf5.lib
+		${HDF5_LIBRARY_DIR}/libhdf5_hl.lib
+		${HDF5_LIBRARY_DIR}/zlibstatic.lib
 	)
 else(MSVC)
     file(GLOB HDF5_LIBRARIES 
