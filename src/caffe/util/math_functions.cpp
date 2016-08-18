@@ -67,6 +67,35 @@ void caffe_set(const int N, const Dtype alpha, Dtype* Y) {
   }
 }
 
+template DLL_EXPORT void caffe_cpu_gemm<float>(const CBLAS_TRANSPOSE TransA,
+    const CBLAS_TRANSPOSE TransB, const int M, const int N, const int K,
+    const float alpha, const float* A, const float* B, const float beta,
+    float* C);
+
+template DLL_EXPORT void caffe_cpu_gemv<float>(const CBLAS_TRANSPOSE TransA, const int M, const int N,
+    const float alpha, const float* A, const float* x, const float beta,
+    float* y);
+
+template DLL_EXPORT void caffe_axpy<float>(const int N, const float alpha, const float* X,
+    float* Y);
+
+
+
+
+template DLL_EXPORT void caffe_cpu_gemm<double>(const CBLAS_TRANSPOSE TransA,
+    const CBLAS_TRANSPOSE TransB, const int M, const int N, const int K,
+    const double alpha, const double* A, const double* B, const double beta,
+    double* C);
+
+template DLL_EXPORT void caffe_cpu_gemv<double>(const CBLAS_TRANSPOSE TransA, const int M, const int N,
+    const double alpha, const double* A, const double* x, const double beta,
+    double* y);
+
+template DLL_EXPORT void caffe_axpy<double>(const int N, const double alpha, const double* X,
+    double* Y);
+
+
+
 template DLL_EXPORT void caffe_set<int>(const int N, const int alpha, int* Y);
 template DLL_EXPORT void caffe_set<float>(const int N, const float alpha, float* Y);
 template DLL_EXPORT void caffe_set<double>(const int N, const double alpha, double* Y);
@@ -129,7 +158,10 @@ void caffe_cpu_axpby<double>(const int N, const double alpha, const double* X,
                              const double beta, double* Y) {
   cblas_daxpby(N, alpha, X, 1, beta, Y, 1);
 }
-
+template DLL_EXPORT void caffe_cpu_axpby<float>(const int N, const float alpha, const float* X,
+    const float beta, float* Y);
+template DLL_EXPORT void caffe_cpu_axpby<double>(const int N, const double alpha, const double* X,
+    const double beta, double* Y);
 template <>
 void caffe_add<float>(const int n, const float* a, const float* b,
     float* y) {
@@ -233,6 +265,25 @@ void caffe_abs<double>(const int n, const double* a, double* y) {
 unsigned int caffe_rng_rand() {
   return (*caffe_rng())();
 }
+
+template DLL_EXPORT void caffe_add_scalar<float>(const int N, const float alpha, float *X);
+template DLL_EXPORT void caffe_scal<float>(const int N, const float alpha, float *X);
+template DLL_EXPORT void caffe_sqr<float>(const int N, const float* a, float* y);
+template DLL_EXPORT void caffe_add<float>(const int N, const float* a, const float* b, float* y);
+template DLL_EXPORT void caffe_sub<float>(const int N, const float* a, const float* b, float* y);
+template DLL_EXPORT void caffe_mul<float>(const int N, const float* a, const float* b, float* y);
+template DLL_EXPORT void caffe_div<float>(const int N, const float* a, const float* b, float* y);
+template DLL_EXPORT void caffe_powx<float>(const int n, const float* a, const float b, float* y);
+
+template DLL_EXPORT void caffe_add_scalar<double>(const int N, const double alpha, double *X);
+template DLL_EXPORT void caffe_scal<double>(const int N, const double alpha, double *X);
+template DLL_EXPORT void caffe_sqr<double>(const int N, const double* a, double* y);
+template DLL_EXPORT void caffe_add<double>(const int N, const double* a, const double* b, double* y);
+template DLL_EXPORT void caffe_sub<double>(const int N, const double* a, const double* b, double* y);
+template DLL_EXPORT void caffe_mul<double>(const int N, const double* a, const double* b, double* y);
+template DLL_EXPORT void caffe_div<double>(const int N, const double* a, const double* b, double* y);
+template DLL_EXPORT void caffe_powx<double>(const int n, const double* a, const double b, double* y);
+
 
 template <typename Dtype>
 Dtype caffe_nextafter(const Dtype b) {
