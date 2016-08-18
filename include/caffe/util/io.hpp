@@ -10,7 +10,7 @@
 #include "google/protobuf/message.h"
 
 #include "caffe/common.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/format.hpp"
 
 #ifndef CAFFE_TMP_DIR_RETRIES

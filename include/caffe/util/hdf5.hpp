@@ -7,7 +7,7 @@
 #include "hdf5_hl.h"
 
 #include "caffe/blob.hpp"
-#include "caffe/common.hpp"
+
 namespace caffe {
 
 template <typename Dtype>

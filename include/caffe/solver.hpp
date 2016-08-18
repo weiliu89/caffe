@@ -6,7 +6,6 @@
 
 #include "caffe/net.hpp"
 #include "caffe/solver_factory.hpp"
-#include "caffe/common.hpp"
 
 namespace caffe {
 

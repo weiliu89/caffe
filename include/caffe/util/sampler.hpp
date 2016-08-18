@@ -6,7 +6,6 @@
 #include "glog/logging.h"
 
 #include "caffe/caffe.hpp"
-#include "caffe/common.hpp"
 
 namespace caffe {
 

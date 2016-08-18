@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 namespace caffe {
 
@@ -19,7 +19,7 @@ namespace caffe {
  * of the layer.
  */
 template <typename Dtype>
-class BiasLayer : public Layer<Dtype> {
+class DLL_EXPORT BiasLayer : public Layer<Dtype> {
  public:
   explicit BiasLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

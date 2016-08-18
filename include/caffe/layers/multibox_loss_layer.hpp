@@ -9,7 +9,6 @@
 #include "caffe/layer.hpp"
 #include "caffe/proto/caffe_pb.h"
 #include "caffe/util/bbox_util.hpp"
-#include "caffe/common.hpp"
 
 #include "caffe/layers/loss_layer.hpp"
 

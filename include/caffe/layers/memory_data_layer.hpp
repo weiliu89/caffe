@@ -6,7 +6,6 @@
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
 #include "caffe/proto/caffe_pb.h"
-#include "caffe/common.hpp"
 #include "caffe/layers/base_data_layer.hpp"
 
 namespace caffe {
