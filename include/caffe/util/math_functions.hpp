@@ -225,8 +225,7 @@ template <typename Dtype>
 DLL_EXPORT void caffe_gpu_rng_gaussian(const int n, const Dtype mu, const Dtype sigma,
                             Dtype* r);
 
-template <typename Dtype>
-DLL_EXPORT void caffe_gpu_rng_bernoulli(const int n, const Dtype p, int* r);
+//template <typename Dtype> DLL_EXPORT void caffe_gpu_rng_bernoulli(const int n, const Dtype p, int* r);
 
 template <typename Dtype>
 DLL_EXPORT void caffe_gpu_dot(const int n, const Dtype* x, const Dtype* y, Dtype* out);
@@ -240,8 +239,7 @@ DLL_EXPORT void caffe_gpu_sign(const int n, const Dtype* x, Dtype* y);
 template<typename Dtype>
 DLL_EXPORT void caffe_gpu_sgnbit(const int n, const Dtype* x, Dtype* y);
 
-template <typename Dtype>
-DLL_EXPORT void caffe_gpu_fabs(const int n, const Dtype* x, Dtype* y);
+//template <typename Dtype> DLL_EXPORT void caffe_gpu_fabs(const int n, const Dtype* x, Dtype* y);
 
 template <typename Dtype>
 DLL_EXPORT void caffe_gpu_scale(const int n, const Dtype alpha, const Dtype *x, Dtype* y);
