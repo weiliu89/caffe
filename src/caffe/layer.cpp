@@ -24,7 +24,9 @@ void Layer<Dtype>::Unlock() {
 
 template <typename Dtype>
 void Layer<Dtype>::layer_gpu_dot(const int n, const Dtype* x, const Dtype* y, Dtype* out) {
+#ifndef CPU_ONLY
   caffe_gpu_dot(n, x, y, out);
+#endif
 }
 
 
