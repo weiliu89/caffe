@@ -64,9 +64,6 @@ class GPUParams : public Params<Dtype> {
 
  private:
   int buffer_device_;
-#ifndef CPU_ONLY
-  cudaStream_t stream_;
-#endif
 };
 
 class DevicePair {

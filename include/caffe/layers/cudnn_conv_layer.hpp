@@ -42,8 +42,7 @@ class CuDNNConvolutionLayer : public ConvolutionLayer<Dtype> {
   // We update it on second Fwd/Bwd pass and we allocate it *once*
   // when we start third pass. We might recompute it later if demand grows
   // and/or we suddenly need to get extra memory for other needs.
-  static size_t& workspace_size(int device);
-  static vector<size_t> WORKSPACE_SIZES;
+  static size_t WORKSPACE_SIZE;
   // This is the workspace used by all Convolution layers one after another.
   // We carry it global to prevent unnecessary allocations/deallocations
   // because they hurt performance.
@@ -110,7 +109,7 @@ class CuDNNConvolutionLayer : public ConvolutionLayer<Dtype> {
 };
 
 template<typename Dtype>
-vector<size_t> CuDNNConvolutionLayer<Dtype>::WORKSPACE_SIZES;
+size_t CuDNNConvolutionLayer<Dtype>::WORKSPACE_SIZE = 0UL;
 
 template<typename Dtype>
 const size_t CuDNNConvolutionLayer<Dtype>::INITIAL_WORKSPACE_SIZE =

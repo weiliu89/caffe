@@ -10,7 +10,7 @@ endif()
 project(Caffe C CXX)
 
 # ---[ Caffe version
-set(CAFFE_TARGET_VERSION "0.15.12")
+set(CAFFE_TARGET_VERSION "0.15.8")
 set(CAFFE_TARGET_SOVERSION "0.15")
 add_definitions(-DCAFFE_VERSION=${CAFFE_TARGET_VERSION})
 
@@ -80,7 +80,8 @@ configure_file(cmake/Templates/caffe_config.h.in "${PROJECT_BINARY_DIR}/caffe_co
 # ---[ Includes
 set(Caffe_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(THIRDPARTY_DIR ${PROJECT_SOURCE_DIR}/3rdparty)
-include_directories(${Caffe_INCLUDE_DIR} ${PROJECT_BINARY_DIR} ${THIRDPARTY_DIR})
+set(THIRDPARTY_DIR_DST ${CMAKE_BINARY_DIR}/3rdparty)
+include_directories(${Caffe_INCLUDE_DIR} ${PROJECT_BINARY_DIR} ${THIRDPARTY_DIR_DST})
 include_directories(BEFORE src) # This is needed for gtest.
 
 # ---[ Subdirectories
@@ -106,3 +107,7 @@ caffe_print_configuration_summary()
 
 # ---[ Export configs generation
 caffe_generate_export_configs()
+
+# ---[ CUB Memory Manager
+set(CUB_VERSION "1.5.2")
+execute_process(COMMAND ${THIRDPARTY_DIR}/getCUB.sh ${CUB_VERSION})

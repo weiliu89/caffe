@@ -32,7 +32,7 @@ namespace caffe {
 
 template<typename Dtype>
 void zeroCoverage(vector<reference_wrapper<Dtype> >* coverages) {
-  foreach_(reference_wrapper<Dtype>& coverage, *coverages) {
+  foreach_(::reference_wrapper<Dtype>& coverage, *coverages) {
     coverage.get() = 0.0;
   }
 }
@@ -266,7 +266,7 @@ TransformedLabel_<Dtype>::TransformedLabel_(
         g_y,
         CoverageGenerator<Dtype>::TRANSFORMED_LABEL_SIZE + iCoverage);
 
-    coverages.push_back(ref(coverage));
+    coverages.push_back(::ref(coverage));
   }
 }
 

@@ -81,7 +81,7 @@ void DetectNetTransformationLayer<Dtype>::retrieveMeanImage(Size dimensions) {
 
   // resize, if dimensions were defined:
   if (dimensions.area() > 0) {
-    cv::resize(data_mean_, data_mean_, dimensions, 0, 0, cv::INTER_CUBIC);
+    resize(data_mean_, data_mean_, dimensions, cv::INTER_CUBIC);
   }
   // scale from 0..255 to 0..1:
   data_mean_ /= Dtype(UINT8_MAX);
@@ -358,7 +358,7 @@ void DetectNetTransformationLayer<Dtype>::transform(
     // mean subtraction must occur after color augmentations as colorshift
     //  outside of 0..1 invalidates scale
     meanSubtract(&img_temp);
-    // images now bounded from [-1,1] (range is dependent on mean subtraction)
+    // images now bounded from -0.5...0.5
     as.scale = augmentation_scale(img_temp, img_aug, bboxlist, &bboxlist_aug);
     as.degree =
         augmentation_rotate(*img_aug, &img_temp, bboxlist_aug, &bboxlist_aug);
@@ -438,7 +438,9 @@ void DetectNetTransformationLayer<Dtype>::transform_scale(
   if (size.height != img.rows || size.width != img.cols) {
     Dtype scale_x = (Dtype)size.width / img.cols;
     Dtype scale_y = (Dtype)size.height / img.rows;
-    cv::resize(img, *img_temp, size, 0, 0, cv::INTER_CUBIC);
+
+    resize(img, *img_temp, size, cv::INTER_CUBIC);
+
     vector<BboxLabel > bboxList_aug;
     foreach_(BboxLabel label, bboxList) {  // for every bbox:
       // resize by scale
@@ -534,7 +536,7 @@ void DetectNetTransformationLayer<Dtype>::transform_crop(
     // construct a destination matrix:
     *img_dst = Mat3v(dst_size);
     // and fill with black:
-    img_dst->setTo(Scalar(0, 0, 0));
+    img_dst->setTo(Scalar(-0.5, -0.5, -0.5));
 
     // define destinationROI inside of destination mat:
     Mat3v destinationROI = (*img_dst)(dst_rect);
@@ -650,7 +652,7 @@ float DetectNetTransformationLayer<Dtype>::augmentation_rotate(
     // construct a destination matrix large enough to contain the rotated image:
     *img_aug = Mat3v(boundingSize);
     // and fill with black:
-    img_aug->setTo(Scalar(0, 0, 0));
+    img_aug->setTo(Scalar(-0.5, -0.5, -0.5));
     // warp old image into new buffer, maintaining the background:
     warpAffine(
         img_src,

@@ -2501,7 +2501,7 @@ layer {
     python_param {
         module: 'caffe.layers.detectnet.clustering'
         layer: 'ClusterDetections'
-        param_str : '1248, 352, 16, 0.6, 3, 0.02, 22, 1'
+        param_str : '1248, 352, 16, 0.6, 3, 0.02, 22'
     }
     include: { phase: TEST }
 }
@@ -2516,7 +2516,7 @@ layer {
   python_param {
       module: 'caffe.layers.detectnet.clustering'
       layer: 'ClusterGroundtruth'
-      param_str : '1248, 352, 16, 1'
+      param_str : '1248, 352, 16'
   }
   include: { phase: TEST stage: "val" }
 }

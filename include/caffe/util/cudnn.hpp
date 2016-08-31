@@ -17,7 +17,8 @@
       << cudnnGetErrorString(status); \
   } while (0)
 
-inline const char* cudnnGetErrorString(cudnnStatus_t status) {
+//WINHACK inline const char* cudnnGetErrorString(cudnnStatus_t status) {
+inline const char * CUDNNWINAPI cudnnGetErrorString(cudnnStatus_t status){
   switch (status) {
     case CUDNN_STATUS_SUCCESS:
       return "CUDNN_STATUS_SUCCESS";

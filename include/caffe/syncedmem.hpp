@@ -47,19 +47,11 @@ class SyncedMemory {
   SyncedMemory()
       : cpu_ptr_(NULL), gpu_ptr_(NULL), size_(0), head_(UNINITIALIZED),
         own_cpu_data_(false), cpu_malloc_use_cuda_(false), own_gpu_data_(false),
-        gpu_device_(-1)
-#ifndef CPU_ONLY
-      , stream_(cudaStreamDefault)
-#endif
-      {}
+        gpu_device_(-1) {}
   explicit SyncedMemory(size_t size)
       : cpu_ptr_(NULL), gpu_ptr_(NULL), size_(size), head_(UNINITIALIZED),
         own_cpu_data_(false), cpu_malloc_use_cuda_(false), own_gpu_data_(false),
-        gpu_device_(-1)
-#ifndef CPU_ONLY
-      , stream_(cudaStreamDefault)
-#endif
-      {}
+        gpu_device_(-1) {}
   ~SyncedMemory();
   const void* cpu_data();
   void set_cpu_data(void* data);
@@ -72,13 +64,7 @@ class SyncedMemory {
   size_t size() { return size_; }
 
 #ifndef CPU_ONLY
-  cudaStream_t stream() const {
-    return stream_;
-  }
-  int gpu_device() const {
-    return gpu_device_;
-  }
-  void async_gpu_push();
+  void async_gpu_push(const cudaStream_t& stream);
 #endif
 
  private:
@@ -92,9 +78,6 @@ class SyncedMemory {
   bool cpu_malloc_use_cuda_;
   bool own_gpu_data_;
   int gpu_device_;
-#ifndef CPU_ONLY
-  cudaStream_t stream_;
-#endif
 
   DISABLE_COPY_AND_ASSIGN(SyncedMemory);
 };  // class SyncedMemory

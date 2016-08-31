@@ -33,7 +33,9 @@
 #include "caffe/layers/python_layer.hpp"
 #endif
 
+#if !defined(_MSC_VER)
 #pragma GCC diagnostic ignored "-Wreturn-type"
+#endif
 
 namespace caffe {
 

@@ -308,10 +308,7 @@ void CuDNNConvolutionLayer<Dtype>::FindExConvAlgo(
   // Allocate temporary buffer for weights used for backward filter FindEx
   void *tmp_weights;
   const int tmp_weights_size = sizeof(Dtype) * this->weight_offset_;
-  int device;
-  CUDA_CHECK(cudaGetDevice(&device));
-  cudaStream_t stream = GPUMemory::device_stream(device);
-  GPUMemory::allocate(&tmp_weights, tmp_weights_size, device, stream);
+  GPUMemory::allocate(&tmp_weights, tmp_weights_size);
 
   for (int i = 0; i < bottom.size(); i++) {
     // Find forward algorithm
@@ -372,7 +369,7 @@ void CuDNNConvolutionLayer<Dtype>::FindExConvAlgo(
       workspace_bwd_data_sizes_[i] = bwd_data_results[0].memory;
     }
   }
-  GPUMemory::deallocate(tmp_weights, device, stream);
+  GPUMemory::deallocate(tmp_weights);
 }
 #endif
 
@@ -386,6 +383,8 @@ bool CuDNNConvolutionLayer<Dtype>::IsBottomDescChanged(
   int cached_stride_n; int cached_stride_c;
   int cached_stride_h; int cached_stride_w;
   int n; int c; int h; int w;
+  int stride_n; int stride_c;
+  int stride_h; int stride_w;
   cudnnDataType_t type;
 
   for (int i = 0; i < bottom.size(); i++) {
@@ -395,16 +394,21 @@ bool CuDNNConvolutionLayer<Dtype>::IsBottomDescChanged(
       &cached_n, &cached_c, &cached_h, &cached_w,
       &cached_stride_n, &cached_stride_c,
       &cached_stride_h, &cached_stride_w));
-    const vector<int>& shape = bottom[i]->shape();
-    n = shape[0];
-    c = shape[1] / this->group_;
-    h = shape[2];
-    w = shape[3];
+    CUDNN_CHECK(cudnnGetTensor4dDescriptor(
+      bottom_descs_[i],
+      &type,
+      &n, &c, &h, &w,
+      &stride_n, &stride_c,
+      &stride_h, &stride_w));
 
     if ((cached_n != n) ||
         (cached_c != c) ||
         (cached_h != h) ||
-        (cached_w != w)) {
+        (cached_w != w) ||
+        (cached_stride_n != stride_n) ||
+        (cached_stride_c != stride_c) ||
+        (cached_stride_h != stride_h) ||
+        (cached_stride_w != stride_w)) {
       return true;
     }
   }
@@ -462,9 +466,6 @@ bool CuDNNConvolutionLayer<Dtype>::IsConvDescChanged(
 
 template <typename Dtype>
 void CuDNNConvolutionLayer<Dtype>::UpdateWorkspaceDemand(int size) {
-  int device;
-  CUDA_CHECK(cudaGetDevice(&device));
-  size_t& WORKSPACE_SIZE = workspace_size(device);
   // Updating the maximum WORKSPACE_SIZE
   for (int i = 0; i < size; ++i) {
     if (workspace_fwd_sizes_[i] > WORKSPACE_SIZE) {
@@ -509,17 +510,6 @@ CuDNNConvolutionLayer<Dtype>::~CuDNNConvolutionLayer() {
   delete [] workspace_fwd_sizes_;
   delete [] workspace_bwd_data_sizes_;
   delete [] workspace_bwd_filter_sizes_;
-}
-
-template <typename Dtype>
-size_t& CuDNNConvolutionLayer<Dtype>::workspace_size(int device) {
-  if (device < 0) {
-    CUDA_CHECK(cudaGetDevice(&device));
-  }
-  if (device + 1 > WORKSPACE_SIZES.size()) {
-    WORKSPACE_SIZES.resize(device + 1);
-  }
-  return WORKSPACE_SIZES[device];
 }
 
 INSTANTIATE_CLASS(CuDNNConvolutionLayer);
