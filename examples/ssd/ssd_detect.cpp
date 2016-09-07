@@ -51,12 +51,13 @@ class Detector {
                   std::vector<cv::Mat>* input_channels);
   void Preprocess(const cv::Mat& img,
                   std::vector<cv::gpu::GpuMat>* input_channels);
+
  private:
   shared_ptr<Net<float> > net_;
   cv::Size input_geometry_;
   int num_channels_;
   cv::Mat mean_;
-
+#if !CPU_ONLY && USE_OPENCV_GPU
   std::vector<cv::gpu::GpuMat> input_channels_gpu;
   cv::gpu::GpuMat mean_gpu;
   cv::gpu::GpuMat g_img;
@@ -64,7 +65,7 @@ class Detector {
   cv::gpu::GpuMat sample_resized;
   cv::gpu::GpuMat sample_float;
   cv::gpu::GpuMat sample_normalized;
-
+#endif
 };
 
 Detector::Detector(const string& model_file,
@@ -209,19 +210,6 @@ void Detector::WrapInputLayer(std::vector<cv::Mat>* input_channels) {
   }
 }
 
-void Detector::WrapInputLayer(std::vector<cv::gpu::GpuMat>* input_channels) {
-  Blob<float>* input_layer = net_->input_blobs()[0];
-
-  int width = input_layer->width();
-  int height = input_layer->height();
-  float* input_data = input_layer->mutable_gpu_data();
-  for (int i = 0; i < input_layer->channels(); ++i) {
-    cv::gpu::GpuMat channel(height, width, CV_32FC1, input_data);
-    input_channels->push_back(channel);
-    input_data += width * height;
-  }
-}
-
 void Detector::Preprocess(const cv::Mat& img,
                             std::vector<cv::Mat>* input_channels) {
   /* Convert the input image to the input image format of the network. */
@@ -262,22 +250,36 @@ void Detector::Preprocess(const cv::Mat& img,
     << "Input channels are not wrapping the input layer of the network.";
 }
 
+#if !CPU_ONLY && USE_OPENCV_GPU
+void Detector::WrapInputLayer(std::vector<cv::gpu::GpuMat>* input_channels) {
+  Blob<float>* input_layer = net_->input_blobs()[0];
+
+  int width = input_layer->width();
+  int height = input_layer->height();
+  float* input_data = input_layer->mutable_gpu_data();
+  for (int i = 0; i < input_layer->channels(); ++i) {
+    cv::gpu::GpuMat channel(height, width, CV_32FC1, input_data);
+    input_channels->push_back(channel);
+    input_data += width * height;
+  }
+}
+
 void Detector::Preprocess(const cv::Mat& img,
-                            std::vector<cv::gpu::GpuMat>* input_channels) {
+  std::vector<cv::gpu::GpuMat>* input_channels) {
   /* Convert the input image to the input image format of the network. */
   if(img.channels() == num_channels_)
-	  sample.upload(img);
+    sample.upload(img);
   else
   { 
-	  g_img.upload(img);
-  	  if (g_img.channels() == 3 && num_channels_ == 1)
-		cv::gpu::cvtColor(g_img, sample, cv::COLOR_BGR2GRAY);
-	  else if (g_img.channels() == 4 && num_channels_ == 1)
-		cv::gpu::cvtColor(g_img, sample, cv::COLOR_BGRA2GRAY);
-	  else if (g_img.channels() == 4 && num_channels_ == 3)
-		cv::gpu::cvtColor(g_img, sample, cv::COLOR_BGRA2BGR);
-	  else if (g_img.channels() == 1 && num_channels_ == 3)
-		cv::gpu::cvtColor(g_img, sample, cv::COLOR_GRAY2BGR);
+    g_img.upload(img);
+    if (g_img.channels() == 3 && num_channels_ == 1)
+      cv::gpu::cvtColor(g_img, sample, cv::COLOR_BGR2GRAY);
+    else if (g_img.channels() == 4 && num_channels_ == 1)
+      cv::gpu::cvtColor(g_img, sample, cv::COLOR_BGRA2GRAY);
+    else if (g_img.channels() == 4 && num_channels_ == 3)
+      cv::gpu::cvtColor(g_img, sample, cv::COLOR_BGRA2BGR);
+    else if (g_img.channels() == 1 && num_channels_ == 3)
+      cv::gpu::cvtColor(g_img, sample, cv::COLOR_GRAY2BGR);
   }
 
   if (sample.size() != input_geometry_)
@@ -301,6 +303,7 @@ void Detector::Preprocess(const cv::Mat& img,
         == net_->input_blobs()[0]->gpu_data())
     << "Input channels are not wrapping the input layer of the network.";
 }
+#endif
 
 DEFINE_string(mean_file, "",
     "The mean file used to subtract from the input image.");
@@ -359,10 +362,10 @@ int main(int argc, char** argv) {
   // Process image one by one.
   std::ifstream infile(argv[3]);
   std::string file;
-  //Time Check
+  // Time Check
   struct timeval start_point, end_point;
   double operating_time;
-  gettimeofday(&start_point, NULL);  
+  gettimeofday(&start_point, NULL);
   int iFrame = 0;
 
   while (infile >> file) {
@@ -430,9 +433,10 @@ int main(int argc, char** argv) {
       LOG(FATAL) << "Unknown file_type: " << file_type;
     }
   }
-  gettimeofday(&end_point, NULL); 
-  operating_time = (double)(end_point.tv_sec)+(double)(end_point.tv_usec)/1000000.0-(double)(start_point.tv_sec)-(double)(start_point.tv_usec)/1000000.0;
-  printf("%d Frame, %f, %f fps\n", iFrame, operating_time, (float)iFrame / operating_time );
+  gettimeofday(&end_point, NULL);
+  operating_time = static_cast<double>(end_point.tv_sec) + static_cast<double>(end_point.tv_usec) / 1000000.0
+                 - static_cast<double>(start_point.tv_sec) - static_cast<double>(start_point.tv_usec) / 1000000.0;
+  printf("%d Frame, %f, %f fps\n", iFrame, operating_time, static_cast<float>(iFrame) / operating_time);
   return 0;
 }
 #else
