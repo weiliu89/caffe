@@ -102,7 +102,7 @@ std::vector<vector<float> > Detector::Detect(const cv::Mat& img) {
   net_->Reshape();
 
 #if CPU_ONLY || !USE_OPENCV_GPU
-  std::vector<Mat> input_channels;
+  std::vector<cv::Mat> input_channels;
   WrapInputLayer(&input_channels);
   Preprocess(img, &input_channels);
 #else
