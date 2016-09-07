@@ -267,8 +267,9 @@ void Detector::WrapInputLayer(std::vector<cv::gpu::GpuMat>* input_channels) {
 void Detector::Preprocess(const cv::Mat& img,
   std::vector<cv::gpu::GpuMat>* input_channels) {
   /* Convert the input image to the input image format of the network. */
-  if (img.channels() == num_channels_)
+  if (img.channels() == num_channels_) {
     sample.upload(img);
+  }
   else {
     g_img.upload(img);
     if (g_img.channels() == 3 && num_channels_ == 1)
@@ -433,10 +434,10 @@ int main(int argc, char** argv) {
     }
   }
   gettimeofday(&end_point, NULL);
-  operating_time = static_cast<double>(end_point.tv_sec)
-	             + static_cast<double>(end_point.tv_usec) / 1000000.0
-                 - static_cast<double>(start_point.tv_sec)
-				 - static_cast<double>(start_point.tv_usec) / 1000000.0;
+  operating_time = static_cast<double>(end_point.tv_sec);
+  operating_time += static_cast<double>(end_point.tv_usec) / 1000000.0;
+  operating_time -= static_cast<double>(start_point.tv_sec);
+  operating_time -= static_cast<double>(start_point.tv_usec) / 1000000.0;
   printf("%d Frame, %f, %f fps\n", iFrame, operating_time, static_cast<float>(iFrame) / operating_time);
   return 0;
 }
