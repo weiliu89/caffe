@@ -5,7 +5,6 @@
 
 #ifndef __NVCC__
 #include <boost/log/trivial.hpp>
-#include <sstream>
 // This file replaces google logging with boost logging and equivalent macros
 #define LOG_EVERY_N_VARNAME(base, line) LOG_EVERY_N_VARNAME_CONCAT(base, line)
 #define LOG_EVERY_N_VARNAME_CONCAT(base, line) base ## line
@@ -105,7 +104,9 @@
 #define DCHECK(exp) DISCARD_MESSAGE 
 #endif
 #endif // __NVCC__
-
+#include <sstream>
+#include <functional>
+#include <string>
 namespace caffe
 {
     class DLL_EXPORT LogMessageVoidify {

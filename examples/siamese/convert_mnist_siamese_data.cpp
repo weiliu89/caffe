@@ -8,7 +8,7 @@
 #include <fstream>  // NOLINT(readability/streams)
 #include <string>
 
-//#include "glog/logging.h"
+#include "caffe/logging.hpp"
 #include "google/protobuf/text_format.h"
 #include "stdint.h"
 

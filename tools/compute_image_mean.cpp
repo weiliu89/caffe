@@ -19,8 +19,7 @@ using std::max;
 using std::pair;
 using boost::scoped_ptr;
 
-//DEFINE_string(backend, "lmdb",
-  //      "The backend {leveldb, lmdb} containing the images");
+
 
 int main(int argc, char** argv) {
   //::google::InitGoogleLogging(argv[0]);
@@ -30,6 +29,7 @@ int main(int argc, char** argv) {
   namespace gflags = google;
 #endif
 
+
   /*gflags::SetUsageMessage("Compute the mean_image of a set of images given by"
         " a leveldb/lmdb\n"
         "Usage:\n"
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 
   gflags::ParseCommandLineFlags(&argc, &argv, true);*/
 
-  if (argc < 2 || argc > 3) {
+  /*if (argc < 2 || argc > 3) {
     gflags::ShowUsageWithFlagsRestrict(argv[0], "tools/compute_image_mean");
     return 1;
   }
@@ -117,8 +117,10 @@ int main(int argc, char** argv) {
     }
     LOG(info) << "mean_value channel [" << c << "]:" << mean_values[c] / dim;
   }
+  */
 #else
   LOG(fatal) << "This tool requires OpenCV; compile with USE_OPENCV.";
 #endif  // USE_OPENCV
+
   return 0;
 }
