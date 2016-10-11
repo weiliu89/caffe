@@ -1,5 +1,5 @@
 #include "caffe/util/math_functions.hpp"
-
+#include "caffe/logging.hpp"
 
 namespace caffe {
 
