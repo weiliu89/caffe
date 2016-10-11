@@ -1,4 +1,4 @@
-#include "glog/logging.h"
+
 #include "gtest/gtest.h"
 
 #include "caffe/internal_thread.hpp"

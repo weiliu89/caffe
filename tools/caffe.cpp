@@ -513,7 +513,7 @@ int main(int argc, char** argv)
 		std::cout << desc;
 		return 0;
 	}
-    //caffe::GlobalInit(&argc, &argv);
+    
 	auto brew_function  = boost::lexical_cast<std::string>(argv[1]);
 	boost::program_options::variables_map vm;
 	boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);

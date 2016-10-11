@@ -156,7 +156,7 @@ TYPED_TEST(BlobMathTest, TestSumOfSquares) {
     this->blob_->mutable_gpu_data();
     break;
   default:
-    LOG(FATAL) << "Unknown device: " << TypeParam::device;
+    LOG(fatal) << "Unknown device: " << TypeParam::device;
   }
   EXPECT_NEAR(expected_sumsq, this->blob_->sumsq_data(),
               this->epsilon_ * expected_sumsq);
@@ -174,7 +174,7 @@ TYPED_TEST(BlobMathTest, TestSumOfSquares) {
     this->blob_->mutable_gpu_diff();
     break;
   default:
-    LOG(FATAL) << "Unknown device: " << TypeParam::device;
+    LOG(fatal) << "Unknown device: " << TypeParam::device;
   }
   EXPECT_NEAR(expected_sumsq, this->blob_->sumsq_data(),
               this->epsilon_ * expected_sumsq);
@@ -211,7 +211,7 @@ TYPED_TEST(BlobMathTest, TestAsum) {
     this->blob_->mutable_gpu_data();
     break;
   default:
-    LOG(FATAL) << "Unknown device: " << TypeParam::device;
+    LOG(fatal) << "Unknown device: " << TypeParam::device;
   }
   EXPECT_NEAR(expected_asum, this->blob_->asum_data(),
               this->epsilon_ * expected_asum);
@@ -229,7 +229,7 @@ TYPED_TEST(BlobMathTest, TestAsum) {
     this->blob_->mutable_gpu_diff();
     break;
   default:
-    LOG(FATAL) << "Unknown device: " << TypeParam::device;
+    LOG(fatal) << "Unknown device: " << TypeParam::device;
   }
   EXPECT_NEAR(expected_asum, this->blob_->asum_data(),
               this->epsilon_ * expected_asum);
@@ -260,7 +260,7 @@ TYPED_TEST(BlobMathTest, TestScaleData) {
     this->blob_->mutable_gpu_data();
     break;
   default:
-    LOG(FATAL) << "Unknown device: " << TypeParam::device;
+    LOG(fatal) << "Unknown device: " << TypeParam::device;
   }
   const Dtype kDataScaleFactor = 3;
   this->blob_->scale_data(kDataScaleFactor);
@@ -288,7 +288,7 @@ TYPED_TEST(BlobMathTest, TestScaleData) {
     this->blob_->mutable_gpu_diff();
     break;
   default:
-    LOG(FATAL) << "Unknown device: " << TypeParam::device;
+    LOG(fatal) << "Unknown device: " << TypeParam::device;
   }
   const Dtype kDiffScaleFactor = 3;
   this->blob_->scale_diff(kDiffScaleFactor);

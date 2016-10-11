@@ -110,7 +110,7 @@ void LRNLayerTest<TypeParam>::ReferenceLRNForward(
     }
     break;
   default:
-    LOG(FATAL) << "Unknown normalization region.";
+    LOG(fatal) << "Unknown normalization region.";
   }
 }
 
@@ -281,9 +281,9 @@ class CuDNNLRNLayerTest : public GPUDeviceTest<Dtype> {
 
 template <typename Dtype>
 void CuDNNLRNLayerTest<Dtype>::ReferenceLRNForward(
-    const Blob<Dtype>& blob_bottom, const LayerParameter& layer_param,
-    Blob<Dtype>* blob_top) {
-  //typedef Dtype Dtype;
+	const Blob<Dtype>& blob_bottom, const LayerParameter& layer_param,
+	Blob<Dtype>* blob_top) {
+  //typedef TypeParam Dtype;
   blob_top->Reshape(blob_bottom.num(), blob_bottom.channels(),
       blob_bottom.height(), blob_bottom.width());
   Dtype* top_data = blob_top->mutable_cpu_data();
@@ -338,7 +338,7 @@ void CuDNNLRNLayerTest<Dtype>::ReferenceLRNForward(
     }
     break;
   default:
-    LOG(FATAL) << "Unknown normalization region.";
+    LOG(fatal) << "Unknown normalization region.";
   }
 }
 

@@ -72,7 +72,7 @@ TYPED_TEST_CASE(HDF5OutputLayerTest, TestDtypesAndDevices);
 
 TYPED_TEST(HDF5OutputLayerTest, TestForward) {
   typedef typename TypeParam::Dtype Dtype;
-  LOG(INFO) << "Loading HDF5 file " << this->input_file_name_;
+  LOG(info) << "Loading HDF5 file " << this->input_file_name_;
   hid_t file_id = H5Fopen(this->input_file_name_.c_str(), H5F_ACC_RDONLY,
                           H5P_DEFAULT);
   ASSERT_GE(file_id, 0)<< "Failed to open HDF5 file" <<

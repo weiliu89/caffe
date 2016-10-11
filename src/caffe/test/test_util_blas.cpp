@@ -83,7 +83,7 @@ TYPED_TEST(GemmTest, TestGemmCPUGPU) {
       EXPECT_EQ(C.cpu_data()[i], result[i]);
     }
   } else {
-    LOG(ERROR) << "Skipping test due to old architecture.";
+    LOG(error) << "Skipping test due to old architecture.";
   }
 }
 
@@ -123,7 +123,7 @@ TYPED_TEST(GemmTest, TestGemvCPUGPU) {
       EXPECT_EQ(x.cpu_data()[i], result_3[i]);
     }
   } else {
-    LOG(ERROR) << "Skipping test due to old architecture.";
+    LOG(error) << "Skipping test due to old architecture.";
   }
 }
 

@@ -9,7 +9,7 @@
 #include "caffe/common.hpp"
 #include "caffe/layer.hpp"
 #include "caffe/net.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 #include "caffe/util/format.hpp"
 
 namespace caffe {
@@ -23,7 +23,7 @@ template <typename Dtype> class RecurrentLayer;
  *        architecture, such as RNNLayer or LSTMLayer.
  */
 template <typename Dtype>
-class RecurrentLayer : public Layer<Dtype> {
+class DLL_EXPORT RecurrentLayer : public Layer<Dtype> {
  public:
   explicit RecurrentLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}

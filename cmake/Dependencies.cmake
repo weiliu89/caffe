@@ -24,8 +24,25 @@ list(APPEND Caffe_LINKER_LIBS ${CMAKE_THREAD_LIBS_INIT})
 include(cmake/ProtoBuf.cmake)
 
 # ---[ HDF5
-find_package(HDF5 COMPONENTS HL REQUIRED)
-include_directories(SYSTEM ${HDF5_INCLUDE_DIRS} ${HDF5_HL_INCLUDE_DIR})
+set(HDF5_ROOT_DIRECTORY CACHE PATH "")
+set(HDF5_INCLUDE_DIR "${HDF5_ROOT_DIRECTORY}/include")
+set(HDF5_LIBRARY_DIR "${HDF5_ROOT_DIRECTORY}/lib")
+if(MSVC)
+    file(GLOB HDF5_LIBRARIES 
+		${HDF5_LIBRARY_DIR}/libhdf5.lib
+		${HDF5_LIBRARY_DIR}/libhdf5_hl.lib
+		${HDF5_LIBRARY_DIR}/zlibstatic.lib
+	)
+else(MSVC)
+    file(GLOB HDF5_LIBRARIES 
+		${HDF5_LIBRARY_DIR}/libhdf5.a
+		${HDF5_LIBRARY_DIR}/libhdf5_hl.a
+	)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lz")
+endif(MSVC)
+set(HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIR})
+set(HDF5_HL_LIBRARIES)
+include_directories(SYSTEM ${HDF5_INCLUDE_DIRS} ${HDF5_HL_INCLUDE_DIR} ${HDF5_C_INCLUDE_DIR} ${HDF5_CXX_INCLUDE_DIR})
 list(APPEND Caffe_LINKER_LIBS ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
 # ---[ LMDB
@@ -69,7 +86,7 @@ endif()
 
 # ---[ OpenCV
 if(USE_OPENCV)
-  find_package(OpenCV QUIET COMPONENTS core highgui imgproc imgcodecs)
+  find_package(OpenCV QUIET COMPONENTS core highgui imgproc imgcodecs videoio)
   if(NOT OpenCV_FOUND) # if not OpenCV 3.x, then imgcodecs are not found
     find_package(OpenCV REQUIRED COMPONENTS core highgui imgproc)
   endif()

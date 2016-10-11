@@ -17,6 +17,17 @@
 
 using std::ostringstream;
 
+#ifdef _WIN32
+static inline std::string ReplaceAllSubstrings(std::string str, const std::string& from, const std::string& to) {
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+	}
+	return str;
+}
+#endif
+
 namespace caffe {
 
 template <typename TypeParam>
@@ -61,7 +72,7 @@ class GradientBasedSolverTest : public MultiDeviceTest<TypeParam> {
         param.set_solver_mode(SolverParameter_SolverMode_GPU);
         break;
       default:
-        LOG(FATAL) << "Unknown Caffe mode: " << Caffe::mode();
+        LOG(fatal) << "Unknown Caffe mode: " << Caffe::mode();
     }
     InitSolver(param);
     delta_ = param.delta();
@@ -177,8 +188,8 @@ class GradientBasedSolverTest : public MultiDeviceTest<TypeParam> {
       proto << "momentum: " << momentum << " ";
     }
     MakeTempDir(&snapshot_prefix_);
-#if defined(_MSC_VER)
-    std::replace(snapshot_prefix_.begin(), snapshot_prefix_.end(), '\\', '/');
+#ifdef _WIN32
+	snapshot_prefix_ = ReplaceAllSubstrings(snapshot_prefix_, std::string("\\"), std::string("/"));
 #endif
     proto << "snapshot_prefix: '" << snapshot_prefix_ << "/' ";
     if (snapshot) {
@@ -195,7 +206,7 @@ class GradientBasedSolverTest : public MultiDeviceTest<TypeParam> {
     if (devices == 1) {
       this->solver_->Solve();
     } else {
-      LOG(INFO) << "Multi-GPU test on " << devices << " devices";
+      LOG(info) << "Multi-GPU test on " << devices << " devices";
       vector<int> gpus;
       // put current device at the beginning
       int device_id = solver_->param().device_id();
@@ -336,7 +347,7 @@ class GradientBasedSolverTest : public MultiDeviceTest<TypeParam> {
             (Dtype(1.) - pow(momentum, num_iters));
         update_value = alpha_t * val_m / (std::sqrt(val_v) + delta_);
       } else {
-        LOG(FATAL) << "Unknown solver type: " << solver_->type();
+        LOG(fatal) << "Unknown solver type: " << solver_->type();
       }
       if (i == D) {
         updated_bias.mutable_cpu_diff()[0] = update_value;
