@@ -32,6 +32,10 @@ class DLL_EXPORT Net {
   /// @brief Initialize a network with a NetParameter.
   void Init(const NetParameter& param);
 
+  /// @brief set phase
+  ///        enable train and test with one network, for saving memory
+  void SetPhase(Phase phase);
+
   /**
    * @brief Run Forward and return the result.
    *

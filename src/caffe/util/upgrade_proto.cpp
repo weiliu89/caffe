@@ -74,10 +74,10 @@ bool UpgradeNetAsNeeded(const string& param_file, NetParameter* param) {
   }
   // NetParameter uses old style batch norm layers; try to upgrade it.
   if (NetNeedsBatchNormUpgrade(*param)) {
-    LOG(INFO) << "Attempting to upgrade batch norm layers using deprecated "
+    LOG(info) << "Attempting to upgrade batch norm layers using deprecated "
               << "params: " << param_file;
     UpgradeNetBatchNorm(param);
-    LOG(INFO) << "Successfully upgraded batch norm layers using deprecated "
+    LOG(info) << "Successfully upgraded batch norm layers using deprecated "
               << "params.";
   }
   return success;
