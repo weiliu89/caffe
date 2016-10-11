@@ -316,6 +316,13 @@ class DLL_EXPORT Layer {
     param_propagate_down_[param_id] = value;
   }
 
+  /**
+  * @brief set phase
+  *		   enable train and test with one network, for saving memory
+  */
+  virtual inline void set_phase(Phase phase){
+	  phase_ = phase;
+  }
 
  protected:
   /** The protobuf that stores the layer parameters */
@@ -440,6 +447,8 @@ class DLL_EXPORT Layer {
   void Lock();
   /** Unlock forward_mutex_ if this layer is shared */
   void Unlock();
+  
+  void layer_gpu_dot(const int n, const Dtype* x, const Dtype* y, Dtype* out); 
 
   DISABLE_COPY_AND_ASSIGN(Layer);
 };  // class Layer
@@ -474,7 +483,7 @@ inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
       const Dtype* data = top[top_id]->gpu_data();
       const Dtype* loss_weights = top[top_id]->gpu_diff();
       Dtype blob_loss = 0;
-      caffe_gpu_dot(count, data, loss_weights, &blob_loss);
+      layer_gpu_dot(count, data, loss_weights, &blob_loss);
       loss += blob_loss;
     }
 #endif

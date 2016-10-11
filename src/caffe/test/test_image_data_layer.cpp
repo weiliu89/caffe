@@ -32,7 +32,7 @@ class ImageDataLayerTest : public MultiDeviceTest<TypeParam> {
     // Create test input file.
     MakeTempFilename(&filename_);
     std::ofstream outfile(filename_.c_str(), std::ofstream::out);
-    LOG(INFO) << "Using temporary file " << filename_;
+    LOG(info) << "Using temporary file " << filename_;
     for (int i = 0; i < 5; ++i) {
       outfile << EXAMPLES_SOURCE_DIR "images/cat.jpg " << i << std::endl;
     }
@@ -40,7 +40,7 @@ class ImageDataLayerTest : public MultiDeviceTest<TypeParam> {
     // Create test input file for images of distinct sizes.
     MakeTempFilename(&filename_reshape_);
     std::ofstream reshapefile(filename_reshape_.c_str(), std::ofstream::out);
-    LOG(INFO) << "Using temporary file " << filename_reshape_;
+    LOG(info) << "Using temporary file " << filename_reshape_;
     reshapefile << EXAMPLES_SOURCE_DIR "images/cat.jpg " << 0 << std::endl;
     reshapefile << EXAMPLES_SOURCE_DIR "images/fish-bike.jpg " << 1
                 << std::endl;
@@ -48,7 +48,7 @@ class ImageDataLayerTest : public MultiDeviceTest<TypeParam> {
     // Create test input file for images with space in names
     MakeTempFilename(&filename_space_);
     std::ofstream spacefile(filename_space_.c_str(), std::ofstream::out);
-    LOG(INFO) << "Using temporary file " << filename_space_;
+    LOG(info) << "Using temporary file " << filename_space_;
     spacefile << EXAMPLES_SOURCE_DIR "images/cat.jpg " << 0 << std::endl;
     spacefile << EXAMPLES_SOURCE_DIR "images/cat gray.jpg " << 1 << std::endl;
     spacefile.close();

@@ -124,7 +124,7 @@ TYPED_TEST(LSTMLayerTest, TestForward) {
   shared_ptr<LSTMLayer<Dtype> > layer(new LSTMLayer<Dtype>(this->layer_param_));
   Caffe::set_random_seed(1701);
   layer->SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
-  LOG(INFO) << "Calling forward for full sequence LSTM";
+  LOG(info) << "Calling forward for full sequence LSTM";
   layer->Forward(this->blob_bottom_vec_, this->blob_top_vec_);
 
   // Copy the inputs and outputs to reuse/check them later.
@@ -148,7 +148,7 @@ TYPED_TEST(LSTMLayerTest, TestForward) {
     for (int n = 0; n < num; ++n) {
       this->blob_bottom_cont_.mutable_cpu_data()[n] = t > 0;
     }
-    LOG(INFO) << "Calling forward for LSTM timestep " << t;
+    LOG(info) << "Calling forward for LSTM timestep " << t;
     layer->Forward(this->blob_bottom_vec_, this->blob_top_vec_);
     for (int i = 0; i < top_count; ++i) {
       ASSERT_LT(t * top_count + i, top_copy.count());
@@ -169,7 +169,7 @@ TYPED_TEST(LSTMLayerTest, TestForward) {
     for (int n = 0; n < num; ++n) {
       this->blob_bottom_cont_.mutable_cpu_data()[n] = 0;
     }
-    LOG(INFO) << "Calling forward for LSTM timestep " << t;
+    LOG(info) << "Calling forward for LSTM timestep " << t;
     layer->Forward(this->blob_bottom_vec_, this->blob_top_vec_);
     for (int i = 0; i < top_count; ++i) {
       if (t == 0) {

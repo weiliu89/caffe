@@ -37,7 +37,7 @@ class MultiDeviceTest : public ::testing::Test {
     Caffe::set_mode(TypeParam::device);
   }
   // Caffe tests may create some temporary files, here we will do the cleanup.
-  virtual ~MultiDeviceTest() { RemoveCaffeTempDir(); }
+  virtual ~MultiDeviceTest() { }
 };
 
 typedef ::testing::Types<float, double> TestDtypes;

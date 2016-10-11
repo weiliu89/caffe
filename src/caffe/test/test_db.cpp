@@ -26,7 +26,7 @@ class DBTest : public ::testing::Test {
     MakeTempDir(&source_);
     source_ += "/db";
     string keys[] = {"cat.jpg", "fish-bike.jpg"};
-    LOG(INFO) << "Using temporary db " << source_;
+    LOG(info) << "Using temporary db " << source_;
     scoped_ptr<db::DB> db(db::GetDB(TypeParam::backend));
     db->Open(this->source_, db::NEW);
     scoped_ptr<db::Transaction> txn(db->NewTransaction());

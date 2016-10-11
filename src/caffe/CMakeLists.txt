@@ -21,29 +21,37 @@ endif(MSVC)
 set(Caffe_LINKER_LIBS proto ${Caffe_LINKER_LIBS}) # note, crucial to prepend!
 caffe_default_properties(proto)
 
-# --[ Caffe library
-
 # creates 'test_srcs', 'srcs', 'test_cuda', 'cuda' lists
 caffe_pickup_caffe_sources(${PROJECT_SOURCE_DIR})
 
+
+# ---[ Tests MSVC
+if(MSVC)
+ add_subdirectory(test)
+endif()
+
+
+# --[ Caffe library
 if(HAVE_CUDA)
   caffe_cuda_compile(cuda_objs ${cuda})
   list(APPEND srcs ${cuda_objs} ${cuda})
 endif()
 
-
 add_library(${caffe_lib_name} ${srcs})
 target_link_libraries(${caffe_lib_name} proto ${Caffe_LINKER_LIBS})
 caffe_default_properties(${caffe_lib_name})
-set_target_properties(${caffe_lib_name} PROPERTIES
-  VERSION   ${CAFFE_TARGET_VERSION}
-  SOVERSION ${CAFFE_TARGET_SOVERSION}
-)
 
-# ---[ Tests
-if(NOT MSVC)
- add_subdirectory(test)
-endif()
+if (MSVC)
+  set_target_properties(${caffe_lib_name} PROPERTIES
+    VERSION   ${CAFFE_TARGET_VERSION}
+    SOVERSION ${CAFFE_TARGET_SOVERSION}
+  )
+else(MSVC)
+  set_target_properties(${caffe_lib_name} PROPERTIES
+    VERSION   ${CAFFE_TARGET_VERSION}
+    SOVERSION ${CAFFE_TARGET_SOVERSION}
+  )
+endif(MSVC)
 
 # ---[ Install
 install(DIRECTORY ${Caffe_INCLUDE_DIR}/caffe DESTINATION include)

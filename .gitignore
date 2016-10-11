@@ -5,6 +5,7 @@
 *.lo
 *.o
 *.cuo
+*.pdb
 
 # Compiled Dynamic libraries
 *.so
@@ -16,8 +17,6 @@
 *.a
 
 # Compiled protocol buffers
-*.pb.h
-*.pb.cc
 *_pb2.py
 
 # Compiled python
@@ -46,6 +45,9 @@
 
 # PyCharm files
 .idea
+
+# Visual Studio Code files
+.vscode
 
 # OSX dir files
 .DS_Store
@@ -92,6 +94,7 @@ docs/dev
 LOCK
 CURRENT
 MANIFEST-*
+<<<<<<< HEAD
 /windows/Caffe.sdf
 /windows/Caffe.v12.suo
 /windows/CommonSettings.props
@@ -104,3 +107,10 @@ MANIFEST-*
 *.opensdf
 *.pdb
 *.props
+=======
+
+# temporary directories
+jobs
+temp
+examples/*/*lmdb
+>>>>>>> ac57884d0e3b8a9591dcffcf6bf9fe5ce9a5751e

@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "boost/scoped_ptr.hpp"
-#include "gflags/gflags.h"
+//#include "gflags/gflags.h"
 //#include "glog/logging.h"
 
 #include "caffe/proto/caffe_pb.h"
@@ -28,7 +28,7 @@ using namespace caffe;  // NOLINT(build/namespaces)
 using std::pair;
 using boost::scoped_ptr;
 
-DEFINE_bool(gray, false,
+/*DEFINE_bool(gray, false,
     "When this option is on, treat images as grayscale ones");
 DEFINE_bool(shuffle, false,
     "Randomly shuffle the order of images and their labels");
@@ -42,7 +42,7 @@ DEFINE_bool(encoded, false,
     "When this option is on, the encoded image will be save in datum");
 DEFINE_string(encode_type, "",
     "Optional: What type should we encode the image as ('png','jpg',...).");
-
+    */
 int main(int argc, char** argv) {
 #ifdef USE_OPENCV
 //  ::google::InitGoogleLogging(argv[0]);
@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
   namespace gflags = google;
 #endif
 
-  gflags::SetUsageMessage("Convert a set of images to the leveldb/lmdb\n"
+  /*gflags::SetUsageMessage("Convert a set of images to the leveldb/lmdb\n"
         "format used as input for Caffe.\n"
         "Usage:\n"
         "    convert_imageset [FLAGS] ROOTFOLDER/ LISTFILE DB_NAME\n"
@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
   if (count % 1000 != 0) {
     txn->Commit();
     LOG(info) << "Processed " << count << " files.";
-  }
+  }*/
 #else
   LOG(fatal) << "This tool requires OpenCV; compile with USE_OPENCV.";
 #endif  // USE_OPENCV

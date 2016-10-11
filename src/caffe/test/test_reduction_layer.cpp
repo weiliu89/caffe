@@ -64,7 +64,7 @@ class ReductionLayerTest : public MultiDeviceTest<TypeParam> {
             expected_result += (*in_data) * (*in_data);
             break;
           default:
-            LOG(FATAL) << "Unknown reduction op: "
+            LOG(fatal) << "Unknown reduction op: "
                 << ReductionParameter_ReductionOp_Name(op);
         }
         ++in_data;

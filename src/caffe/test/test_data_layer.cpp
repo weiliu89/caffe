@@ -42,7 +42,7 @@ class DataLayerTest : public MultiDeviceTest<TypeParam> {
   // an image are the same.
   void Fill(const bool unique_pixels, DataParameter_DB backend) {
     backend_ = backend;
-    LOG(INFO) << "Using temporary dataset " << *filename_;
+    LOG(info) << "Using temporary dataset " << *filename_;
     scoped_ptr<db::DB> db(db::GetDB(backend));
     db->Open(*filename_, db::NEW);
     scoped_ptr<db::Transaction> txn(db->NewTransaction());
@@ -108,7 +108,7 @@ class DataLayerTest : public MultiDeviceTest<TypeParam> {
   void TestReshape(DataParameter_DB backend) {
     const int num_inputs = 5;
     // Save data of varying shapes.
-    LOG(INFO) << "Using temporary dataset " << *filename_;
+    LOG(info) << "Using temporary dataset " << *filename_;
     scoped_ptr<db::DB> db(db::GetDB(backend));
     db->Open(*filename_, db::NEW);
     scoped_ptr<db::Transaction> txn(db->NewTransaction());

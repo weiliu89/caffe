@@ -13,7 +13,7 @@ namespace caffe {
 /**
   * @brief Enumeration of actions that a client of the Solver may request by
   * implementing the Solver's action request function, which a
-  * a client may optionally provide in order to request early termination
+  * client may optionally provide in order to request early termination
   * or saving a snapshot without exiting. In the executable caffe, this
   * mechanism is used to allow the snapshot to be saved when stopping
   * execution with a SIGINT (Ctrl-C).
@@ -74,6 +74,7 @@ class DLL_EXPORT Solver {
     return test_nets_;
   }
   int iter() { return iter_; }
+  int max_iter() const { return param_.max_iter(); }
 
   // Invoked at specific points during an iteration
   class Callback {
@@ -103,7 +104,8 @@ class DLL_EXPORT Solver {
   string SnapshotToHDF5();
   // The test routine
   void TestAll();
-  void Test(const int test_net_id = 0);
+  void TestClassification(const int test_net_id = 0);
+  void TestDetection(const int test_net_id = 0);
   virtual void SnapshotSolverState(const string& model_filename) = 0;
   virtual void RestoreSolverStateFromHDF5(const string& state_file) = 0;
   virtual void RestoreSolverStateFromBinaryProto(const string& state_file) = 0;

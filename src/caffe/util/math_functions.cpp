@@ -31,11 +31,11 @@ namespace caffe {
     DEFINE_CAFFE_CPU_UNARY_FUNC(fabs, y[i] = std::fabs(x[i]));
 
 
-    inline void caffe_gpu_memset(const size_t N, const int alpha, void* X) {
+void caffe_gpu_memset(const size_t N, const int alpha, void* X) {
 #ifndef CPU_ONLY
-  CUDA_CHECK(cudaMemset(X, alpha, N));  // NOLINT(caffe/alt_fn)
+    CUDA_CHECK(cudaMemset(X, alpha, N));  // NOLINT(caffe/alt_fn)
 #else
-  NO_GPU;
+    NO_GPU;
 #endif
 }
 template<>
@@ -153,6 +153,7 @@ void caffe_copy(const int N, const Dtype* X, Dtype* Y) {
   }
 }
 
+template DLL_EXPORT void caffe_copy<bool>(const int N, const bool* X, bool* Y);
 template DLL_EXPORT void caffe_copy<int>(const int N, const int* X, int* Y);
 template DLL_EXPORT void caffe_copy<unsigned int>(const int N, const unsigned int* X,
     unsigned int* Y);

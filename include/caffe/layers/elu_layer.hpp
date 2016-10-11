@@ -5,7 +5,7 @@
 
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
+#include "caffe/proto/caffe_pb.h"
 
 #include "caffe/layers/neuron_layer.hpp"
 
@@ -21,7 +21,7 @@ namespace caffe {
  *      @f$.  
  */
 template <typename Dtype>
-class ELULayer : public NeuronLayer<Dtype> {
+class DLL_EXPORT ELULayer : public NeuronLayer<Dtype> {
  public:
   /**
    * @param param provides ELUParameter elu_param,

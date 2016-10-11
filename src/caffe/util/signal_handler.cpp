@@ -63,6 +63,7 @@ void HookupHandler() {
 
   // Set the signal handlers to the default.
 void UnhookHandler() {
+#ifndef _MSC_VER
     if (already_hooked_up) {
 #ifdef _MSC_VER
       if (signal(SIGBREAK, SIG_DFL) == SIG_ERR) {
@@ -89,6 +90,7 @@ void UnhookHandler() {
 #endif
       already_hooked_up = false;
     }
+#endif
   }
 
   // Return true iff a SIGINT has been received since the last time this
