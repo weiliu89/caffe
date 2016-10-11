@@ -7,9 +7,14 @@
 
 #else  // If use MKL, simply include the MKL header
 
+#ifdef USE_ACCELERATE
+#include <Accelerate/Accelerate.h>
+#else
 extern "C" {
 #include <cblas.h>
 }
+#endif  // USE_ACCELERATE
+
 #include <math.h>
 #include "caffe/export.hpp"
 
