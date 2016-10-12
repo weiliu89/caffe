@@ -19,6 +19,9 @@
 #include "caffe/layers/python_layer.hpp"
 #include "caffe/sgd_solvers.hpp"
 
+
+
+
 // Temporary solution for numpy < 1.7 versions: old macro, no promises.
 // You're strongly advised to upgrade to >= 1.7.
 #ifndef NPY_ARRAY_C_CONTIGUOUS
@@ -41,11 +44,66 @@
 
 namespace bp = boost::python;
 
+#ifdef _MSC_VER
+namespace boost
+{
+    template <>
+    caffe::Solver<float> const volatile * get_pointer<class caffe::Solver<float> const volatile >(class caffe::Solver<float> const volatile *c)
+    {
+        return c;
+    }
+    template <>
+    caffe::AdaDeltaSolver<float> const volatile * get_pointer<class caffe::AdaDeltaSolver<float> const volatile >(class caffe::AdaDeltaSolver<float> const volatile *c)
+    {
+        return c;
+    }
+    template <>
+    caffe::AdaGradSolver<float> const volatile * get_pointer<class caffe::AdaGradSolver<float> const volatile >(class caffe::AdaGradSolver<float> const volatile *c)
+    {
+        return c;
+    }
+    template <>
+    caffe::AdamSolver<float> const volatile * get_pointer<class caffe::AdamSolver<float> const volatile >(class caffe::AdamSolver<float> const volatile *c)
+    {
+        return c;
+    }
+    template <>
+    caffe::NesterovSolver<float> const volatile * get_pointer<class caffe::NesterovSolver<float> const volatile >(class caffe::NesterovSolver<float> const volatile *c)
+    {
+        return c;
+    }
+    template <>
+    caffe::Net<float> const volatile * get_pointer<class caffe::Net<float> const volatile >(class caffe::Net<float> const volatile *c)
+    {
+        return c;
+    }
+    template <>
+    caffe::RMSPropSolver<float> const volatile * get_pointer<class caffe::RMSPropSolver<float> const volatile >(class caffe::RMSPropSolver<float> const volatile *c)
+    {
+        return c;
+    }
+    template <>
+    caffe::SGDSolver<float> const volatile * get_pointer<class caffe::SGDSolver<float> const volatile >(class caffe::SGDSolver<float> const volatile *c)
+    {
+        return c;
+    }
+    template <>
+    caffe::Layer<float> const volatile * get_pointer<class caffe::Layer<float> const volatile >(class caffe::Layer<float> const volatile *c)
+    {
+        return c;
+    }
+}
+
+#endif
+
 namespace caffe {
 
 // For Python, for now, we'll just always use float as the type.
 typedef float Dtype;
 const int NPY_DTYPE = NPY_FLOAT32;
+
+
+
 
 // Selecting mode.
 void set_mode_cpu() { Caffe::set_mode(Caffe::CPU); }
@@ -274,6 +332,13 @@ void Solver_add_callback(Solver<Dtype> * solver, bp::object on_start,
   solver->add_callback(new PythonCallback<Dtype>(on_start, on_gradients_ready));
 }
 
+void caffe_log_exception_translator(const caffe::ExceptionWithCallStack<std::string>& e)
+{
+    std::stringstream ss;
+    ss << e << "\n" << e.CallStack();
+    PyErr_SetString(PyExc_UserWarning, ss.str().c_str());
+}
+
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(SolveOverloads, Solve, 0, 1);
 
 BOOST_PYTHON_MODULE(_caffe) {
@@ -419,9 +484,12 @@ BOOST_PYTHON_MODULE(_caffe) {
   bp::class_<vector<bool> >("BoolVec")
     .def(bp::vector_indexing_suite<vector<bool> >());
 
+  bp::register_exception_translator<caffe::ExceptionWithCallStack<std::string>>(&caffe_log_exception_translator);
   // boost python expects a void (missing) return value, while import_array
   // returns NULL for python3. import_array1() forces a void return value.
   import_array1();
+
+  
 }
 
 }  // namespace caffe
