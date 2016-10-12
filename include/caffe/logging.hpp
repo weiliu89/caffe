@@ -26,7 +26,7 @@
 
 #define LOG_FIRST_N(severity, n) static int LOG_OCCURRENCES = 0; if(LOG_OCCURRENCES <= n) ++LOG_OCCURRENCES; if(LOG_OCCURRENCES <= n) LOG(severity)
 
-#define CHECK_OP(op, lhs, rhs) if(!(lhs op rhs)) caffe::throw_on_destroy(__FUNCTION__, __FILE__, __LINE__).stream()
+#define CHECK_OP(op, lhs, rhs) if(!(lhs op rhs)) caffe::throw_on_destroy(__FUNCTION__, __FILE__, __LINE__).stream() << "[" #lhs " " #op " " #rhs "] failed (" << lhs << " " #op " " << rhs << ")"
 
 #define CHECK_EQ(lhs, rhs)  CHECK_OP(==, lhs, rhs)
 #define CHECK_NE(lhs, rhs)  CHECK_OP(!=, lhs, rhs)
@@ -34,7 +34,7 @@
 #define CHECK_LT(lhs, rhs)  CHECK_OP(< , lhs, rhs)
 #define CHECK_GE(lhs, rhs)  CHECK_OP(>=, lhs, rhs)
 #define CHECK_GT(lhs, rhs)  CHECK_OP(> , lhs, rhs)
-#define CHECK(exp) if(!(exp)) caffe::throw_on_destroy(__FUNCTION__, __FILE__, __LINE__).stream()
+#define CHECK(exp) if(!(exp)) caffe::throw_on_destroy(__FUNCTION__, __FILE__, __LINE__).stream() << "Check " #exp " failed! "
 #define CHECK_NOTNULL(val) \
   caffe::CheckNotNull(__FILE__, __LINE__, "'" #val "' Must be non NULL", (val))
 #ifdef _DEBUG
@@ -46,7 +46,7 @@
 #define DCHECK_LT(lhs, rhs)  CHECK_OP(< , lhs, rhs)
 #define DCHECK_GE(lhs, rhs)  CHECK_OP(>=, lhs, rhs)
 #define DCHECK_GT(lhs, rhs)  CHECK_OP(> , lhs, rhs)
-#define DCHECK(exp) if(!(exp)) caffe::throw_on_destroy(__FUNCTION__, __FILE__, __LINE__).stream()
+#define DCHECK(exp) if(!(exp)) caffe::throw_on_destroy(__FUNCTION__, __FILE__, __LINE__).stream() << "Check " #exp " failed! "
 
 #else
 

@@ -29,7 +29,7 @@ void Blob<Dtype>::Reshape(const vector<int>& shape) {
   }
   int* shape_data = static_cast<int*>(shape_data_->mutable_cpu_data());
   for (int i = 0; i < shape.size(); ++i) {
-	CHECK_GT(shape[i], 0) << "must have non zero shape";
+	CHECK_GE(shape[i], 0);
     if (count_ != 0) {
       CHECK_LE(shape[i], INT_MAX / count_) << "blob size exceeds INT_MAX";
     }
