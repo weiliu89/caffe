@@ -660,6 +660,10 @@ int main(int argc, char** argv)
                 }
                 LOG(info) << output_name << " = " << mean_score << loss_msg_stream.str();
             }
+        }else
+        {
+            std::cout << "Must define model, weights, and iterations for testing\n";
+            std::cout << desc;
         }
         return 0;
     }
