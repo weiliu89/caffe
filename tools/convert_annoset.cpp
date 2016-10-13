@@ -135,10 +135,15 @@ int main(int argc, char** argv) {
         ("resize_height", boost::program_options::value<int>()->default_value(0), "Height images are resized to.")
         ("check_size", boost::program_options::value<bool>()->default_value(false), "When this option is on, check that all the datum have the same size")
         ("encoded", boost::program_options::value<bool>()->default_value(false), "When this option is on, the encoded image will be save in datum")
-        ("encode_type", boost::program_options::value<string>()->default_value(""), "Optional: What type should we encode the image as ('png','jpg',...).");
+        ("encode_type", boost::program_options::value<string>()->default_value(""), "Optional: What type should we encode the image as ('png','jpg',...).")
+        ("input", boost::program_options::value<string>(), "Input image list file.  Pair of image file and annotation file")
+        ("output", boost::program_options::value<string>(), "Output database file")
+        ("root", boost::program_options::value<string>(), "Root folder");
+        
 
     boost::program_options::variables_map vm;
-    boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
+    auto parsed_options = boost::program_options::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
+    boost::program_options::store(parsed_options, vm);
 
   if (argc < 4) {
     std::cout << desc;
@@ -155,8 +160,13 @@ int main(int argc, char** argv) {
   const string label_map_file = vm["label_map_file"].as<string>();
   const bool check_label = vm["check_label"].as<bool>();
   std::map<std::string, int> name_to_label;
-
-  std::ifstream infile(argv[2]);
+  if(vm.count("input") == 0)
+  {
+      std::cout << desc;
+      return 0;
+  }
+  LOG(info) << "Loading " << vm["input"].as<string>();
+  std::ifstream infile(vm["input"].as<string>());
   std::vector<std::pair<std::string, boost::variant<int, std::string> > > lines;
   std::string filename;
   int label;
@@ -193,11 +203,21 @@ int main(int argc, char** argv) {
 
   // Create new DB
   scoped_ptr<db::DB> db(db::GetDB(vm["backend"].as<string>()));
-  db->Open(argv[3], db::NEW);
+  if (vm.count("output") == 0)
+  {
+      std::cout << desc;
+      return 0;
+  }
+  db->Open(vm["output"].as<string>(), db::NEW);
   scoped_ptr<db::Transaction> txn(db->NewTransaction());
 
   // Storing to db
-  std::string root_folder(argv[1]);
+  
+  std::string root_folder; //(vm["root"].as<string>());
+  if (vm.count("root"))
+  {
+      root_folder = vm["root"].as<string>();
+  }
   AnnotatedDatum anno_datum;
   Datum* datum = anno_datum.mutable_datum();
   int count = 0;
