@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <csignal>
+#include <ctime>
 #include <map>
 #include <string>
 #include <utility>
@@ -6,7 +8,6 @@
 
 #include "boost/iterator/counting_iterator.hpp"
 
-#include "caffe/3rdparty/hungarian.h"
 #include "caffe/util/bbox_util.hpp"
 
 namespace caffe {
@@ -96,6 +97,7 @@ void ClipBBox(const NormalizedBBox& bbox, NormalizedBBox* clip_bbox) {
   clip_bbox->set_ymax(std::max(std::min(bbox.ymax(), 1.f), 0.f));
   clip_bbox->clear_size();
   clip_bbox->set_size(BBoxSize(*clip_bbox));
+  clip_bbox->set_difficult(bbox.difficult());
 }
 
 void ScaleBBox(const NormalizedBBox& bbox, const int height, const int width,
@@ -343,6 +345,38 @@ void DecodeBBoxes(
   }
 }
 
+void DecodeBBoxesAll(const vector<LabelBBox>& all_loc_preds,
+    const vector<NormalizedBBox>& prior_bboxes,
+    const vector<vector<float> >& prior_variances,
+    const int num, const bool share_location,
+    const int num_loc_classes, const int background_label_id,
+    const CodeType code_type, const bool variance_encoded_in_target,
+    vector<LabelBBox>* all_decode_bboxes) {
+  CHECK_EQ(all_loc_preds.size(), num);
+  all_decode_bboxes->clear();
+  all_decode_bboxes->resize(num);
+  for (int i = 0; i < num; ++i) {
+    // Decode predictions into bboxes.
+    LabelBBox& decode_bboxes = (*all_decode_bboxes)[i];
+    for (int c = 0; c < num_loc_classes; ++c) {
+      int label = share_location ? -1 : c;
+      if (label == background_label_id) {
+        // Ignore background class.
+        continue;
+      }
+      if (all_loc_preds[i].find(label) == all_loc_preds[i].end()) {
+        // Something bad happened if there are no predictions for current label.
+        LOG(FATAL) << "Could not find location predictions for label " << label;
+      }
+      const vector<NormalizedBBox>& label_loc_preds =
+          all_loc_preds[i].find(label)->second;
+      DecodeBBoxes(prior_bboxes, prior_variances,
+                   code_type, variance_encoded_in_target,
+                   label_loc_preds, &(decode_bboxes[label]));
+    }
+  }
+}
+
 void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
     const vector<NormalizedBBox>& pred_bboxes, const int label,
     const MatchType match_type, const float overlap_threshold,
@@ -485,7 +519,7 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
     int start_idx = i * 8;
     int item_id = gt_data[start_idx];
     if (item_id == -1) {
-      break;
+      continue;
     }
     int label = gt_data[start_idx + 1];
     CHECK_NE(background_label_id, label)
@@ -563,22 +597,23 @@ void GetLocPredictions(const Dtype* loc_data, const int num,
   if (share_location) {
     CHECK_EQ(num_loc_classes, 1);
   }
+  loc_preds->resize(num);
   for (int i = 0; i < num; ++i) {
-    LabelBBox label_bbox;
+    LabelBBox& label_bbox = (*loc_preds)[i];
     for (int p = 0; p < num_preds_per_class; ++p) {
       int start_idx = p * num_loc_classes * 4;
       for (int c = 0; c < num_loc_classes; ++c) {
         int label = share_location ? -1 : c;
-        NormalizedBBox bbox;
-        bbox.set_xmin(loc_data[start_idx + c * 4]);
-        bbox.set_ymin(loc_data[start_idx + c * 4 + 1]);
-        bbox.set_xmax(loc_data[start_idx + c * 4 + 2]);
-        bbox.set_ymax(loc_data[start_idx + c * 4 + 3]);
-        label_bbox[label].push_back(bbox);
+        if (label_bbox.find(label) == label_bbox.end()) {
+          label_bbox[label].resize(num_preds_per_class);
+        }
+        label_bbox[label][p].set_xmin(loc_data[start_idx + c * 4]);
+        label_bbox[label][p].set_ymin(loc_data[start_idx + c * 4 + 1]);
+        label_bbox[label][p].set_xmax(loc_data[start_idx + c * 4 + 2]);
+        label_bbox[label][p].set_ymax(loc_data[start_idx + c * 4 + 3]);
       }
     }
     loc_data += num_preds_per_class * num_loc_classes * 4;
-    loc_preds->push_back(label_bbox);
   }
 }
 
@@ -595,8 +630,9 @@ void GetConfidenceScores(const Dtype* conf_data, const int num,
       const int num_preds_per_class, const int num_classes,
       vector<map<int, vector<float> > >* conf_preds) {
   conf_preds->clear();
+  conf_preds->resize(num);
   for (int i = 0; i < num; ++i) {
-    map<int, vector<float> > label_scores;
+    map<int, vector<float> >& label_scores = (*conf_preds)[i];
     for (int p = 0; p < num_preds_per_class; ++p) {
       int start_idx = p * num_classes;
       for (int c = 0; c < num_classes; ++c) {
@@ -604,7 +640,6 @@ void GetConfidenceScores(const Dtype* conf_data, const int num,
       }
     }
     conf_data += num_preds_per_class * num_classes;
-    conf_preds->push_back(label_scores);
   }
 }
 
@@ -615,6 +650,39 @@ template void GetConfidenceScores(const float* conf_data, const int num,
 template void GetConfidenceScores(const double* conf_data, const int num,
       const int num_preds_per_class, const int num_classes,
       vector<map<int, vector<float> > >* conf_preds);
+
+template <typename Dtype>
+void GetConfidenceScores(const Dtype* conf_data, const int num,
+      const int num_preds_per_class, const int num_classes,
+      const bool class_major, vector<map<int, vector<float> > >* conf_preds) {
+  conf_preds->clear();
+  conf_preds->resize(num);
+  for (int i = 0; i < num; ++i) {
+    map<int, vector<float> >& label_scores = (*conf_preds)[i];
+    if (class_major) {
+      for (int c = 0; c < num_classes; ++c) {
+        label_scores[c].assign(conf_data, conf_data + num_preds_per_class);
+        conf_data += num_preds_per_class;
+      }
+    } else {
+      for (int p = 0; p < num_preds_per_class; ++p) {
+        int start_idx = p * num_classes;
+        for (int c = 0; c < num_classes; ++c) {
+          label_scores[c].push_back(conf_data[start_idx + c]);
+        }
+      }
+      conf_data += num_preds_per_class * num_classes;
+    }
+  }
+}
+
+// Explicit initialization.
+template void GetConfidenceScores(const float* conf_data, const int num,
+      const int num_preds_per_class, const int num_classes,
+      const bool class_major, vector<map<int, vector<float> > >* conf_preds);
+template void GetConfidenceScores(const double* conf_data, const int num,
+      const int num_preds_per_class, const int num_classes,
+      const bool class_major, vector<map<int, vector<float> > >* conf_preds);
 
 template <typename Dtype>
 void GetMaxConfidenceScores(const Dtype* conf_data, const int num,
@@ -708,6 +776,9 @@ void GetDetectionResults(const Dtype* det_data, const int num_det,
   for (int i = 0; i < num_det; ++i) {
     int start_idx = i * 7;
     int item_id = det_data[start_idx];
+    if (item_id == -1) {
+      continue;
+    }
     int label = det_data[start_idx + 1];
     CHECK_NE(background_label_id, label)
         << "Found background label in the detection results.";
@@ -850,6 +921,57 @@ void ApplyNMS(const bool* overlapped, const int num, vector<int>* indices) {
   }
 }
 
+void GetMaxScoreIndex(const vector<float>& scores, const float threshold,
+      const int top_k, vector<pair<float, int> >* score_index_vec) {
+  // Generate index score pairs.
+  for (int i = 0; i < scores.size(); ++i) {
+    if (scores[i] > threshold) {
+      score_index_vec->push_back(std::make_pair(scores[i], i));
+    }
+  }
+
+  // Sort the score pair according to the scores in descending order
+  std::stable_sort(score_index_vec->begin(), score_index_vec->end(),
+                   SortScorePairDescend<int>);
+
+  // Keep top_k scores if needed.
+  if (top_k > -1 && top_k < score_index_vec->size()) {
+    score_index_vec->resize(top_k);
+  }
+}
+
+void ApplyNMSFast(const vector<NormalizedBBox>& bboxes,
+      const vector<float>& scores, const float score_threshold,
+      const float nms_threshold, const int top_k, vector<int>* indices) {
+  // Sanity check.
+  CHECK_EQ(bboxes.size(), scores.size())
+      << "bboxes and scores have different size.";
+
+  // Get top_k scores (with corresponding indices).
+  vector<pair<float, int> > score_index_vec;
+  GetMaxScoreIndex(scores, score_threshold, top_k, &score_index_vec);
+
+  // Do nms.
+  indices->clear();
+  while (score_index_vec.size() != 0) {
+    const int idx = score_index_vec.front().second;
+    bool keep = true;
+    for (int k = 0; k < indices->size(); ++k) {
+      if (keep) {
+        const int kept_idx = (*indices)[k];
+        float overlap = JaccardOverlap(bboxes[idx], bboxes[kept_idx]);
+        keep = overlap <= nms_threshold;
+      } else {
+        break;
+      }
+    }
+    if (keep) {
+      indices->push_back(idx);
+    }
+    score_index_vec.erase(score_index_vec.begin());
+  }
+}
+
 void CumSum(const vector<pair<float, int> >& pairs, vector<int>* cumsum) {
   // Sort the pairs based on first item of the pair.
   vector<pair<float, int> > sort_pairs = pairs;
@@ -875,8 +997,7 @@ void ComputeAP(const vector<pair<float, int> >& tp, const int num_pos,
   // Make sure that tp and fp have complement value.
   for (int i = 0; i < num; ++i) {
     CHECK_LE(fabs(tp[i].first - fp[i].first), eps);
-    CHECK_GE(tp[i].second, 0);
-    CHECK_GE(fp[i].second, 0);
+    CHECK_EQ(tp[i].second, 1 - fp[i].second);
   }
   prec->clear();
   rec->clear();
@@ -1004,6 +1125,8 @@ vector<cv::Scalar> GetColors(const int n) {
   return colors;
 }
 
+static clock_t start_clock = clock();
+
 template <typename Dtype>
 void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
                    const float threshold, const vector<cv::Scalar>& colors,
@@ -1015,6 +1138,10 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
   if (num_det == 0 || num_img == 0) {
     return;
   }
+  // Comute FPS.
+  float fps = num_img / (static_cast<double>(clock() - start_clock) /
+          CLOCKS_PER_SEC);
+
   const Dtype* detections_data = detections->cpu_data();
   const int width = images[0].cols;
   const int height = images[0].rows;
@@ -1036,8 +1163,23 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
     all_detections[img_idx][label].push_back(bbox);
   }
 
+  int fontface = cv::FONT_HERSHEY_SIMPLEX;
+  double scale = 1;
+  int thickness = 2;
+  int baseline = 0;
+  char buffer[50];
   for (int i = 0; i < num_img; ++i) {
     cv::Mat image = images[i];
+    // Show FPS.
+    snprintf(buffer, sizeof(buffer), "FPS: %.2f", fps);
+    cv::Size text = cv::getTextSize(buffer, fontface, scale, thickness,
+                                    &baseline);
+    cv::rectangle(image, cv::Point(0, 0),
+                  cv::Point(text.width, text.height + baseline),
+                  CV_RGB(255, 255, 255), CV_FILLED);
+    cv::putText(image, buffer, cv::Point(0, text.height + baseline / 2.),
+                fontface, scale, CV_RGB(0, 0, 0), thickness, 8);
+    // Draw bboxes.
     for (map<int, vector<NormalizedBBox> >::iterator it =
          all_detections[i].begin(); it != all_detections[i].end(); ++it) {
       int label = it->first;
@@ -1053,11 +1195,6 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
         cv::Point bottom_right_pt(bboxes[j].xmax(), bboxes[j].ymax());
         cv::rectangle(image, top_left_pt, bottom_right_pt, color, 4);
         cv::Point bottom_left_pt(bboxes[j].xmin(), bboxes[j].ymax());
-        int fontface = cv::FONT_HERSHEY_SIMPLEX;
-        double scale = 1;
-        int thickness = 2;
-        int baseline = 0;
-        char buffer[50];
         snprintf(buffer, sizeof(buffer), "%s: %.2f", label_name.c_str(),
                  bboxes[j].score());
         cv::Size text = cv::getTextSize(buffer, fontface, scale, thickness,
@@ -1072,9 +1209,10 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
     }
     cv::imshow("detections", image);
     if (cv::waitKey(1) == 27) {
-      exit(-1);
+      raise(SIGINT);
     }
   }
+  start_clock = clock();
 }
 
 template
