@@ -1,37 +1,65 @@
-# Caffe
+# TextBoxes: A Fast Text Detector with a Single Deep Neural Network
 
-[![Build Status](https://travis-ci.org/BVLC/caffe.svg?branch=master)](https://travis-ci.org/BVLC/caffe)
-[![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
+### Introduction
+This paper presents an end-to-end trainable fast scene text detector, named TextBoxes, which detects scene text with both high accuracy and efficiency in a single network forward pass, involving no post-process except for a standard nonmaximum suppression. For more details, please refer to our [arXiv paper](https://arxiv.org/abs/1611.06779).
 
-Caffe is a deep learning framework made with expression, speed, and modularity in mind.
-It is developed by the Berkeley Vision and Learning Center ([BVLC](http://bvlc.eecs.berkeley.edu)) and community contributors.
+### Citing TextBoxes
+Please cite TextBoxes in your publications if it helps your research:
 
-Check out the [project site](http://caffe.berkeleyvision.org) for all the details like
-
-- [DIY Deep Learning for Vision with Caffe](https://docs.google.com/presentation/d/1UeKXVgRvvxg9OUdh_UiC5G71UMscNPlvArsWER41PsU/edit#slide=id.p)
-- [Tutorial Documentation](http://caffe.berkeleyvision.org/tutorial/)
-- [BVLC reference models](http://caffe.berkeleyvision.org/model_zoo.html) and the [community model zoo](https://github.com/BVLC/caffe/wiki/Model-Zoo)
-- [Installation instructions](http://caffe.berkeleyvision.org/installation.html)
-
-and step-by-step examples.
-
-[![Join the chat at https://gitter.im/BVLC/caffe](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/BVLC/caffe?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Please join the [caffe-users group](https://groups.google.com/forum/#!forum/caffe-users) or [gitter chat](https://gitter.im/BVLC/caffe) to ask questions and talk about methods and models.
-Framework development discussions and thorough bug reports are collected on [Issues](https://github.com/BVLC/caffe/issues).
-
-Happy brewing!
-
-## License and Citation
-
-Caffe is released under the [BSD 2-Clause license](https://github.com/BVLC/caffe/blob/master/LICENSE).
-The BVLC reference models are released for unrestricted use.
-
-Please cite Caffe in your publications if it helps your research:
-
-    @article{jia2014caffe,
-      Author = {Jia, Yangqing and Shelhamer, Evan and Donahue, Jeff and Karayev, Sergey and Long, Jonathan and Girshick, Ross and Guadarrama, Sergio and Darrell, Trevor},
-      Journal = {arXiv preprint arXiv:1408.5093},
-      Title = {Caffe: Convolutional Architecture for Fast Feature Embedding},
-      Year = {2014}
+    @article{LiaoSBWL16TextBoxes,
+      author    = {Minghui Liao and
+                   Baoguang Shi and
+                   Xiang Bai and
+                   Xinggang Wang and
+                   Wenyu Liu},
+      title     = {TextBoxes: {A} Fast Text Detector with a Single Deep Neural Network},
+      journal   = {CoRR},
+      volume    = {abs/1611.06779},
+      year      = {2016},
     }
+
+### Contents
+1. [Installation](#installation)
+2. [Download](#download)
+3. [Test](#test)
+4. [Train](#train)
+5. [Performance](#performance)
+
+### Installation
+1. Get the code. We will call the directory that you cloned Caffe into `$CAFFE_ROOT`
+  ```Shell
+  git clone https://github.com/MhLiao/caffe.git
+  
+  cd caffe
+  
+  git checkout TextBoxes
+  
+  make -j8
+  
+  make py
+  ```
+
+### Download
+1. Models trained on ICDAR 2013: [Dropbox link](https://www.dropbox.com/s/g8pjzv2de9gty8g/TextBoxes_icdar13.caffemodel?dl=0) [BaiduYun link](http://pan.baidu.com/s/1qY73XHq)
+2. Fully convolutional reduced (atrous) VGGNet: [Dropbox link](https://www.dropbox.com/s/qxc64az0a21vodt/VGG_ILSVRC_16_layers_fc_reduced.caffemodel?dl=0) [BaiduYun link](http://pan.baidu.com/s/1slQyMiL)
+3. Compiled mex file for non-maximum suppression(if you can not compile the 'polygon_intersect.cpp' correctly): [Dropbox link](https://www.dropbox.com/s/xtjuwvphxnz1nl8/polygon_intersect.mexa64?dl=0) [BaiduYun link](http://pan.baidu.com/s/1jIe9UWA)
+
+
+### Test
+1. Download the ICDAR 2013 DataSet
+2. Download the Models trained on ICDAR 2013
+3. Modify the related paths in the "examples/TextBoxes/test_icdar13.py"
+4. run "python examples/test_icdar13.py"
+5. To multi-scale test, you should use "test_icdar13_multi_scale.py" and "evaluation_nms.m"
+
+### Train
+1. Train about 50k iterions on Synthetic data which refered in the paper.
+2. Train about 2k iterions on corresponding training data such as ICDAR 2013 and SVT.
+3. For more information, such as learning rate setting, please refer to the paper.
+
+### Performance
+1. Using the given test code, you can achieve an F-measure of about 80% on ICDAR 2013 with a single scale.
+2. Using the given multi-scale test code, you can achieve an F-measure of about 85% on ICDAR 2013 with a non-maximum suppression.
+3. More performance information, please refer to the paper and Task1 and Task4 of Challenge2 on the ICDAR 2015 website: http://rrc.cvc.uab.es/?ch=2&com=evaluation
+
+Please let me know if you encounter any issues.

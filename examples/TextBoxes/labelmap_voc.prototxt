@@ -1,0 +1,10 @@
+item {
+  name: "no text"
+  label: 0
+  display_name: "background"
+}
+item {
+  name: "text"
+  label: 1
+  display_name: "text"
+}
