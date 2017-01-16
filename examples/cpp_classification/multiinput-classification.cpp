@@ -1,9 +1,12 @@
-#include <caffe/caffe.hpp>
-#ifdef USE_OPENCV
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#endif  // USE_OPENCV
+#include <stddef.h>
+#include <time.h>
+
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+}
+
 #include <algorithm>
 #include <iosfwd>
 #include <memory>
@@ -11,13 +14,183 @@
 #include <utility>
 #include <vector>
 
+#include <caffe/caffe.hpp>
 #ifdef USE_OPENCV
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#endif  // USE_OPENCV
+#ifdef USE_OPENCV
+
 using namespace caffe;  // NOLINT(build/namespaces)
 using std::string;
 
 /* Pair (label, confidence) representing a prediction. */
 typedef std::pair<string, float> Prediction;
 typedef std::vector<Prediction> PredictionList;
+
+//////////////////////////////////////////////////////////////////////////////
+// FFmpeg part
+//////////////////////////////////////////////////////////////////////////////
+
+void SaveFrame(AVFrame *pFrame, int width, int height, int iFrame) {
+  FILE *pFile;
+  char szFilename[32];
+  int  y;
+  
+  // Open file
+  sprintf(szFilename, "frame%06d.ppm", iFrame);
+  pFile=fopen(szFilename, "wb");
+  if(pFile==NULL)
+    return;
+  
+  // Write header
+  fprintf(pFile, "P6\n%d %d\n255\n", width, height);
+  
+  // Write pixel data
+  for(y=0; y<height; y++)
+    fwrite(pFrame->data[0]+y*pFrame->linesize[0], 1, width*3, pFile);
+  
+  // Close file
+  fclose(pFile);
+}
+
+int read_video_and_extract_frames(int argc, char *argv[]) {
+  /*int dumpFrames=argv[2];*/
+
+  if (argc<2) {
+    fprintf(stderr, "Did not provide input video\n");
+    return -1;
+  }
+
+  clock_t t;
+  t = clock();
+  av_register_all();
+  AVFormatContext *pFormatCtx = NULL;
+  // Open video file
+  if(avformat_open_input(&pFormatCtx, argv[1], NULL, NULL)!=0) {
+    fprintf(stderr, " Couldn't open file!\n");
+    return -1;
+  }
+  // Retrieve stream information
+  if(avformat_find_stream_info(pFormatCtx, NULL)<0) {
+    fprintf(stderr, "Couldn't find stream information!\n");
+    return -1;
+  }
+  // Dump information about file onto standard error
+  av_dump_format(pFormatCtx, 0, argv[1], 0);
+
+  AVCodec *pCodec = NULL;
+  AVCodecContext *pCodecCtx = NULL;
+
+  // Find the first video stream
+  int videoStream=-1;
+  for(unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
+    if(pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO) {
+      videoStream=i;
+      break;
+    }
+  }
+  if(videoStream==-1) {
+    fprintf(stderr, "Didn't find a video stream!\n");
+    return -1;
+  }
+
+  // Get a pointer to the codec context for the video stream
+  pCodecCtx=pFormatCtx->streams[videoStream]->codec;
+
+  // Find the decoder for the video stream
+  pCodec=avcodec_find_decoder(pCodecCtx->codec_id);
+  if(!pCodec) {
+    fprintf(stderr, "Unsupported codec!\n");
+    return -1;
+  }
+
+  // Open codec
+  if(avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
+    fprintf(stderr, "Could not open codec\n");
+    return -1;
+  }
+
+  AVFrame *pFrame=NULL, *pFrameRGB = NULL;
+  
+  // Allocate video frame
+  /*pFrame=av_frame_alloc();*/
+  pFrame=avcodec_alloc_frame();
+  if(pFrame==NULL) {
+    fprintf(stderr, "Could not allocate video frame\n");
+    return -1;
+  }
+  // Allocate an AVFrame structure
+  /*pFrameRGB=av_frame_alloc();*/
+  pFrameRGB=avcodec_alloc_frame();
+  if(pFrameRGB==NULL) {
+    fprintf(stderr, "Could not allocate output RGB video frame\n");
+    return -1;
+  }
+
+  uint8_t *buffer = NULL;
+  int numBytes;
+  // Determine required buffer size and allocate buffer
+  numBytes=avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+  buffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
+
+  // Assign appropriate parts of buffer to image planes in pFrameRGB
+  // Note that pFrameRGB is an AVFrame, but AVFrame is a superset of AVPicture
+  avpicture_fill((AVPicture *)pFrameRGB, buffer, AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+
+  struct SwsContext *sws_ctx = NULL;
+  int frameFinished;
+  AVPacket packet;
+  // initialize SWS context for software scaling
+  sws_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pCodecCtx->width,
+    pCodecCtx->height, AV_PIX_FMT_RGB24, SWS_BILINEAR, NULL, NULL, NULL);
+
+  unsigned int i=0;
+
+  while(av_read_frame(pFormatCtx, &packet)>=0) {
+    // Is this a packet from the video stream?
+    if(packet.stream_index==videoStream) {
+      // Decode video frame
+      avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
+    
+      // Did we get a video frame?
+      if(frameFinished) {
+        // Convert the image from its native format to RGB
+        sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data, pFrame->linesize, 0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
+	
+        // Save the frame to disk
+        ++i;
+        /*if (dumpFrames==1)*/
+          //SaveFrame(pFrameRGB, pCodecCtx->width, pCodecCtx->height, i);
+      }
+    }
+    
+    // Free the packet that was allocated by av_read_frame
+    av_free_packet(&packet);
+  }
+
+  // Free the RGB image
+  av_free(buffer);
+  av_free(pFrameRGB);
+
+  // Free the YUV frame
+  av_free(pFrame);
+
+  // Close the codecs
+  avcodec_close(pCodecCtx);
+  //avcodec_close(pCodecCtxOrig);
+
+  // Close the video file
+  avformat_close_input(&pFormatCtx);
+  t = clock()-t;
+  printf ("Total execution time: %f seconds.\n",((float)t)/CLOCKS_PER_SEC);
+  return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Caffe part
+//////////////////////////////////////////////////////////////////////////////
 
 class Classifier {
  public:
