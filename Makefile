@@ -15,7 +15,7 @@ ifeq ($(DEBUG_BUILD_DIR),)
 	DEBUG_BUILD_DIR := .$(BUILD_DIR)_debug
 endif
 
-DEBUG ?= 0
+DEBUG ?= 1
 ifeq ($(DEBUG), 1)
 	BUILD_DIR := $(DEBUG_BUILD_DIR)
 	OTHER_BUILD_DIR := $(RELEASE_BUILD_DIR)
@@ -184,7 +184,11 @@ LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_hl hdf5
 USE_LEVELDB ?= 1
 USE_LMDB ?= 1
 USE_OPENCV ?= 1
+USE_FFMPEG ?= 1
 
+ifeq ($(USE_FFMPEG), 1)
+LIBRARIES += avcodec avformat avutil swscale
+endif
 ifeq ($(USE_LEVELDB), 1)
 	LIBRARIES += leveldb snappy
 endif
