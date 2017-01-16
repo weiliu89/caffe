@@ -15,12 +15,9 @@ extern "C" {
 #include <vector>
 
 #include <caffe/caffe.hpp>
-#ifdef USE_OPENCV
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#endif  // USE_OPENCV
-#ifdef USE_OPENCV
 
 using namespace caffe;  // NOLINT(build/namespaces)
 using std::string;
@@ -282,7 +279,7 @@ std::vector<PredictionList> Classifier::Classify(const std::vector<cv::Mat>& img
   N = std::min<int>(labels_.size(), N);
 
   std::vector<PredictionList> imgs_predictions;
-  for (int idx_image = 0; idx_image < imgs.size(); ++idx_image) {
+  for (unsigned int idx_image = 0; idx_image < imgs.size(); ++idx_image) {
     std::vector<int> maxN = Argmax(output[idx_image], N);
     std::vector<Prediction> predictions;
     for (int i = 0; i < N; ++i) {
@@ -346,7 +343,7 @@ std::vector<std::vector<float> > Classifier::Predict(const std::vector<cv::Mat>&
   //const float* end = begin + imgs.size() * output_layer->channels();
 
   std::vector<std::vector<float> > result;
-  for (int i = 0; i < imgs.size(); ++i) {
+  for (unsigned int i = 0; i < imgs.size(); ++i) {
     std::vector<float> predict_outputs(
         begin + output_layer->channels() * i,
         begin + output_layer->channels() * (i + 1)
@@ -408,11 +405,11 @@ void Classifier::Preprocess(const std::vector<cv::Mat>& imgs,
   /* This operation will write the separate BGR planes directly to the
    * input layer of the network because it is wrapped by the cv::Mat
    * objects in input_channels. */
-  for (int i = 0; i < imgs.size(); ++i) {
+  for (unsigned int i = 0; i < imgs.size(); ++i) {
     //cv::split(sample_normalized, *input_channels);
     std::vector<cv::Mat> channels;
     cv::split(sample_normalized, channels);
-    for (int j = 0; j < channels.size(); ++j) {
+    for (unsigned int j = 0; j < channels.size(); ++j) {
       channels[j].copyTo((*input_channels)[i * num_channels_ + j]);
     }
   }
@@ -444,7 +441,7 @@ int main(int argc, char** argv) {
   }
 
   std::vector<cv::Mat> imgs;
-  for (int i = 0; i < files.size(); ++i) {
+  for (unsigned int i = 0; i < files.size(); ++i) {
     cv::Mat img = cv::imread(files[i], -1);
     CHECK(!img.empty()) << "Unable to decode image " << files[i];
     imgs.push_back(img);
@@ -453,7 +450,7 @@ int main(int argc, char** argv) {
   std::vector<PredictionList> prediction_lists = classifier.Classify(imgs);
 
   /* Print the top N predictions. */
-  for (int idx_image = 0; idx_image < imgs.size(); ++idx_image) {
+  for (unsigned int idx_image = 0; idx_image < imgs.size(); ++idx_image) {
     PredictionList& predictions = prediction_lists[idx_image];
     std::cout << "---------- Prediction for "
               << files[idx_image] << " ----------" << std::endl;
@@ -464,8 +461,3 @@ int main(int argc, char** argv) {
     }
   }
 }
-#else
-int main(int argc, char** argv) {
-  LOG(FATAL) << "This example requires OpenCV; compile with USE_OPENCV.";
-}
-#endif  // USE_OPENCV
