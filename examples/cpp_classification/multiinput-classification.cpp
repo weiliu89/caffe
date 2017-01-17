@@ -19,11 +19,8 @@ extern "C" {
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-using namespace caffe;  // NOLINT(build/namespaces)
-using std::string;
-
 /* Pair (label, confidence) representing a prediction. */
-typedef std::pair<string, float> Prediction;
+typedef std::pair<std::string, float> Prediction;
 typedef std::vector<Prediction> PredictionList;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -109,18 +106,15 @@ int read_video_and_extract_frames(int argc, char *argv[]) {
     return -1;
   }
 
-  AVFrame *pFrame=NULL, *pFrameRGB = NULL;
-  
   // Allocate video frame
-  /*pFrame=av_frame_alloc();*/
-  pFrame=avcodec_alloc_frame();
+  AVFrame* pFrame=avcodec_alloc_frame();
   if(pFrame==NULL) {
     fprintf(stderr, "Could not allocate video frame\n");
     return -1;
   }
+
   // Allocate an AVFrame structure
-  /*pFrameRGB=av_frame_alloc();*/
-  pFrameRGB=avcodec_alloc_frame();
+  AVFrame* pFrameRGB=avcodec_alloc_frame();
   if(pFrameRGB==NULL) {
     fprintf(stderr, "Could not allocate output RGB video frame\n");
     return -1;
@@ -136,23 +130,23 @@ int read_video_and_extract_frames(int argc, char *argv[]) {
   // Note that pFrameRGB is an AVFrame, but AVFrame is a superset of AVPicture
   avpicture_fill((AVPicture *)pFrameRGB, buffer, AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
 
-  struct SwsContext *sws_ctx = NULL;
-  int frameFinished;
-  AVPacket packet;
   // initialize SWS context for software scaling
+  struct SwsContext *sws_ctx = NULL;
   sws_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pCodecCtx->width,
     pCodecCtx->height, AV_PIX_FMT_RGB24, SWS_BILINEAR, NULL, NULL, NULL);
 
   unsigned int i=0;
 
+  AVPacket packet;
   while(av_read_frame(pFormatCtx, &packet)>=0) {
     // Is this a packet from the video stream?
     if(packet.stream_index==videoStream) {
       // Decode video frame
-      avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
+      int gotPicturePtr;
+      avcodec_decode_video2(pCodecCtx, pFrame, &gotPicturePtr, &packet);
     
       // Did we get a video frame?
-      if(frameFinished) {
+      if(gotPicturePtr) {
         // Convert the image from its native format to RGB
         sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data, pFrame->linesize, 0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
 	
@@ -191,15 +185,15 @@ int read_video_and_extract_frames(int argc, char *argv[]) {
 
 class Classifier {
  public:
-  Classifier(const string& model_file,
-             const string& trained_file,
-             const string& mean_file,
-             const string& label_file);
+  Classifier(const std::string& model_file,
+             const std::string& trained_file,
+             const std::string& mean_file,
+             const std::string& label_file);
 
   std::vector<PredictionList> Classify(const std::vector<cv::Mat>& imgs, int N = 5);
 
  private:
-  void SetMean(const string& mean_file);
+  void SetMean(const std::string& mean_file);
 
   std::vector<std::vector<float> > Predict(const std::vector<cv::Mat>& img);
 
@@ -209,31 +203,31 @@ class Classifier {
                   std::vector<cv::Mat>* input_channels);
 
  private:
-  shared_ptr<Net<float> > net_;
+  boost::shared_ptr<caffe::Net<float> > net_;
   cv::Size input_geometry_;
   int num_channels_;
   cv::Mat mean_;
-  std::vector<string> labels_;
+  std::vector<std::string> labels_;
 };
 
-Classifier::Classifier(const string& model_file,
-                       const string& trained_file,
-                       const string& mean_file,
-                       const string& label_file) {
+Classifier::Classifier(const std::string& model_file,
+                       const std::string& trained_file,
+                       const std::string& mean_file,
+                       const std::string& label_file) {
 #ifdef CPU_ONLY
-  Caffe::set_mode(Caffe::CPU);
+  caffe::Caffe::set_mode(caffe::Caffe::CPU);
 #else
-  Caffe::set_mode(Caffe::GPU);
+  caffe::Caffe::set_mode(caffe::Caffe::GPU);
 #endif
 
   /* Load the network. */
-  net_.reset(new Net<float>(model_file, TEST));
+  net_.reset(new caffe::Net<float>(model_file, caffe::TEST));
   net_->CopyTrainedLayersFrom(trained_file);
 
   CHECK_EQ(net_->num_inputs(), 1) << "Network should have exactly one input.";
   CHECK_EQ(net_->num_outputs(), 1) << "Network should have exactly one output.";
 
-  Blob<float>* input_layer = net_->input_blobs()[0];
+  caffe::Blob<float>* input_layer = net_->input_blobs()[0];
   num_channels_ = input_layer->channels();
   CHECK(num_channels_ == 3 || num_channels_ == 1)
     << "Input layer should have 1 or 3 channels.";
@@ -245,11 +239,11 @@ Classifier::Classifier(const string& model_file,
   /* Load labels. */
   std::ifstream labels(label_file.c_str());
   CHECK(labels) << "Unable to open labels file " << label_file;
-  string line;
+  std::string line;
   while (std::getline(labels, line))
-    labels_.push_back(string(line));
+    labels_.push_back(std::string(line));
 
-  Blob<float>* output_layer = net_->output_blobs()[0];
+  caffe::Blob<float>* output_layer = net_->output_blobs()[0];
   CHECK_EQ(labels_.size(), output_layer->channels())
     << "Number of labels is different from the output layer dimension.";
 }
@@ -293,12 +287,12 @@ std::vector<PredictionList> Classifier::Classify(const std::vector<cv::Mat>& img
 }
 
 /* Load the mean file in binaryproto format. */
-void Classifier::SetMean(const string& mean_file) {
-  BlobProto blob_proto;
+void Classifier::SetMean(const std::string& mean_file) {
+  caffe::BlobProto blob_proto;
   ReadProtoFromBinaryFileOrDie(mean_file.c_str(), &blob_proto);
 
   /* Convert from BlobProto to Blob<float> */
-  Blob<float> mean_blob;
+  caffe::Blob<float> mean_blob;
   mean_blob.FromProto(blob_proto);
   CHECK_EQ(mean_blob.channels(), num_channels_)
     << "Number of channels of mean file doesn't match input layer.";
@@ -324,7 +318,7 @@ void Classifier::SetMean(const string& mean_file) {
 }
 
 std::vector<std::vector<float> > Classifier::Predict(const std::vector<cv::Mat>& imgs) {
-  Blob<float>* input_layer = net_->input_blobs()[0];
+  caffe::Blob<float>* input_layer = net_->input_blobs()[0];
   input_layer->Reshape(imgs.size(), num_channels_,
                        input_geometry_.height, input_geometry_.width);
   /* Forward dimension change to all layers. */
@@ -338,7 +332,7 @@ std::vector<std::vector<float> > Classifier::Predict(const std::vector<cv::Mat>&
   net_->Forward();
 
   /* Copy the output layer to a std::vector */
-  Blob<float>* output_layer = net_->output_blobs()[0];
+  caffe::Blob<float>* output_layer = net_->output_blobs()[0];
   const float* begin = output_layer->cpu_data();
   //const float* end = begin + imgs.size() * output_layer->channels();
 
@@ -350,7 +344,6 @@ std::vector<std::vector<float> > Classifier::Predict(const std::vector<cv::Mat>&
     );
     result.push_back(predict_outputs);
   }
-  //return std::vector<float>(begin, end);
   return result;
 }
 
@@ -360,7 +353,7 @@ std::vector<std::vector<float> > Classifier::Predict(const std::vector<cv::Mat>&
  * operation will write the separate channels directly to the input
  * layer. */
 void Classifier::WrapInputLayer(std::vector<cv::Mat>* input_channels, int num_images) {
-  Blob<float>* input_layer = net_->input_blobs()[0];
+  caffe::Blob<float>* input_layer = net_->input_blobs()[0];
 
   int width = input_layer->width();
   int height = input_layer->height();
@@ -419,7 +412,14 @@ void Classifier::Preprocess(const std::vector<cv::Mat>& imgs,
     << "Input channels are not wrapping the input layer of the network.";
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+// main function
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
 int main(int argc, char** argv) {
+  // check args
   if (argc < 6) {
     std::cerr << "Usage: " << argv[0]
               << " deploy.prototxt network.caffemodel"
@@ -427,19 +427,31 @@ int main(int argc, char** argv) {
     return 1;
   }
 
+  // init google log
   ::google::InitGoogleLogging(argv[0]);
 
-  string model_file   = argv[1];
-  string trained_file = argv[2];
-  string mean_file    = argv[3];
-  string label_file   = argv[4];
+  // create caffe classifier
+  std::string model_file   = argv[1];
+  std::string trained_file = argv[2];
+  std::string mean_file    = argv[3];
+  std::string label_file   = argv[4];
   Classifier classifier(model_file, trained_file, mean_file, label_file);
 
-  std::vector<string> files;
+  ////////////////////////////////////////////////////////////////////////////
+  // BEGIN use ffmpeg to open video
+  ////////////////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////////////////
+  // END use ffmpeg to open video
+  ////////////////////////////////////////////////////////////////////////////
+
+  // read image file names from argv
+  std::vector<std::string> files;
   for (int idx_files = 5; idx_files < argc; ++idx_files) {
     files.push_back(argv[idx_files]);
   }
 
+  // open images & push to vector
   std::vector<cv::Mat> imgs;
   for (unsigned int i = 0; i < files.size(); ++i) {
     cv::Mat img = cv::imread(files[i], -1);
@@ -447,9 +459,10 @@ int main(int argc, char** argv) {
     imgs.push_back(img);
   }
 
+  // classify
   std::vector<PredictionList> prediction_lists = classifier.Classify(imgs);
 
-  /* Print the top N predictions. */
+  // print result
   for (unsigned int idx_image = 0; idx_image < imgs.size(); ++idx_image) {
     PredictionList& predictions = prediction_lists[idx_image];
     std::cout << "---------- Prediction for "
