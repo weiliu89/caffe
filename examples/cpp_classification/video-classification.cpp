@@ -20,7 +20,7 @@ extern "C" {
 #include <opencv2/imgproc/imgproc.hpp>
 
 //////////////////////////////////////////////////////////////////////////////
-// 
+//
 // Data Layout in caffe's Blob data structure is 4-dimension array
 //
 //   (number, channel, height, width)
@@ -59,156 +59,143 @@ typedef std::vector<Prediction> PredictionList;
 // FFmpeg part
 //////////////////////////////////////////////////////////////////////////////
 
-void SaveFrame(AVFrame *pFrame, int width, int height, int iFrame) {
-  FILE *pFile;
-  char szFilename[32];
-  int  y;
-  
-  // Open file
-  sprintf(szFilename, "frame%06d.ppm", iFrame);
-  pFile=fopen(szFilename, "wb");
-  if(pFile==NULL)
-    return;
-  
-  // Write header
-  fprintf(pFile, "P6\n%d %d\n255\n", width, height);
-  
-  // Write pixel data
-  for(y=0; y<height; y++)
-    fwrite(pFrame->data[0] + y * pFrame->linesize[0], 1, width*3, pFile);
-  
-  // Close file
-  fclose(pFile);
-}
+class VideoDecoder {
+ public:
+  VideoDecoder(const std::string& video_file);
+  ~VideoDecoder();
 
-int read_video_and_extract_frames(int argc, char *argv[]) {
-  /*int dumpFrames=argv[2];*/
+  // if ignoreFrame is true, the frame will still be decoded, but will not
+  // convert the frame to RGB and not write the result frame out. useful when
+  // you want to ignore some frame.
+  //
+  // return true if decode a frame, false if end-of-video
+  bool DecodeOneFrame(bool ignoreFrame);
 
-  if (argc<2) {
-    fprintf(stderr, "Did not provide input video\n");
-    return -1;
-  }
+  AVFrame* GetFrame() { return pFrameRGB; }
 
-  clock_t t;
-  t = clock();
-  av_register_all();
-  AVFormatContext *pFormatCtx = NULL;
+ private:
+  AVFormatContext*   pFormatCtx;
+  AVCodec*           pCodec;
+  AVCodecContext*    pCodecCtx;
+  AVFrame*           pFrame;
+  AVFrame*           pFrameRGB;
+  uint8_t*           pBuffer;
+  int                firstVideoStreamIndex;
+  struct SwsContext* sws_ctx;
+} ;
+
+VideoDecoder::VideoDecoder(const std::string& video_file)
+  : pFormatCtx(NULL)
+  , pCodec(NULL)
+  , pCodecCtx(NULL)
+  , pFrame(avcodec_alloc_frame())
+  , pFrameRGB(avcodec_alloc_frame())
+  , pBuffer(NULL)
+  , firstVideoStreamIndex(-1)
+  , sws_ctx(NULL)
+{
   // Open video file
-  if(avformat_open_input(&pFormatCtx, argv[1], NULL, NULL)!=0) {
-    fprintf(stderr, " Couldn't open file!\n");
-    return -1;
+  if (avformat_open_input(&pFormatCtx, video_file.c_str(), NULL, NULL)!=0) {
+    std::cerr << "Couldn't open file!" << std::endl;
+    assert(0 && "Couldn't open file!");
   }
+
   // Retrieve stream information
   if(avformat_find_stream_info(pFormatCtx, NULL)<0) {
-    fprintf(stderr, "Couldn't find stream information!\n");
-    return -1;
+    std::cerr << "Couldn't find stream information!" << std::endl;
+    assert(0 && "Couldn't find stream information!");
   }
-  // Dump information about file onto standard error
-  av_dump_format(pFormatCtx, 0, argv[1], 0);
 
-  AVCodec *pCodec = NULL;
-  AVCodecContext *pCodecCtx = NULL;
+  // Dump information about file onto standard error
+  av_dump_format(pFormatCtx, 0, video_file.c_str(), 0);
 
   // Find the first video stream
-  int videoStream=-1;
   for(unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
     if(pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO) {
-      videoStream=i;
+      firstVideoStreamIndex = i;
       break;
     }
   }
-  if(videoStream==-1) {
-    fprintf(stderr, "Didn't find a video stream!\n");
-    return -1;
+  if(firstVideoStreamIndex == -1) {
+    std::cerr << "Didn't find a video stream!" << std::endl;
+    assert(0 && "Didn't find a video stream!");
   }
 
   // Get a pointer to the codec context for the video stream
-  pCodecCtx=pFormatCtx->streams[videoStream]->codec;
+  pCodecCtx=pFormatCtx->streams[firstVideoStreamIndex]->codec;
 
   // Find the decoder for the video stream
   pCodec=avcodec_find_decoder(pCodecCtx->codec_id);
   if(!pCodec) {
-    fprintf(stderr, "Unsupported codec!\n");
-    return -1;
+    std::cerr << "Unsupported codec!" << std::endl;
+    assert(0 && "Unsupported codec!");
   }
 
   // Open codec
   if(avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
-    fprintf(stderr, "Could not open codec\n");
-    return -1;
+    std::cerr << "Could not open codec!" << std::endl;
+    assert(0 && "Could not open codec!");
   }
 
-  // Allocate video frame
-  AVFrame* pFrame=avcodec_alloc_frame();
   if(pFrame==NULL) {
-    fprintf(stderr, "Could not allocate video frame\n");
-    return -1;
+    std::cerr << "Could not allocate output video frame" << std::endl;
+    assert(0 && "Could not allocate output video frame");
   }
 
-  // Allocate an AVFrame structure
-  AVFrame* pFrameRGB=avcodec_alloc_frame();
   if(pFrameRGB==NULL) {
-    fprintf(stderr, "Could not allocate output RGB video frame\n");
-    return -1;
+    std::cerr << "Could not allocate output RGB video frame" << std::endl;
+    assert(0 && "Could not allocate output RGB video frame");
   }
 
-  uint8_t *buffer = NULL;
-  int numBytes;
+  int numBytes = 0;
   // Determine required buffer size and allocate buffer
   numBytes=avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
-  buffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
+  pBuffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
 
   // Assign appropriate parts of buffer to image planes in pFrameRGB
   // Note that pFrameRGB is an AVFrame, but AVFrame is a superset of AVPicture
-  avpicture_fill((AVPicture *)pFrameRGB, buffer, AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+  avpicture_fill((AVPicture *)pFrameRGB, pBuffer, AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
 
   // initialize SWS context for software scaling
-  struct SwsContext *sws_ctx = NULL;
   sws_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pCodecCtx->width,
     pCodecCtx->height, AV_PIX_FMT_RGB24, SWS_BILINEAR, NULL, NULL, NULL);
+}
 
-  unsigned int i=0;
-
-  AVPacket packet;
-  while(av_read_frame(pFormatCtx, &packet)>=0) {
-    // Is this a packet from the video stream?
-    if(packet.stream_index==videoStream) {
-      // Decode video frame
-      int gotPicturePtr;
-      avcodec_decode_video2(pCodecCtx, pFrame, &gotPicturePtr, &packet);
-    
-      // Did we get a video frame?
-      if(gotPicturePtr) {
-        // Convert the image from its native format to RGB
-        sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data, pFrame->linesize, 0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
-	
-        // Save the frame to disk
-        ++i;
-        /*if (dumpFrames==1)*/
-          //SaveFrame(pFrameRGB, pCodecCtx->width, pCodecCtx->height, i);
-      }
-    }
-    
-    // Free the packet that was allocated by av_read_frame
-    av_free_packet(&packet);
-  }
-
-  // Free the RGB image
-  av_free(buffer);
+VideoDecoder::~VideoDecoder() {
+  av_free(pBuffer);
   av_free(pFrameRGB);
-
-  // Free the YUV frame
   av_free(pFrame);
 
-  // Close the codecs
   avcodec_close(pCodecCtx);
-  //avcodec_close(pCodecCtxOrig);
-
-  // Close the video file
   avformat_close_input(&pFormatCtx);
-  t = clock()-t;
-  printf ("Total execution time: %f seconds.\n",((float)t)/CLOCKS_PER_SEC);
-  return 0;
+}
+
+bool VideoDecoder::DecodeOneFrame(bool ignoreFrame) {
+  AVPacket packet;
+  while (av_read_frame(pFormatCtx, &packet) >= 0) {
+    // Is this a packet from the video stream?
+    if (packet.stream_index != firstVideoStreamIndex)
+      continue;
+
+    // Decode video frame
+    int gotPicturePtr;
+    avcodec_decode_video2(pCodecCtx, pFrame, &gotPicturePtr, &packet);
+    // Did we get a video frame?
+    if(!gotPicturePtr)
+      continue;
+
+    // do we want skip this frame?
+    if (ignoreFrame) {
+      av_free_packet(&packet);
+      return true;
+    }
+
+    // Convert the image from its native format to RGB
+    sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data, pFrame->linesize, 0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
+    return true;
+  }
+  av_free_packet(&packet);
+  return false;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -223,6 +210,7 @@ class Classifier {
              const std::string& label_file);
 
   std::vector<PredictionList> Classify(const std::vector<cv::Mat>& imgs, int N = 5);
+  // return true if this batch is full and ready to fire, false if not
   bool PushImage(AVFrame* f);
   std::vector<std::vector<float> > ForwardBatch();
 
@@ -482,6 +470,28 @@ void Classifier::Preprocess(const std::vector<cv::Mat>& imgs,
     << "Input channels are not wrapping the input layer of the network.";
 }
 
+void split_to_caffe(uint8_t* source, float* target, int num_img, int image_size, int channel_size, int height, int width) {
+  for (int h = 0; h < height; ++h) {
+    for (int w = 0; w < width; ++w) {
+      int idx_on_frame = w * height + h;
+      int idx_on_caffe = num_img * image_size
+                       //+ num_channels_ * channel_size_
+                       //+ channel * 0 // we dont computer channel offset here, unroll with three line below
+                       + h * width
+                       + w;
+
+      // on caffe blob, stride of channel is height * width
+      // on AVFrame, stride of channel is one pixel (dependends on the format, int or float or ...)
+      //
+      // on caffe blob, type is 32 bit float
+      // on AVFrame, type is ... according to the sws setting, here we use RGB24, each color 8 bit.
+      target[idx_on_caffe + channel_size * 0] = source[idx_on_frame + 0];
+      target[idx_on_caffe + channel_size * 1] = source[idx_on_frame + 1];
+      target[idx_on_caffe + channel_size * 2] = source[idx_on_frame + 2];
+    }
+  }
+}
+
 bool Classifier::PushImage(AVFrame* frame) {
   for (int h = 0; h < height_; ++h) {
     for (int w = 0; w < width_; ++w) {
@@ -519,155 +529,80 @@ bool Classifier::PushImage(AVFrame* frame) {
 
 int main(int argc, char** argv) {
   // check args
-  if (argc != 6) {
+  if (argc == 3 && std::string("benchmark") == argv[1]) {
+    //////////////////////////////////////////////////////////////////////////////
+    // bench split speed
+    //////////////////////////////////////////////////////////////////////////////
+
+    int height = 480;
+    int width = 856;
+    float cpu[3 * height * width];
+    uint8_t img[3 * width * height];
+
+    for (int i = 0; i < 100; ++i) {
+      split_to_caffe(img, cpu, 0, 3 * height * width, height * width, height, width);
+      std::cout << i << std::endl;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // bench decoder speed
+    //////////////////////////////////////////////////////////////////////////////
+
+    //std::string video_file   = argv[2];
+    //av_register_all();
+    //// a video decoder
+    //VideoDecoder video_decoder(video_file);
+    //int count_frame = 0;
+    //while(video_decoder.DecodeOneFrame(count_frame % 30 != 0)) {
+    //  //video_decoder.GetFrame();
+    //  ++count_frame;
+    //  if (count_frame % 1000 == 0) {
+    //    std::cout << count_frame << std::endl;
+    //  }
+    //}
+
+    return 0;
+  }
+  else if (argc == 6) {
+    // init google log
+    ::google::InitGoogleLogging(argv[0]);
+    // init ffmpeg
+    av_register_all();
+
+    // create caffe classifier
+    std::string model_file   = argv[1];
+    std::string trained_file = argv[2];
+    std::string mean_file    = argv[3];
+    std::string label_file   = argv[4];
+    std::string video_file   = argv[5];
+
+    // a video decoder
+    std::cout << "Opening video: " << video_file << std::endl;
+    VideoDecoder video_decoder(video_file);
+    std::cout << "Open video done" << std::endl;
+
+    // a classifier
+    std::cout << "Opening classifier: " << model_file << std::endl;
+    Classifier classifier(model_file, trained_file, mean_file, label_file);
+    std::cout << "Open classifier done" << std::endl;
+
+    int count_frame = 0;
+    while(video_decoder.DecodeOneFrame(count_frame % 30 != 0)) {
+      AVFrame* frameRGB = video_decoder.GetFrame();
+      if (classifier.PushImage(frameRGB)) {
+        classifier.ForwardBatch();
+        std::cout << count_frame << std::endl;
+      }
+      ++count_frame;
+      if (count_frame % 1000 == 0) {
+        std::cout << "============= " << count_frame << std::endl;
+      }
+    }
+  }
+  else {
     std::cerr << "Usage: " << argv[0]
               << " deploy.prototxt network.caffemodel"
               << " mean.binaryproto labels.txt video.avi" << std::endl;
     return 1;
   }
-
-  // init google log
-  ::google::InitGoogleLogging(argv[0]);
-
-  // create caffe classifier
-  std::string model_file   = argv[1];
-  std::string trained_file = argv[2];
-  std::string mean_file    = argv[3];
-  std::string label_file   = argv[4];
-  std::string video_file   = argv[5];
-  Classifier classifier(model_file, trained_file, mean_file, label_file);
-
-  ////////////////////////////////////////////////////////////////////////////
-  // BEGIN use ffmpeg to open video
-  ////////////////////////////////////////////////////////////////////////////
-
-  av_register_all();
-  AVFormatContext *pFormatCtx = NULL;
-  // Open video file
-  if(avformat_open_input(&pFormatCtx, video_file.c_str(), NULL, NULL)!=0) {
-    fprintf(stderr, " Couldn't open file!\n");
-    return -1;
-  }
-  // Retrieve stream information
-  if(avformat_find_stream_info(pFormatCtx, NULL)<0) {
-    fprintf(stderr, "Couldn't find stream information!\n");
-    return -1;
-  }
-  // Dump information about file onto standard error
-  av_dump_format(pFormatCtx, 0, video_file.c_str(), 0);
-
-  AVCodec *pCodec = NULL;
-  AVCodecContext *pCodecCtx = NULL;
-
-  // Find the first video stream
-  int videoStream=-1;
-  for(unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
-    if(pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO) {
-      videoStream=i;
-      break;
-    }
-  }
-  if(videoStream==-1) {
-    fprintf(stderr, "Didn't find a video stream!\n");
-    return -1;
-  }
-
-  // Get a pointer to the codec context for the video stream
-  pCodecCtx=pFormatCtx->streams[videoStream]->codec;
-
-  // Find the decoder for the video stream
-  pCodec=avcodec_find_decoder(pCodecCtx->codec_id);
-  if(!pCodec) {
-    fprintf(stderr, "Unsupported codec!\n");
-    return -1;
-  }
-
-  // Open codec
-  if(avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
-    fprintf(stderr, "Could not open codec\n");
-    return -1;
-  }
-
-  // Allocate video frame
-  AVFrame* pFrame=avcodec_alloc_frame();
-  if(pFrame==NULL) {
-    fprintf(stderr, "Could not allocate video frame\n");
-    return -1;
-  }
-
-  // Allocate an AVFrame structure
-  AVFrame* pFrameRGB=avcodec_alloc_frame();
-  if(pFrameRGB==NULL) {
-    fprintf(stderr, "Could not allocate output RGB video frame\n");
-    return -1;
-  }
-
-  uint8_t *buffer = NULL;
-  int numBytes;
-  // Determine required buffer size and allocate buffer
-  numBytes=avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
-  buffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
-
-  // Assign appropriate parts of buffer to image planes in pFrameRGB
-  // Note that pFrameRGB is an AVFrame, but AVFrame is a superset of AVPicture
-  avpicture_fill((AVPicture *)pFrameRGB, buffer, AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
-
-  // initialize SWS context for software scaling
-  struct SwsContext *sws_ctx = NULL;
-  sws_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pCodecCtx->width,
-    pCodecCtx->height, AV_PIX_FMT_RGB24, SWS_BILINEAR, NULL, NULL, NULL);
-
-  unsigned int count_frame=0;
-  unsigned int count_batch=0;
-
-  AVPacket packet;
-  while(av_read_frame(pFormatCtx, &packet)>=0) {
-    // Is this a packet from the video stream?
-    if(packet.stream_index==videoStream) {
-      // Decode video frame
-      int gotPicturePtr;
-      avcodec_decode_video2(pCodecCtx, pFrame, &gotPicturePtr, &packet);
-    
-      // Did we get a video frame?
-      if(gotPicturePtr) {
-        // Convert the image from its native format to RGB
-        sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data, pFrame->linesize, 0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
-
-        // Save the frame to disk
-        //if (dumpFrames==1)
-        //  SaveFrame(pFrameRGB, pCodecCtx->width, pCodecCtx->height, i);
-
-        ++count_frame;
-        if (count_frame % 30 == 0) {
-          // if push image full fill batch size, do forward
-          if(classifier.PushImage(pFrameRGB)) {
-            std::vector<std::vector<float> > result = classifier.ForwardBatch();
-            ++count_batch;
-            std::cout << "done batch: " << count_batch << std::endl;
-          }
-        }
-      }
-    }
-    
-    // Free the packet that was allocated by av_read_frame
-    av_free_packet(&packet);
-  }
-
-  // Free the RGB image
-  av_free(buffer);
-  av_free(pFrameRGB);
-
-  // Free the YUV frame
-  av_free(pFrame);
-
-  // Close the codecs
-  avcodec_close(pCodecCtx);
-  //avcodec_close(pCodecCtxOrig);
-
-  // Close the video file
-  avformat_close_input(&pFormatCtx);
-
-  ////////////////////////////////////////////////////////////////////////////
-  // END use ffmpeg to open video
-  ////////////////////////////////////////////////////////////////////////////
 }
