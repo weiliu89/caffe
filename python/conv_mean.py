@@ -4,8 +4,9 @@ import numpy
 a = numpy.load('/volNAS/share/models/scene/34_scene_v1/mean.npy')
 
 print 'Array dim:', a.shape
-a2 = numpy.swapaxes(a, 0, 1)
-print 'Array dim after swap:', a2.shape
+print 'array[0:2][0][0] = (%f, %f, %f)' % (a[0][0][0], a[1][0][0], a[2][0][0])
+
+a2 = numpy.array([a])
 
 b = caffe.io.array_to_blobproto(a2)
 
