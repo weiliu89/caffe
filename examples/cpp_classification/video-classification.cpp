@@ -495,7 +495,7 @@ void split_to_caffe(uint8_t* source, float* target, int num_img, int image_size,
 bool Classifier::PushImage(AVFrame* frame) {
   for (int h = 0; h < height_; ++h) {
     for (int w = 0; w < width_; ++w) {
-      int idx_on_frame = w * height_ + h;
+      int idx_on_frame = (h * frame->width + w) * num_channels_;
       int idx_on_caffe = num_pushed_image_ * image_size_
                        //+ num_channels_ * channel_size_
                        + num_channels_ * 0 // we dont computer channel offset here, unroll with three line below
