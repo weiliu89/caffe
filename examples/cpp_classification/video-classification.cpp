@@ -231,7 +231,7 @@ class Classifier {
   int width_;
   int num_channels_;
   int batch_size_;
-  cv::Mat mean_;
+  caffe::Blob<float> mean_blob_;
   std::vector<std::string> labels_;
 
   int image_size_;
@@ -287,53 +287,15 @@ Classifier::Classifier(const std::string& model_file,
     << "Number of labels is different from the output layer dimension.";
 }
 
-static bool PairCompare(const std::pair<float, int>& lhs,
-                        const std::pair<float, int>& rhs) {
-  return lhs.first > rhs.first;
-}
-
-/* Return the indices of the top N values of vector v. */
-static std::vector<int> Argmax(const std::vector<float>& v, int N) {
-  std::vector<std::pair<float, int> > pairs;
-  for (size_t i = 0; i < v.size(); ++i)
-    pairs.push_back(std::make_pair(v[i], i));
-  std::partial_sort(pairs.begin(), pairs.begin() + N, pairs.end(), PairCompare);
-
-  std::vector<int> result;
-  for (int i = 0; i < N; ++i)
-    result.push_back(pairs[i].second);
-  return result;
-}
-
 /* Load the mean file in binaryproto format. */
 void Classifier::SetMean(const std::string& mean_file) {
   caffe::BlobProto blob_proto;
   ReadProtoFromBinaryFileOrDie(mean_file.c_str(), &blob_proto);
 
   /* Convert from BlobProto to Blob<float> */
-  caffe::Blob<float> mean_blob;
-  mean_blob.FromProto(blob_proto);
-  CHECK_EQ(mean_blob.channels(), num_channels_)
+  mean_blob_.FromProto(blob_proto);
+  CHECK_EQ(mean_blob_.channels(), num_channels_)
     << "Number of channels of mean file doesn't match input layer.";
-
-  /* The format of the mean file is planar 32-bit float BGR or grayscale. */
-  std::vector<cv::Mat> channels;
-  float* data = mean_blob.mutable_cpu_data();
-  for (int i = 0; i < num_channels_; ++i) {
-    /* Extract an individual channel. */
-    cv::Mat channel(mean_blob.height(), mean_blob.width(), CV_32FC1, data);
-    channels.push_back(channel);
-    data += mean_blob.height() * mean_blob.width();
-  }
-
-  /* Merge the separate channels into a single image. */
-  cv::Mat mean;
-  cv::merge(channels, mean);
-
-  /* Compute the global mean pixel value and create a mean image
-   * filled with this value. */
-  cv::Scalar channel_mean = cv::mean(mean);
-  mean_ = cv::Mat(input_geometry_, mean.type(), channel_mean);
 }
 
 std::vector<std::vector<float> > Classifier::ForwardBatch() {
@@ -371,9 +333,9 @@ bool Classifier::PushImage(AVFrame* frame) {
       //
       // on caffe blob, type is 32 bit float
       // on AVFrame, type is ... according to the sws setting, here we use RGB24, each color 8 bit.
-      mutable_cpu_data_[idx_on_caffe + channel_size_ * 0] = static_cast<float>(frame->data[0][idx_on_frame + 0]);
-      mutable_cpu_data_[idx_on_caffe + channel_size_ * 1] = static_cast<float>(frame->data[0][idx_on_frame + 1]);
-      mutable_cpu_data_[idx_on_caffe + channel_size_ * 2] = static_cast<float>(frame->data[0][idx_on_frame + 2]);
+      mutable_cpu_data_[idx_on_caffe + channel_size_ * 0] = static_cast<float>(frame->data[0][idx_on_frame + 0]) - mean_blob_.data_at(0, 0, h, w);
+      mutable_cpu_data_[idx_on_caffe + channel_size_ * 1] = static_cast<float>(frame->data[0][idx_on_frame + 1]) - mean_blob_.data_at(0, 1, h, w);
+      mutable_cpu_data_[idx_on_caffe + channel_size_ * 2] = static_cast<float>(frame->data[0][idx_on_frame + 2]) - mean_blob_.data_at(0, 2, h, w);
     }
   }
 
