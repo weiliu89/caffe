@@ -50,8 +50,6 @@ extern "C" {
 //   2. scale? don't know
 //
 
-
-/* Pair (label, confidence) representing a prediction. */
 typedef std::pair<std::string, float> Prediction;
 typedef std::vector<Prediction> PredictionList;
 
@@ -64,14 +62,22 @@ class VideoDecoder {
   VideoDecoder(const std::string& video_file);
   ~VideoDecoder();
 
-  // if ignoreFrame is true, the frame will still be decoded, but will not
-  // convert the frame to RGB and not write the result frame out. useful when
-  // you want to ignore some frame.
-  //
-  // return true if decode a frame, false if end-of-video
-  bool DecodeOneFrame(bool ignoreFrame);
+  /// @param ignoreFrame if true, the frame will still be decoded, but will not
+  /// convert the frame to RGB and not write the result frame out. useful when
+  /// you want to ignore some frame.
+  ///
+  /// @return the decoded frame, NULL if end-of-video. Note that, the resourec
+  /// of the returned frame is owned by the VideoDecoder, you should NOT free
+  /// the AVFrame by yourself.
+  ///
+  /// @note The return frame format is (width x height x channel), channel order is RGB.
+  /// data type of each channle is uint8_t.
+  AVFrame* DecodeOneFrame(bool ignoreFrame);
 
-  AVFrame* GetFrame() { return pFrameRGB; }
+  // get video height
+  int Height() { return pCodecCtx->height; }
+  // get video width
+  int Width() { return pCodecCtx->width; }
 
  private:
   AVFormatContext*   pFormatCtx;
@@ -149,16 +155,18 @@ VideoDecoder::VideoDecoder(const std::string& video_file)
 
   int numBytes = 0;
   // Determine required buffer size and allocate buffer
-  numBytes=avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+  numBytes=avpicture_get_size(AV_PIX_FMT_BGR24, pCodecCtx->width, pCodecCtx->height);
   pBuffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
 
   // Assign appropriate parts of buffer to image planes in pFrameRGB
   // Note that pFrameRGB is an AVFrame, but AVFrame is a superset of AVPicture
-  avpicture_fill((AVPicture *)pFrameRGB, pBuffer, AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+  avpicture_fill((AVPicture *)pFrameRGB, pBuffer, AV_PIX_FMT_BGR24, pCodecCtx->width, pCodecCtx->height);
+  pFrameRGB->width  = pCodecCtx->width;
+  pFrameRGB->height = pCodecCtx->height;
 
   // initialize SWS context for software scaling
   sws_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pCodecCtx->width,
-    pCodecCtx->height, AV_PIX_FMT_RGB24, SWS_BILINEAR, NULL, NULL, NULL);
+    pCodecCtx->height, AV_PIX_FMT_BGR24, SWS_BILINEAR, NULL, NULL, NULL);
 }
 
 VideoDecoder::~VideoDecoder() {
@@ -170,32 +178,32 @@ VideoDecoder::~VideoDecoder() {
   avformat_close_input(&pFormatCtx);
 }
 
-bool VideoDecoder::DecodeOneFrame(bool ignoreFrame) {
+AVFrame* VideoDecoder::DecodeOneFrame(bool ignoreFrame) {
   AVPacket packet;
   while (av_read_frame(pFormatCtx, &packet) >= 0) {
     // Is this a packet from the video stream?
     if (packet.stream_index != firstVideoStreamIndex)
       continue;
 
-    // Decode video frame
+    // Decode this packet
     int gotPicturePtr;
     avcodec_decode_video2(pCodecCtx, pFrame, &gotPicturePtr, &packet);
-    // Did we get a video frame?
+    // Check if this packet is a vidoe frame
     if(!gotPicturePtr)
       continue;
 
-    // do we want skip this frame?
+    // If we want to skip this frame, free the packet and return
     if (ignoreFrame) {
       av_free_packet(&packet);
-      return true;
+      return pFrameRGB;
     }
 
     // Convert the image from its native format to RGB
     sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data, pFrame->linesize, 0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
-    return true;
+    return pFrameRGB;
   }
   av_free_packet(&packet);
-  return false;
+  return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -209,18 +217,12 @@ class Classifier {
              const std::string& mean_file,
              const std::string& label_file);
 
-  std::vector<PredictionList> Classify(const std::vector<cv::Mat>& imgs, int N = 5);
   // return true if this batch is full and ready to fire, false if not
   bool PushImage(AVFrame* f);
   std::vector<std::vector<float> > ForwardBatch();
 
  private:
   void SetMean(const std::string& mean_file);
-  std::vector<std::vector<float> > Predict(const std::vector<cv::Mat>& img);
-  void WrapInputLayer(std::vector<cv::Mat>* input_channels, int num_images);
-  void Preprocess(const std::vector<cv::Mat>& img,
-                  std::vector<cv::Mat>* input_channels);
-
 
  private:
   boost::shared_ptr<caffe::Net<float> > net_;
@@ -303,26 +305,6 @@ static std::vector<int> Argmax(const std::vector<float>& v, int N) {
   return result;
 }
 
-/* Return the top N predictions. */
-std::vector<PredictionList> Classifier::Classify(const std::vector<cv::Mat>& imgs, int N) {
-  std::vector<std::vector<float> > output = Predict(imgs);
-
-  N = std::min<int>(labels_.size(), N);
-
-  std::vector<PredictionList> imgs_predictions;
-  for (unsigned int idx_image = 0; idx_image < imgs.size(); ++idx_image) {
-    std::vector<int> maxN = Argmax(output[idx_image], N);
-    std::vector<Prediction> predictions;
-    for (int i = 0; i < N; ++i) {
-      int idx = maxN[i];
-      predictions.push_back(std::make_pair(labels_[idx], output[idx_image][idx]));
-    }
-    imgs_predictions.push_back(predictions);
-  }
-
-  return imgs_predictions;
-}
-
 /* Load the mean file in binaryproto format. */
 void Classifier::SetMean(const std::string& mean_file) {
   caffe::BlobProto blob_proto;
@@ -375,129 +357,11 @@ std::vector<std::vector<float> > Classifier::ForwardBatch() {
   return result;
 }
 
-std::vector<std::vector<float> > Classifier::Predict(const std::vector<cv::Mat>& imgs) {
-  caffe::Blob<float>* input_layer = net_->input_blobs()[0];
-  input_layer->Reshape(imgs.size(), num_channels_,
-                       input_geometry_.height, input_geometry_.width);
-  /* Forward dimension change to all layers. */
-  net_->Reshape();
-
-  std::vector<cv::Mat> input_channels;
-  WrapInputLayer(&input_channels, imgs.size());
-
-  Preprocess(imgs, &input_channels);
-
-  net_->Forward();
-
-  /* Copy the output layer to a std::vector */
-  caffe::Blob<float>* output_layer = net_->output_blobs()[0];
-  const float* begin = output_layer->cpu_data();
-  //const float* end = begin + imgs.size() * output_layer->channels();
-
-  std::vector<std::vector<float> > result;
-  for (unsigned int i = 0; i < imgs.size(); ++i) {
-    std::vector<float> predict_outputs(
-        begin + output_layer->channels() * i,
-        begin + output_layer->channels() * (i + 1)
-    );
-    result.push_back(predict_outputs);
-  }
-  return result;
-}
-
-/* Wrap the input layer of the network in separate cv::Mat objects
- * (one per channel). This way we save one memcpy operation and we
- * don't need to rely on cudaMemcpy2D. The last preprocessing
- * operation will write the separate channels directly to the input
- * layer. */
-void Classifier::WrapInputLayer(std::vector<cv::Mat>* input_channels, int num_images) {
-  caffe::Blob<float>* input_layer = net_->input_blobs()[0];
-
-  int width = input_layer->width();
-  int height = input_layer->height();
-  float* input_data = input_layer->mutable_cpu_data();
-  for (int i = 0; i < input_layer->channels() * num_images; ++i) {
-    cv::Mat channel(height, width, CV_32FC1, input_data);
-    input_channels->push_back(channel);
-    input_data += width * height;
-  }
-}
-
-void Classifier::Preprocess(const std::vector<cv::Mat>& imgs,
-                            std::vector<cv::Mat>* input_channels) {
-  /* Convert the input image to the input image format of the network. */
-  cv::Mat sample;
-  if (imgs[0].channels() == 3 && num_channels_ == 1)
-    cv::cvtColor(imgs[0], sample, cv::COLOR_BGR2GRAY);
-  else if (imgs[0].channels() == 4 && num_channels_ == 1)
-    cv::cvtColor(imgs[0], sample, cv::COLOR_BGRA2GRAY);
-  else if (imgs[0].channels() == 4 && num_channels_ == 3)
-    cv::cvtColor(imgs[0], sample, cv::COLOR_BGRA2BGR);
-  else if (imgs[0].channels() == 1 && num_channels_ == 3)
-    cv::cvtColor(imgs[0], sample, cv::COLOR_GRAY2BGR);
-  else
-    sample = imgs[0];
-
-  cv::Mat sample_resized;
-  if (sample.size() != input_geometry_)
-    cv::resize(sample, sample_resized, input_geometry_);
-  else
-    sample_resized = sample;
-
-  cv::Mat sample_float;
-  if (num_channels_ == 3)
-    sample_resized.convertTo(sample_float, CV_32FC3);
-  else
-    sample_resized.convertTo(sample_float, CV_32FC1);
-
-  cv::Mat sample_normalized;
-  cv::subtract(sample_float, mean_, sample_normalized);
-
-  /* This operation will write the separate BGR planes directly to the
-   * input layer of the network because it is wrapped by the cv::Mat
-   * objects in input_channels. */
-  for (unsigned int i = 0; i < imgs.size(); ++i) {
-    //cv::split(sample_normalized, *input_channels);
-    std::vector<cv::Mat> channels;
-    cv::split(sample_normalized, channels);
-    for (unsigned int j = 0; j < channels.size(); ++j) {
-      channels[j].copyTo((*input_channels)[i * num_channels_ + j]);
-    }
-  }
-
-  CHECK(reinterpret_cast<float*>(input_channels->at(0).data)
-        == net_->input_blobs()[0]->cpu_data())
-    << "Input channels are not wrapping the input layer of the network.";
-}
-
-void split_to_caffe(uint8_t* source, float* target, int num_img, int image_size, int channel_size, int height, int width) {
-  for (int h = 0; h < height; ++h) {
-    for (int w = 0; w < width; ++w) {
-      int idx_on_frame = w * height + h;
-      int idx_on_caffe = num_img * image_size
-                       //+ num_channels_ * channel_size_
-                       //+ channel * 0 // we dont computer channel offset here, unroll with three line below
-                       + h * width
-                       + w;
-
-      // on caffe blob, stride of channel is height * width
-      // on AVFrame, stride of channel is one pixel (dependends on the format, int or float or ...)
-      //
-      // on caffe blob, type is 32 bit float
-      // on AVFrame, type is ... according to the sws setting, here we use RGB24, each color 8 bit.
-      target[idx_on_caffe + channel_size * 0] = source[idx_on_frame + 0];
-      target[idx_on_caffe + channel_size * 1] = source[idx_on_frame + 1];
-      target[idx_on_caffe + channel_size * 2] = source[idx_on_frame + 2];
-    }
-  }
-}
-
 bool Classifier::PushImage(AVFrame* frame) {
   for (int h = 0; h < height_; ++h) {
     for (int w = 0; w < width_; ++w) {
       int idx_on_frame = (h * frame->width + w) * num_channels_;
       int idx_on_caffe = num_pushed_image_ * image_size_
-                       //+ num_channels_ * channel_size_
                        + num_channels_ * 0 // we dont computer channel offset here, unroll with three line below
                        + h * width_
                        + w;
@@ -531,35 +395,21 @@ int main(int argc, char** argv) {
   // check args
   if (argc == 3 && std::string("benchmark") == argv[1]) {
     //////////////////////////////////////////////////////////////////////////////
-    // bench split speed
-    //////////////////////////////////////////////////////////////////////////////
-
-    int height = 480;
-    int width = 856;
-    float cpu[3 * height * width];
-    uint8_t img[3 * width * height];
-
-    for (int i = 0; i < 100; ++i) {
-      split_to_caffe(img, cpu, 0, 3 * height * width, height * width, height, width);
-      std::cout << i << std::endl;
-    }
-
-    //////////////////////////////////////////////////////////////////////////////
     // bench decoder speed
     //////////////////////////////////////////////////////////////////////////////
 
-    //std::string video_file   = argv[2];
-    //av_register_all();
-    //// a video decoder
-    //VideoDecoder video_decoder(video_file);
-    //int count_frame = 0;
-    //while(video_decoder.DecodeOneFrame(count_frame % 30 != 0)) {
-    //  //video_decoder.GetFrame();
-    //  ++count_frame;
-    //  if (count_frame % 1000 == 0) {
-    //    std::cout << count_frame << std::endl;
-    //  }
-    //}
+    std::string video_file   = argv[2];
+    av_register_all();
+    // a video decoder
+    VideoDecoder video_decoder(video_file);
+    int count_frame = 0;
+    while(AVFrame* frame = video_decoder.DecodeOneFrame(count_frame % 30 != 0)) {
+      (void)frame;
+      ++count_frame;
+      if (count_frame % 1000 == 0) {
+        std::cout << count_frame << std::endl;
+      }
+    }
 
     return 0;
   }
@@ -569,40 +419,42 @@ int main(int argc, char** argv) {
     // init ffmpeg
     av_register_all();
 
-    // create caffe classifier
+    // read args
     std::string model_file   = argv[1];
     std::string trained_file = argv[2];
     std::string mean_file    = argv[3];
     std::string label_file   = argv[4];
     std::string video_file   = argv[5];
 
-    // a video decoder
+    // create a video decoder
     std::cout << "Opening video: " << video_file << std::endl;
     VideoDecoder video_decoder(video_file);
     std::cout << "Open video done" << std::endl;
 
-    // a classifier
+    // create a classifier
     std::cout << "Opening classifier: " << model_file << std::endl;
     Classifier classifier(model_file, trained_file, mean_file, label_file);
     std::cout << "Open classifier done" << std::endl;
 
+    // decode each frame
     int count_frame = 0;
-    while(video_decoder.DecodeOneFrame(count_frame % 30 != 0)) {
-      AVFrame* frameRGB = video_decoder.GetFrame();
-      if (classifier.PushImage(frameRGB)) {
-        classifier.ForwardBatch();
-        std::cout << count_frame << std::endl;
+    int count_pushed_frame = 0;
+    while(AVFrame* frameRGB = video_decoder.DecodeOneFrame(count_frame % 30 != 0)) {
+      bool ok_to_fire = classifier.PushImage(frameRGB);
+      ++count_pushed_frame;
+      if (ok_to_fire) {
+        std::vector<std::vector<float> > predict_results = classifier.ForwardBatch();
       }
       ++count_frame;
       if (count_frame % 1000 == 0) {
-        std::cout << "============= " << count_frame << std::endl;
+        std::cout << "Number of decoded frame: " << count_frame << std::endl;
       }
     }
   }
   else {
     std::cerr << "Usage: " << argv[0]
               << " deploy.prototxt network.caffemodel"
-              << " mean.binaryproto labels.txt video.avi" << std::endl;
+              << " mean.binaryproto labels.txt video.mp4" << std::endl;
     return 1;
   }
 }
