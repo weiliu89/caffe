@@ -184,7 +184,11 @@ LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_hl hdf5
 USE_LEVELDB ?= 1
 USE_LMDB ?= 1
 USE_OPENCV ?= 1
+USE_FFMPEG ?= 1
 
+ifeq ($(USE_FFMPEG), 1)
+LIBRARIES += avcodec avformat avutil swscale
+endif
 ifeq ($(USE_LEVELDB), 1)
 	LIBRARIES += leveldb snappy
 endif
