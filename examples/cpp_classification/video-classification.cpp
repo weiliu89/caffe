@@ -1,12 +1,6 @@
 #include <stddef.h>
 #include <time.h>
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-}
-
 #include <algorithm>
 #include <iosfwd>
 #include <memory>
@@ -14,10 +8,13 @@ extern "C" {
 #include <utility>
 #include <vector>
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+}
+
 #include <caffe/caffe.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -226,7 +223,6 @@ class Classifier {
 
  private:
   boost::shared_ptr<caffe::Net<float> > net_;
-  cv::Size input_geometry_;
   int height_;
   int width_;
   int num_channels_;
@@ -270,7 +266,6 @@ Classifier::Classifier(const std::string& model_file,
 
   CHECK(num_channels_ == 3 || num_channels_ == 1)
     << "Input layer should have 1 or 3 channels.";
-  input_geometry_ = cv::Size(input_layer->width(), input_layer->height());
 
   /* Load the binaryproto mean file. */
   SetMean(mean_file);
