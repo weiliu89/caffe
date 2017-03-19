@@ -1,7 +1,7 @@
 #!/bin/bash
 
-root_dir=/localdata/markustp/downloads/VOCdevkit/
-sub_dir=ImageSets/Main
+root_dir=/localdata/markustp/data
+sub_dir=data
 bash_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 for dataset in trainval test
 do
@@ -10,23 +10,19 @@ do
   then
     rm -f $dst_file
   fi
-  for name in VOC2007 VOC2012
+  for name in ascend
   do
-    if [[ $dataset == "test" && $name == "VOC2012" ]]
-    then
-      continue
-    fi
     echo "Create list for $name $dataset..."
     dataset_file=$root_dir/$name/$sub_dir/$dataset.txt
 
     img_file=$bash_dir/$dataset"_img.txt"
     cp $dataset_file $img_file
-    sed -i "s/^/$name\/JPEGImages\//g" $img_file
+    sed -i "s/^/$name\/data\/MinimizedTrainingData\/Images\//g" $img_file
     sed -i "s/$/.jpg/g" $img_file
 
     label_file=$bash_dir/$dataset"_label.txt"
     cp $dataset_file $label_file
-    sed -i "s/^/$name\/Annotations\//g" $label_file
+    sed -i "s/^/$name\/data\/xml\/SSD\//g" $label_file
     sed -i "s/$/.xml/g" $label_file
 
     paste -d' ' $img_file $label_file >> $dst_file
