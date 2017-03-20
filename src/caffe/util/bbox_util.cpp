@@ -2206,12 +2206,14 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
                  bboxes[j].score());
         cv::Size text = cv::getTextSize(buffer, fontface, scale, thickness,
                                         &baseline);
+/*
         cv::rectangle(
             image, bottom_left_pt + cv::Point(0, 0),
             bottom_left_pt + cv::Point(text.width, -text.height-baseline),
             color, CV_FILLED);
         cv::putText(image, buffer, bottom_left_pt - cv::Point(0, baseline),
                     fontface, scale, CV_RGB(0, 0, 0), thickness, 8);
+*/
       }
     }
     // Save result if required.
