@@ -73,7 +73,7 @@ caffe_root = os.getcwd()
 # Set true if you want to start training right after generating all files.
 run_soon = True
 # The video file path
-video_file = "/localdata/markustp/downloads/data_28july_1_front_video.mp4"
+video_file = "/home/markus/Desktop/movie7_0.mp4"
 
 # The parameters for the video demo
 
