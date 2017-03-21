@@ -73,9 +73,9 @@ caffe_root = os.getcwd()
 # Set true if you want to start training right after generating all files.
 run_soon = True
 # The video file path
-video_file = "/home/markus/Desktop/data_3aug_6_3.mp4"
+video_file = "/localdata/markustp/downloads/data_3aug_7_left_video.mp4"
 # Name of the file to save the output video
-save_file = "/home/markus/Desktop/output_data_3aug_6_3.avi"
+save_file = "/localdata/markustp/data/videos/output_data_3aug_7_left_video.avi"
 
 # The parameters for the video demo
 
@@ -92,8 +92,8 @@ lr_mult = 1.
 # Stores LabelMapItem.
 label_map_file = "data/ascend/labelmap.prototxt"
 # The resized image size
-resize_width = 300
-resize_height = 300
+resize_width = 512
+resize_height = 512
 
 # Parameters needed for test.
 # Set the number of test iterations to the maximum integer number.
@@ -189,6 +189,8 @@ if max_iter == 0:
 
 # The resume model.
 pretrain_model = "{}_iter_{}.caffemodel".format(snapshot_prefix, max_iter)
+
+print("Using caffemodel: " + pretrain_model)
 
 # parameters for generating priors.
 # minimum dimension of input image
