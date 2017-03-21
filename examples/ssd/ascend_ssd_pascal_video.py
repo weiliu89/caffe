@@ -73,7 +73,9 @@ caffe_root = os.getcwd()
 # Set true if you want to start training right after generating all files.
 run_soon = True
 # The video file path
-video_file = "/localdata/markustp/downloads/movie7_0.mp4"
+video_file = "/home/markus/Desktop/data_3aug_6_3.mp4"
+# Name of the file to save the output video
+save_file = "/home/markus/Desktop/output_data_3aug_6_3.avi"
 
 # The parameters for the video demo
 
@@ -108,7 +110,7 @@ visualize_threshold = 0.3
 video_width = 1920
 video_height = 1080
 # Scale the image size for display.
-scale = 0.8
+scale = 1.0
 
 ### Hopefully you don't need to change the following ###
 resize = "{}x{}".format(resize_width, resize_height)
@@ -150,6 +152,7 @@ det_out_param = {
     'code_type': code_type,
     'visualize': True,
     'visualize_threshold': visualize_threshold,
+    'save_file': save_file,
     }
 
 # The job name should be same as the name used in examples/ssd/ssd_pascal.py.
