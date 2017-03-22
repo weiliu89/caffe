@@ -1,1 +1,0 @@
-./build/examples/ssd/ssd_detect.bin -out_file detected.txt /localdata/markustp/caffe/models/VGGNet/Ascend/SSD_300x300/deploy.prototxt /localdata/markustp/caffe/models/VGGNet/Ascend/SSD_300x300/VGG_Ascend_SSD_300x300_iter_16000.caffemodel  /localdata/markustp/training_data/ImageList.txt
