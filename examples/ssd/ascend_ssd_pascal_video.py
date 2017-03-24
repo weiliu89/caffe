@@ -73,9 +73,9 @@ caffe_root = os.getcwd()
 # Set true if you want to start training right after generating all files.
 run_soon = True
 # The video file path
-video_file = "/localdata/markustp/downloads/data_3aug_7_left_video.mp4"
+video_file = "./data/ascend/video_data/data_3aug_6_0.mp4"
 # Name of the file to save the output video
-save_file = "/localdata/markustp/data/videos/output_data_3aug_7_left_video.avi"
+save_file = "./data/ascend/video_data/output_data_3aug_6_0.mp4.avi"
 
 # The parameters for the video demo
 
@@ -92,8 +92,8 @@ lr_mult = 1.
 # Stores LabelMapItem.
 label_map_file = "data/ascend/labelmap.prototxt"
 # The resized image size
-resize_width = 512
-resize_height = 512
+resize_width = 300
+resize_height = 300
 
 # Parameters needed for test.
 # Set the number of test iterations to the maximum integer number.
