@@ -76,7 +76,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     y = np.concatenate((firstvals, y, lastvals))
     return np.convolve(m[::-1], y, mode='valid')
 
-with open("../jobs/VGGNet/Ascend/SSD_300x300_first_full_training/VGG_Ascend_SSD_300x300.log", "r") as f:
+with open("../jobs/VGGNet/Ascend/SSD_512x512/VGG_Ascend_SSD_512x512.log", "r") as f:
     raw_data = f.read()
 
 data_lines = raw_data.split("\n")
@@ -86,22 +86,44 @@ iterations = []
 for line in data_lines:
     if ", loss = " in line:
         words = line.split(" ")
-        iteration = int(words[5][:-1])
-        loss = float(words[8])
+        iteration = int(words[-4][:-1])
+        loss = float(words[-1])
         loss_over_time.append(loss)
         iterations.append(iteration)
 
+acc_over_time = []
+acc_iterations = []
+i = 0
+while i < len(data_lines):
+    line = data_lines[i]
+    if "Test net output #0: detection_eva" in line:
+        i = i + 1
+        iteration_line = data_lines[i].split(" ")
+        words = line.split(" ")
+        acc_over_time.append(float(words[-1]))
+        acc_iterations.append(int(iteration_line[-4][:-1]))
+    i = i + 1
 
-plt.plot(iterations, loss_over_time)
-axes = plt.gca()
-axes.set_ylim([0, 10])
-axes.set_axisbelow(True) # Funker ikke! 
+print len(acc_iterations)
+print len(acc_over_time)
+
+fig, ax1 = plt.subplots()
+
+ax1.plot(iterations, loss_over_time)
+ax1.set_ylabel('Multibox training loss')
+ax1.set_xlabel('Iterations')
+#axes = plt.gca()
+ax1.set_ylim([0, 10])
+#axes.set_axisbelow(True) # Funker ikke!
+
+ax2 = ax1.twinx()
+ax2.set_ylim([0.0, 1.0])
+ax2.plot(acc_iterations, acc_over_time, color="green")
 
 yhat = savitzky_golay(np.array(loss_over_time), 71, 3) # window size 51, polynomial order 3
-plt.plot(iterations, yhat, color="red")
+#ax1.plot(iterations, yhat, color="red")
 
 
 
-plt.ylabel('Multibox training loss')
-plt.xlabel('Iterations')
-plt.savefig("out.png")
+
+plt.savefig("out.png", dpi=1000)
