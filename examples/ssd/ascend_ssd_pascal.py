@@ -74,9 +74,9 @@ caffe_root = os.getcwd()
 run_soon = True
 # Set true if you want to load from most recently saved snapshot.
 # Otherwise, we will load from the pretrain_model defined below.
-resume_training = True
+resume_training = False
 # If true, Remove old model files.
-remove_old_models = False
+remove_old_models = True
 
 # The database file for training data. Created by data/VOC0712/create_data.sh
 train_data = "/localdata/markustp/data/ascend/lmdb/ascend_trainval_lmdb"
@@ -356,7 +356,7 @@ elif normalization_mode == P.Loss.FULL:
   base_lr *= 2000.
 
 # Evaluate on whole test set.
-num_test_image = 834
+num_test_image = 901
 test_batch_size = 2
 # Ideally test_batch_size should be divisible by num_test_image,
 # otherwise mAP will be slightly off the true value.
@@ -367,7 +367,7 @@ solver_param = {
     'base_lr': base_lr,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 14000, 16000],
+    'stepvalue': [8000, 12000, 15000],
     'gamma': 0.1,
     'momentum': 0.9,
     'iter_size': iter_size,
@@ -382,7 +382,7 @@ solver_param = {
     'snapshot_after_train': True,
     # Test parameters
     'test_iter': [test_iter],
-    'test_interval': 1010,
+    'test_interval': 500,
     'eval_type': "detection",
     'ap_version': "11point",
     'test_initialization': False,

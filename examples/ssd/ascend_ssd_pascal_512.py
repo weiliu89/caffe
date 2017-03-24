@@ -334,7 +334,7 @@ gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 
 # Divide the mini-batch to different GPUs.
-batch_size = 10
+batch_size = 8
 accum_batch_size = 8
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
@@ -356,7 +356,7 @@ elif normalization_mode == P.Loss.FULL:
   base_lr *= 2000.
 
 # Evaluate on whole test set.
-num_test_image = 834
+num_test_image = 901
 test_batch_size = 2
 # Ideally test_batch_size should be divisible by num_test_image,
 # otherwise mAP will be slightly off the true value.
