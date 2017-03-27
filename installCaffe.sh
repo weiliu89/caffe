@@ -29,7 +29,10 @@ cd caffe
 git checkout ssd
 cp Makefile.config.example Makefile.config
 # Regen the makefile; On 16.04, aarch64 has issues with a static cuda runtime
-cmake -DCUDA_USE_STATIC_CUDA_RUNTIME=OFF
+mkdir build
+cd build
+cmake -DCUDA_USE_STATIC_CUDA_RUNTIME=OFF ..
+cd ..
 # Include the hdf5 directory for the includes; 16.04 has issues for some reason
 echo "INCLUDE_DIRS += /usr/include/hdf5/serial/" >> Makefile.config
 /bin/echo -e "\e[1;32mCompiling Caffe\e[0m"
