@@ -25,7 +25,6 @@ sudo apt-get install python-dev python-numpy -y
 
 sudo usermod -a -G video $USER
 /bin/echo -e "\e[1;32mCloning Caffe into the home directory\e[0m"
-cd caffe 
 git checkout ssd
 cp Makefile.config.example Makefile.config
 # Enable cuDNN usage
@@ -34,11 +33,12 @@ sed -i 's/# USE_CUDNN/USE_CUDNN/g' Makefile.config
 mkdir build
 cd build
 cmake -DCUDA_USE_STATIC_CUDA_RUNTIME=OFF ..
-cd ..
 # Include the hdf5 directory for the includes; 16.04 has issues for some reason
 echo "INCLUDE_DIRS += /usr/include/hdf5/serial/" >> Makefile.config
 /bin/echo -e "\e[1;32mCompiling Caffe\e[0m"
 make -j4 all
+# Make python
+make py
 # Run the tests to make sure everything works
 /bin/echo -e "\e[1;32mRunning Caffe Tests\e[0m"
 make -j4 runtest
