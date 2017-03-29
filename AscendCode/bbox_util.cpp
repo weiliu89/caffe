@@ -2178,6 +2178,7 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
   for (int i = 0; i < num_img; ++i) {
     cv::Mat image = images[i];
     // Show FPS.
+/*
     snprintf(buffer, sizeof(buffer), "FPS: %.2f", fps);
     cv::Size text = cv::getTextSize(buffer, fontface, scale, thickness,
                                     &baseline);
@@ -2186,6 +2187,7 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
                   CV_RGB(255, 255, 255), CV_FILLED);
     cv::putText(image, buffer, cv::Point(0, text.height + baseline / 2.),
                 fontface, scale, CV_RGB(0, 0, 0), thickness, 8);
+*/
     // Draw bboxes.
     for (map<int, vector<NormalizedBBox> >::iterator it =
          all_detections[i].begin(); it != all_detections[i].end(); ++it) {
@@ -2206,19 +2208,21 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
                  bboxes[j].score());
         cv::Size text = cv::getTextSize(buffer, fontface, scale, thickness,
                                         &baseline);
+/*
         cv::rectangle(
             image, bottom_left_pt + cv::Point(0, 0),
             bottom_left_pt + cv::Point(text.width, -text.height-baseline),
             color, CV_FILLED);
         cv::putText(image, buffer, bottom_left_pt - cv::Point(0, baseline),
                     fontface, scale, CV_RGB(0, 0, 0), thickness, 8);
+*/
       }
     }
     // Save result if required.
     if (!save_file.empty()) {
       if (!cap_out.isOpened()) {
         cv::Size size(image.size().width, image.size().height);
-        cv::VideoWriter outputVideo(save_file, CV_FOURCC('D', 'I', 'V', 'X'),
+        cv::VideoWriter outputVideo(save_file, CV_FOURCC('M','J','P','G'),
             30, size, true);
         cap_out = outputVideo;
       }
