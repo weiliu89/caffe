@@ -76,7 +76,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     y = np.concatenate((firstvals, y, lastvals))
     return np.convolve(m[::-1], y, mode='valid')
 
-with open("../jobs/VGGNet/Ascend/SSD_512x512/VGG_Ascend_SSD_512x512.log", "r") as f:
+with open("../jobs/VGGNet/Ascend/SSD_300x300/VGG_Ascend_SSD_300x300.log", "r") as f:
     raw_data = f.read()
 
 data_lines = raw_data.split("\n")
@@ -121,7 +121,7 @@ ax2.set_ylim([0.0, 1.0])
 ax2.plot(acc_iterations, acc_over_time, color="green")
 
 yhat = savitzky_golay(np.array(loss_over_time), 71, 3) # window size 51, polynomial order 3
-#ax1.plot(iterations, yhat, color="red")
+ax1.plot(iterations, yhat, color="red")
 
 
 

@@ -73,9 +73,9 @@ caffe_root = os.getcwd()
 # Set true if you want to start training right after generating all files.
 run_soon = True
 # The video file path
-video_file = "./data/ascend/video_data/data_3aug_7_left_video.mp4"
+video_file = "./data/ascend/video_data/data_3aug_6_left_video.mp4"
 # Name of the file to save the output video
-save_file = "./data/ascend/video_data/output_300_data_3aug_7_left.mp4.avi"
+save_file = "./data/ascend/video_data/output_300_data_3aug_6_left.avi"
 
 # The parameters for the video demo
 
