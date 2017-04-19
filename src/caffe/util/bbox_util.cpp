@@ -2115,12 +2115,13 @@ cv::Scalar HSV2RGB(const float h, const float s, const float v) {
   return cv::Scalar(r * 255, g * 255, b * 255);
 }
 
+/*
 // http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically
 vector<cv::Scalar> GetColors(const int n) {
   vector<cv::Scalar> colors;
   cv::RNG rng(12345);
   const float golden_ratio_conjugate = 0.618033988749895;
-  const float s = 0.3;
+  const float s = 0.5;
   const float v = 0.99;
   for (int i = 0; i < n; ++i) {
     const float h = std::fmod(rng.uniform(0.f, 1.f) + golden_ratio_conjugate,
@@ -2129,6 +2130,19 @@ vector<cv::Scalar> GetColors(const int n) {
   }
   return colors;
 }
+*/
+
+vector<cv::Scalar> GetColors(const int n) 
+{
+  vector<cv::Scalar> colors;
+  colors.push_back(cv::Scalar(0, 0, 0)); //Black
+  colors.push_back(cv::Scalar(0, 255, 0)); //Green
+  colors.push_back(cv::Scalar(50, 50, 255));  //Red
+  colors.push_back(cv::Scalar(245, 245, 245)); //White (slightly gray)
+
+  return colors;
+}
+
 
 static clock_t start_clock = clock();
 static cv::VideoWriter cap_out;
@@ -2145,10 +2159,11 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
   if (num_det == 0 || num_img == 0) {
     return;
   }
+/*
   // Comute FPS.
   float fps = num_img / (static_cast<double>(clock() - start_clock) /
           CLOCKS_PER_SEC);
-
+*/
   const Dtype* detections_data = detections->cpu_data();
   const int width = images[0].cols;
   const int height = images[0].rows;
@@ -2170,14 +2185,17 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
     all_detections[img_idx][label].push_back(bbox);
   }
 
+/*
   int fontface = cv::FONT_HERSHEY_SIMPLEX;
   double scale = 1;
   int thickness = 2;
   int baseline = 0;
   char buffer[50];
+*/
   for (int i = 0; i < num_img; ++i) {
     cv::Mat image = images[i];
     // Show FPS.
+/*
     snprintf(buffer, sizeof(buffer), "FPS: %.2f", fps);
     cv::Size text = cv::getTextSize(buffer, fontface, scale, thickness,
                                     &baseline);
@@ -2186,6 +2204,7 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
                   CV_RGB(255, 255, 255), CV_FILLED);
     cv::putText(image, buffer, cv::Point(0, text.height + baseline / 2.),
                 fontface, scale, CV_RGB(0, 0, 0), thickness, 8);
+*/
     // Draw bboxes.
     for (map<int, vector<NormalizedBBox> >::iterator it =
          all_detections[i].begin(); it != all_detections[i].end(); ++it) {
@@ -2202,6 +2221,7 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
         cv::Point bottom_right_pt(bboxes[j].xmax(), bboxes[j].ymax());
         cv::rectangle(image, top_left_pt, bottom_right_pt, color, 4);
         cv::Point bottom_left_pt(bboxes[j].xmin(), bboxes[j].ymax());
+/*
         snprintf(buffer, sizeof(buffer), "%s: %.2f", label_name.c_str(),
                  bboxes[j].score());
         cv::Size text = cv::getTextSize(buffer, fontface, scale, thickness,
@@ -2212,6 +2232,7 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
             color, CV_FILLED);
         cv::putText(image, buffer, bottom_left_pt - cv::Point(0, baseline),
                     fontface, scale, CV_RGB(0, 0, 0), thickness, 8);
+*/
       }
     }
     // Save result if required.

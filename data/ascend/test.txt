@@ -89,6 +89,7 @@ ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0890.jpg ascend/data/xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0910.jpg ascend/data/xml/SSD/3aug_7_video_1_0910.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0810.jpg ascend/data/xml/SSD/3aug_7_video_1_0810.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1286.jpg ascend/data/xml/SSD/3aug_7_video_3_1286.xml
+ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0750.jpg ascend/data/xml/SSD/3aug_7_video_1_0750.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_1600.jpg ascend/data/xml/SSD/3aug_7_video_0_1600.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_1005.jpg ascend/data/xml/SSD/3aug_7_video_0_1005.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0516.jpg ascend/data/xml/SSD/3aug_7_video_3_0516.xml
@@ -115,11 +116,9 @@ ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1131.jpg ascend/data/xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_1540.jpg ascend/data/xml/SSD/3aug_7_video_0_1540.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0461.jpg ascend/data/xml/SSD/3aug_7_video_3_0461.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0275.jpg ascend/data/xml/SSD/3aug_7_video_1_0275.xml
-ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1721.jpg ascend/data/xml/SSD/3aug_7_video_3_1721.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0460.jpg ascend/data/xml/SSD/3aug_7_video_1_0460.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0540.jpg ascend/data/xml/SSD/3aug_7_video_0_0540.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0585.jpg ascend/data/xml/SSD/3aug_7_video_0_0585.xml
-ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1736.jpg ascend/data/xml/SSD/3aug_7_video_3_1736.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0880.jpg ascend/data/xml/SSD/3aug_7_video_1_0880.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1066.jpg ascend/data/xml/SSD/3aug_7_video_3_1066.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_1460.jpg ascend/data/xml/SSD/3aug_7_video_1_1460.xml
@@ -165,7 +164,6 @@ ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0725.jpg ascend/data/xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0465.jpg ascend/data/xml/SSD/3aug_7_video_1_0465.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0840.jpg ascend/data/xml/SSD/3aug_7_video_0_0840.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0460.jpg ascend/data/xml/SSD/3aug_7_video_0_0460.xml
-ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1716.jpg ascend/data/xml/SSD/3aug_7_video_3_1716.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1096.jpg ascend/data/xml/SSD/3aug_7_video_3_1096.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1596.jpg ascend/data/xml/SSD/3aug_7_video_3_1596.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0276.jpg ascend/data/xml/SSD/3aug_7_video_3_0276.xml
@@ -334,7 +332,6 @@ ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1641.jpg ascend/data/xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1166.jpg ascend/data/xml/SSD/3aug_7_video_3_1166.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0560.jpg ascend/data/xml/SSD/3aug_7_video_0_0560.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0375.jpg ascend/data/xml/SSD/3aug_7_video_1_0375.xml
-ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1731.jpg ascend/data/xml/SSD/3aug_7_video_3_1731.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0746.jpg ascend/data/xml/SSD/3aug_7_video_3_0746.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1476.jpg ascend/data/xml/SSD/3aug_7_video_3_1476.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_1025.jpg ascend/data/xml/SSD/3aug_7_video_1_1025.xml
@@ -443,6 +440,7 @@ ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0990.jpg ascend/data/xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0625.jpg ascend/data/xml/SSD/3aug_7_video_0_0625.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0581.jpg ascend/data/xml/SSD/3aug_7_video_3_0581.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0696.jpg ascend/data/xml/SSD/3aug_7_video_3_0696.xml
+ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0956.jpg ascend/data/xml/SSD/3aug_7_video_3_0956.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0476.jpg ascend/data/xml/SSD/3aug_7_video_3_0476.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0205.jpg ascend/data/xml/SSD/3aug_7_video_0_0205.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1046.jpg ascend/data/xml/SSD/3aug_7_video_3_1046.xml
@@ -495,6 +493,7 @@ ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0880.jpg ascend/data/xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0410.jpg ascend/data/xml/SSD/3aug_7_video_0_0410.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_1725.jpg ascend/data/xml/SSD/3aug_7_video_0_1725.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0185.jpg ascend/data/xml/SSD/3aug_7_video_1_0185.xml
+ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0740.jpg ascend/data/xml/SSD/3aug_7_video_1_0740.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0510.jpg ascend/data/xml/SSD/3aug_7_video_0_0510.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_1425.jpg ascend/data/xml/SSD/3aug_7_video_1_1425.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1526.jpg ascend/data/xml/SSD/3aug_7_video_3_1526.xml
@@ -653,6 +652,7 @@ ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0385.jpg ascend/data/xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0665.jpg ascend/data/xml/SSD/3aug_7_video_1_0665.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0955.jpg ascend/data/xml/SSD/3aug_7_video_1_0955.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0950.jpg ascend/data/xml/SSD/3aug_7_video_0_0950.xml
+ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0745.jpg ascend/data/xml/SSD/3aug_7_video_1_0745.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_1450.jpg ascend/data/xml/SSD/3aug_7_video_0_1450.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_1060.jpg ascend/data/xml/SSD/3aug_7_video_0_1060.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_1430.jpg ascend/data/xml/SSD/3aug_7_video_0_1430.xml
@@ -862,7 +862,6 @@ ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0745.jpg ascend/data/xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_1605.jpg ascend/data/xml/SSD/3aug_7_video_0_1605.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0471.jpg ascend/data/xml/SSD/3aug_7_video_3_0471.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_0436.jpg ascend/data/xml/SSD/3aug_7_video_3_0436.xml
-ascend/data/MinimizedTrainingData/Images/3aug_7_video_3_1726.jpg ascend/data/xml/SSD/3aug_7_video_3_1726.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_1340.jpg ascend/data/xml/SSD/3aug_7_video_1_1340.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_0_0495.jpg ascend/data/xml/SSD/3aug_7_video_0_0495.xml
 ascend/data/MinimizedTrainingData/Images/3aug_7_video_1_0960.jpg ascend/data/xml/SSD/3aug_7_video_1_0960.xml

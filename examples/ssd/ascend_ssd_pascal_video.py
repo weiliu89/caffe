@@ -73,9 +73,9 @@ caffe_root = os.getcwd()
 # Set true if you want to start training right after generating all files.
 run_soon = True
 # The video file path
-video_file = "./data/ascend/video_data/data_3aug_6_left_video.mp4"
+video_file = "./data/ascend/video_data/data_3aug_7_left_video.mp4"
 # Name of the file to save the output video
-save_file = "./data/ascend/video_data/output_300_data_3aug_6_left.avi"
+save_file = "./data/ascend/video_data/output_300_colored_3aug_7_left_video.avi"
 
 # The parameters for the video demo
 
@@ -83,7 +83,7 @@ save_file = "./data/ascend/video_data/output_300_data_3aug_6_left.avi"
 # If true, use batch norm for all newly added layers.
 # Currently only the non batch norm version has been tested.
 use_batchnorm = False
-num_classes = 2
+num_classes = 4
 share_location = True
 background_label_id=0
 conf_loss_type = P.MultiBoxLoss.SOFTMAX
@@ -156,7 +156,7 @@ det_out_param = {
     }
 
 # The job name should be same as the name used in examples/ssd/ssd_pascal.py.
-job_name = "SSD_{}".format(resize)
+job_name = "SSD_Color_{}".format(resize)
 # The name of the model. Modify it if you want.
 model_name = "VGG_Ascend_{}".format(job_name)
 

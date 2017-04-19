@@ -232,7 +232,7 @@ else:
     base_lr = 0.00004
 
 # Modify the job name if you want.
-job_name = "SSD_{}".format(resize)
+job_name = "SSD_Color_{}".format(resize)
 # The name of the model. Modify it if you want.
 model_name = "VGG_Ascend_{}".format(job_name)
 
@@ -263,7 +263,7 @@ pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"
 label_map_file = "data/ascend/labelmap.prototxt"
 
 # MultiBoxLoss parameters.
-num_classes = 2
+num_classes = 4
 share_location = True
 background_label_id=0
 train_on_diff_gt = True
@@ -367,11 +367,11 @@ solver_param = {
     'base_lr': base_lr,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [8000, 12000, 15000],
+    'stepvalue': [10000, 18000, 22000],
     'gamma': 0.1,
     'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 16000,
+    'max_iter': 24000,
     'snapshot': 1000,
     'display': 10,
     'average_loss': 10,
