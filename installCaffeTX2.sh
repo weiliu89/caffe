@@ -22,6 +22,7 @@ sudo apt-get install libatlas-base-dev -y
 # Remaining Dependencies
 sudo apt-get install libgflags-dev libgoogle-glog-dev liblmdb-dev -y
 sudo apt-get install python-dev python-numpy -y
+sudo apt-get install libopenblas-dev -y
 
 sudo usermod -a -G video $USER
 /bin/echo -e "\e[1;32mCloning Caffe into the home directory\e[0m"
@@ -36,9 +37,9 @@ cmake -DCUDA_USE_STATIC_CUDA_RUNTIME=OFF ..
 # echo "INCLUDE_DIRS += /usr/include/hdf5/serial/" >> Makefile.config
 /bin/echo -e "\e[1;32mCompiling Caffe\e[0m"
 make -j6 all
+
 cd ..
 make py
-cd build
 # Run the tests to make sure everything works
 /bin/echo -e "\e[1;32mRunning Caffe Tests\e[0m"
 make -j6 runtest
