@@ -232,7 +232,7 @@ else:
     base_lr = 0.000004
 
 # Modify the job name if you want.
-job_name = "SSD_{}".format(resize)
+job_name = "SSD_Colored_{}".format(resize)
 # The name of the model. Modify it if you want.
 model_name = "VGG_Ascend_{}".format(job_name)
 
@@ -263,7 +263,7 @@ pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"
 label_map_file = "data/ascend/labelmap.prototxt"
 
 # MultiBoxLoss parameters.
-num_classes = 2
+num_classes = 4
 share_location = True
 background_label_id=0
 train_on_diff_gt = True
