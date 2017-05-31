@@ -73,7 +73,7 @@ caffe_root = os.getcwd()
 # Set true if you want to start training right after generating all files.
 run_soon = True
 # The device id for webcam
-webcam_id = 0
+webcam_id = 1
 # Number of frames to be skipped.
 skip_frames = 0
 
@@ -83,7 +83,7 @@ skip_frames = 0
 # If true, use batch norm for all newly added layers.
 # Currently only the non batch norm version has been tested.
 use_batchnorm = False
-num_classes = 2
+num_classes = 4
 share_location = True
 background_label_id=0
 conf_loss_type = P.MultiBoxLoss.SOFTMAX
@@ -156,14 +156,14 @@ det_out_param = {
     }
 
 # The job name should be same as the name used in examples/ssd/ssd_pascal.py.
-job_name = "SSD_{}".format(resize)
+job_name = "SSD_Color_{}".format(resize)
 # The name of the model. Modify it if you want.
 model_name = "VGG_Ascend_{}".format(job_name)
 
 # Directory which stores the model .prototxt file.
 save_dir = "models/VGGNet/Ascend/{}_webcam".format(job_name)
 # Directory which stores the snapshot of trained models.
-snapshot_dir = "models/VGGNet/Ascend/{}_v1".format(job_name)
+snapshot_dir = "models/VGGNet/Ascend/{}".format(job_name)
 # Directory which stores the job script and log file.
 job_dir = "jobs/VGGNet/Ascend/{}_webcam".format(job_name)
 

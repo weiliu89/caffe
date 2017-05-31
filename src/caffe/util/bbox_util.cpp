@@ -2159,11 +2159,11 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
   if (num_det == 0 || num_img == 0) {
     return;
   }
-/*
+
   // Comute FPS.
   float fps = num_img / (static_cast<double>(clock() - start_clock) /
           CLOCKS_PER_SEC);
-*/
+
   const Dtype* detections_data = detections->cpu_data();
   const int width = images[0].cols;
   const int height = images[0].rows;
@@ -2185,17 +2185,17 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
     all_detections[img_idx][label].push_back(bbox);
   }
 
-/*
+
   int fontface = cv::FONT_HERSHEY_SIMPLEX;
   double scale = 1;
   int thickness = 2;
   int baseline = 0;
   char buffer[50];
-*/
+
   for (int i = 0; i < num_img; ++i) {
     cv::Mat image = images[i];
     // Show FPS.
-/*
+
     snprintf(buffer, sizeof(buffer), "FPS: %.2f", fps);
     cv::Size text = cv::getTextSize(buffer, fontface, scale, thickness,
                                     &baseline);
@@ -2204,7 +2204,7 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
                   CV_RGB(255, 255, 255), CV_FILLED);
     cv::putText(image, buffer, cv::Point(0, text.height + baseline / 2.),
                 fontface, scale, CV_RGB(0, 0, 0), thickness, 8);
-*/
+
     // Draw bboxes.
     for (map<int, vector<NormalizedBBox> >::iterator it =
          all_detections[i].begin(); it != all_detections[i].end(); ++it) {

@@ -21,7 +21,7 @@ sudo apt-get install --no-install-recommends libboost-all-dev -y
 sudo apt-get install libatlas-base-dev -y
 # Remaining Dependencies
 sudo apt-get install libgflags-dev libgoogle-glog-dev liblmdb-dev -y
-sudo apt-get install python-dev python-numpy -y
+sudo apt-get install python-dev python-numpy python-skimage python-protobuf -y
 sudo apt-get install libopenblas-dev -y
 
 sudo usermod -a -G video $USER
@@ -37,9 +37,10 @@ cmake -DCUDA_USE_STATIC_CUDA_RUNTIME=OFF ..
 # echo "INCLUDE_DIRS += /usr/include/hdf5/serial/" >> Makefile.config
 /bin/echo -e "\e[1;32mCompiling Caffe\e[0m"
 make -j6 all
+sudo make install -j6
+make pycaffe 
+export export PYTHONPATH=$home/caffe/python:$PYTHONPATH
 
-cd ..
-make py
 # Run the tests to make sure everything works
 /bin/echo -e "\e[1;32mRunning Caffe Tests\e[0m"
 make -j6 runtest
