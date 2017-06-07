@@ -4,9 +4,9 @@ root_dir=$cur_dir/../..
 cd $root_dir
 
 redo=1
-data_root_dir="/localdata/markustp/downloads/VOCdevkit"
-dataset_name="VOC0712"
-mapfile="./data/$dataset_name/labelmap_voc.prototxt"
+data_root_dir="/localdata/markustp/data"
+dataset_name="ascend"
+mapfile="./data/$dataset_name/labelmap.prototxt"
 anno_type="detection"
 db="lmdb"
 min_dim=0

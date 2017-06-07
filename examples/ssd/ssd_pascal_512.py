@@ -83,8 +83,8 @@ train_data = "/localdata/markustp/data/VOCdevkit/VOC0712/lmdb/VOC0712_trainval_l
 # The database file for testing data. Created by data/VOC0712/create_data.sh
 test_data = "/localdata/markustp/data/VOCdevkit/VOC0712/lmdb/VOC0712_test_lmdb"
 # Specify the batch sampler.
-resize_width = 300
-resize_height = 300
+resize_width = 512
+resize_height = 512
 resize = "{}x{}".format(resize_width, resize_height)
 batch_sampler = [
         {

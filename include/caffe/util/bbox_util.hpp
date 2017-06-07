@@ -511,6 +511,7 @@ template <typename Dtype>
 
 #ifdef USE_OPENCV
 vector<cv::Scalar> GetColors(const int n);
+vector<cv::Scalar> GetThreeColors();
 
 template <typename Dtype>
 void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,

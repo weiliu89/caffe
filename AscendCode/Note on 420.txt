@@ -1,0 +1,1 @@
+420 var laget med batch size=12 og med learning rate steps: 

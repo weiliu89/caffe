@@ -1,5 +1,17 @@
 ## General
 
+# Cmake
+### CMake ###
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+
 # Compiled Object files
 *.slo
 *.lo
@@ -55,13 +67,11 @@
 
 ## Caffe
 
-# User's build configuration
-Makefile.config
-
 # Data and models are either
 # 1. reference, and not casually committed
 # 2. custom, and live on their own unless they're deliberated contributed
-data/*
+#data/*
+data/ascend/video_data/*
 models/*
 *.caffemodel
 *.caffemodel.h5
