@@ -184,8 +184,7 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
             int max_size_ = max_sizes_[s];
             box_width = sqrt(min_size_ * max_size_) * sqrt(ar);
             box_height = sqrt(min_size_ * max_size_) / sqrt(ar);
-          }
-          else{
+          } else {
             box_width = min_size_ * sqrt(ar);
             box_height = min_size_ / sqrt(ar);
           }
