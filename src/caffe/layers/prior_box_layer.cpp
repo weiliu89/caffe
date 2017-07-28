@@ -179,8 +179,16 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
           if (fabs(ar - 1.) < 1e-6) {
             continue;
           }
-          box_width = sqrt(min_size_ * max_size_) * sqrt(ar);
-          box_height = sqrt(min_size_ * max_size_) / sqrt(ar);
+          if (max_sizes_.size() > 0) {
+            CHECK_EQ(min_sizes_.size(), max_sizes_.size());
+            int max_size_ = max_sizes_[s];
+            box_width = sqrt(min_size_ * max_size_) * sqrt(ar);
+            box_height = sqrt(min_size_ * max_size_) / sqrt(ar);
+          }
+          else{
+            box_width = min_size_ * sqrt(ar);
+            box_height = min_size_ / sqrt(ar);
+          }
           // xmin
           top_data[idx++] = (center_x - box_width / 2.) / img_width;
           // ymin
