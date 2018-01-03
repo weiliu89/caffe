@@ -12,9 +12,13 @@
 //    folder/video1.mp4
 //    folder/video2.mp4
 //
+
+#define USE_OPENCV_GPU 1
+
 #include <caffe/caffe.hpp>
 #ifdef USE_OPENCV
 #include <opencv2/core/core.hpp>
+#include <opencv2/gpu/gpu.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #endif  // USE_OPENCV
@@ -42,15 +46,26 @@ class Detector {
   void SetMean(const string& mean_file, const string& mean_value);
 
   void WrapInputLayer(std::vector<cv::Mat>* input_channels);
-
+  void WrapInputLayer(std::vector<cv::gpu::GpuMat>* input_channels);
   void Preprocess(const cv::Mat& img,
                   std::vector<cv::Mat>* input_channels);
+  void Preprocess(const cv::Mat& img,
+                  std::vector<cv::gpu::GpuMat>* input_channels);
 
  private:
   shared_ptr<Net<float> > net_;
   cv::Size input_geometry_;
   int num_channels_;
   cv::Mat mean_;
+#if !CPU_ONLY && USE_OPENCV_GPU
+  std::vector<cv::gpu::GpuMat> input_channels_gpu;
+  cv::gpu::GpuMat mean_gpu;
+  cv::gpu::GpuMat g_img;
+  cv::gpu::GpuMat sample;
+  cv::gpu::GpuMat sample_resized;
+  cv::gpu::GpuMat sample_float;
+  cv::gpu::GpuMat sample_normalized;
+#endif
 };
 
 Detector::Detector(const string& model_file,
@@ -87,10 +102,14 @@ std::vector<vector<float> > Detector::Detect(const cv::Mat& img) {
   /* Forward dimension change to all layers. */
   net_->Reshape();
 
+#if CPU_ONLY || !USE_OPENCV_GPU
   std::vector<cv::Mat> input_channels;
   WrapInputLayer(&input_channels);
-
   Preprocess(img, &input_channels);
+#else
+  WrapInputLayer(&input_channels_gpu);
+  Preprocess(img, &input_channels_gpu);
+#endif
 
   net_->Forward();
 
@@ -168,6 +187,9 @@ void Detector::SetMean(const string& mean_file, const string& mean_value) {
     }
     cv::merge(channels, mean_);
   }
+#if !CPU_ONLY && USE_OPENCV_GPU
+  mean_gpu.upload(mean_);
+#endif
 }
 
 /* Wrap the input layer of the network in separate cv::Mat objects
@@ -228,6 +250,60 @@ void Detector::Preprocess(const cv::Mat& img,
     << "Input channels are not wrapping the input layer of the network.";
 }
 
+#if !CPU_ONLY && USE_OPENCV_GPU
+void Detector::WrapInputLayer(std::vector<cv::gpu::GpuMat>* input_channels) {
+  Blob<float>* input_layer = net_->input_blobs()[0];
+
+  int width = input_layer->width();
+  int height = input_layer->height();
+  float* input_data = input_layer->mutable_gpu_data();
+  for (int i = 0; i < input_layer->channels(); ++i) {
+    cv::gpu::GpuMat channel(height, width, CV_32FC1, input_data);
+    input_channels->push_back(channel);
+    input_data += width * height;
+  }
+}
+
+void Detector::Preprocess(const cv::Mat& img,
+  std::vector<cv::gpu::GpuMat>* input_channels) {
+  /* Convert the input image to the input image format of the network. */
+  if (img.channels() == num_channels_) {
+    sample.upload(img);
+  } else {
+    g_img.upload(img);
+    if (g_img.channels() == 3 && num_channels_ == 1)
+      cv::gpu::cvtColor(g_img, sample, cv::COLOR_BGR2GRAY);
+    else if (g_img.channels() == 4 && num_channels_ == 1)
+      cv::gpu::cvtColor(g_img, sample, cv::COLOR_BGRA2GRAY);
+    else if (g_img.channels() == 4 && num_channels_ == 3)
+      cv::gpu::cvtColor(g_img, sample, cv::COLOR_BGRA2BGR);
+    else if (g_img.channels() == 1 && num_channels_ == 3)
+      cv::gpu::cvtColor(g_img, sample, cv::COLOR_GRAY2BGR);
+  }
+
+  if (sample.size() != input_geometry_)
+    cv::gpu::resize(sample, sample_resized, input_geometry_);
+  else
+    sample_resized = sample;
+
+  if (num_channels_ == 3)
+    sample_resized.convertTo(sample_float, CV_32FC3);
+  else
+    sample_resized.convertTo(sample_float, CV_32FC1);
+
+  cv::gpu::subtract(sample_float, mean_gpu, sample_normalized);
+
+  /* This operation will write the separate BGR planes directly to the
+   * input layer of the network because it is wrapped by the Mat
+   * objects in input_channels. */
+  cv::gpu::split(sample_normalized, *input_channels);
+
+  CHECK(reinterpret_cast<float*>(input_channels->at(0).data)
+        == net_->input_blobs()[0]->gpu_data())
+    << "Input channels are not wrapping the input layer of the network.";
+}
+#endif
+
 DEFINE_string(mean_file, "",
     "The mean file used to subtract from the input image.");
 DEFINE_string(mean_value, "104,117,123",
@@ -285,6 +361,12 @@ int main(int argc, char** argv) {
   // Process image one by one.
   std::ifstream infile(argv[3]);
   std::string file;
+  // Time Check
+  struct timeval start_point, end_point;
+  double operating_time;
+  gettimeofday(&start_point, NULL);
+  int iFrame = 0;
+
   while (infile >> file) {
     if (file_type == "image") {
       cv::Mat img = cv::imread(file, -1);
@@ -307,6 +389,7 @@ int main(int argc, char** argv) {
           out << static_cast<int>(d[6] * img.rows) << std::endl;
         }
       }
+      iFrame++;
     } else if (file_type == "video") {
       cv::VideoCapture cap(file);
       if (!cap.isOpened()) {
@@ -349,6 +432,14 @@ int main(int argc, char** argv) {
       LOG(FATAL) << "Unknown file_type: " << file_type;
     }
   }
+  gettimeofday(&end_point, NULL);
+  operating_time = static_cast<double>(end_point.tv_sec);
+  operating_time += static_cast<double>(end_point.tv_usec) / 1000000.0;
+  operating_time -= static_cast<double>(start_point.tv_sec);
+  operating_time -= static_cast<double>(start_point.tv_usec) / 1000000.0;
+  printf("%d Frame", iFrame);
+  printf(", %f", operating_time);
+  printf(", %f fps\n", static_cast<float>(iFrame) / operating_time);
   return 0;
 }
 #else
