@@ -333,6 +333,9 @@ gpus = "0,1,2,3"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 
+# modify num_gpus
+num_gpus = 0
+
 # Divide the mini-batch to different GPUs.
 batch_size = 32
 accum_batch_size = 32

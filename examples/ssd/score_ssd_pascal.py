@@ -344,6 +344,9 @@ gpus = "0"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 
+# modify
+num_gpus = 0
+
 # The number does not matter since we do not do training with this script.
 batch_size = 1
 accum_batch_size = 1
