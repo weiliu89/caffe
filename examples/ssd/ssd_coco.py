@@ -338,7 +338,7 @@ num_gpus = len(gpulist)
 # Divide the mini-batch to different GPUs.
 batch_size = 32
 accum_batch_size = 32
-iter_size = accum_batch_size / batch_size
+iter_size = accum_batch_size // batch_size
 solver_mode = P.Solver.CPU
 device_id = 0
 batch_size_per_device = batch_size
@@ -360,7 +360,7 @@ elif normalization_mode == P.Loss.FULL:
 # Evaluate on whole test set.
 num_test_image = 5000
 test_batch_size = 8
-test_iter = num_test_image / test_batch_size
+test_iter = num_test_image // test_batch_size
 
 solver_param = {
     # Train parameters
