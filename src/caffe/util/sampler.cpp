@@ -109,8 +109,8 @@ void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox) {
   // Make sure bbox_width & bbox_height <= 1.0
   // When 0.f > 1 - bbox_width caffe_rng_uniform will get
   // a error on some devices
-  bbox_width = bbox_width >= 0? 1.0f : bbox_width;
-  bbox_height = bbox_height >= 0? 1.0f : bbox_height;
+  bbox_width = bbox_width >= 1.0? 1.0f : bbox_width;
+  bbox_height = bbox_height >= 1.0? 1.0f : bbox_height;
 
   // Figure out top left coordinates.
   float w_off, h_off;
