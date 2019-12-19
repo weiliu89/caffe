@@ -56,6 +56,14 @@ Please cite SSD in your publications if it helps your research:
   ```Shell
   # Modify Makefile.config according to your Caffe installation.
   cp Makefile.config.example Makefile.config
+  make all
+  
+  CMAKE BUILD(only after make all):
+  rm -r build
+  mkdir build
+  cd build
+  cmake ..
+  
   make -j8
   # Make sure to include $CAFFE_ROOT/python to your PYTHONPATH.
   make py
